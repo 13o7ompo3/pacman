@@ -2,7 +2,7 @@ import pygame
 from pygame.time import Clock
 from pygame import Color, Vector2
 
-from src.visual.scene import Scene
+from src.visual.scenes.game_scene import VisualMaze
 
 
 def main():
@@ -10,9 +10,9 @@ def main():
     # pygame.font.init()
     WIDTH, HEIGHT = 960, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
-    clock = pygame.time.Clock()
+    clock = Clock()
 
-    scr = Scene()
+    scr = VisualMaze()
 
     while True:
         for event in pygame.event.get():
