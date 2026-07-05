@@ -1,10 +1,11 @@
 from pydantic import BaseModel
-from pygame import Rect, Surface
+from pygame import KEYDOWN, Rect, Surface
+import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
 from src.visual import Node
-from src.logical.maze import LogicalMaze
+from src.logical.maze import Direction, LogicalMaze
 
 
 class Cell(Node):
@@ -94,6 +95,27 @@ class Cell(Node):
             )
 
 
+class Player(Node):
+    def __init__(self, step_size: int, moves) -> None:
+        super().__init__()
+        self.step_size = step_size
+        self.moves = moves
+
+    def _on_input(self, event: Event) -> None:
+        if event.type == KEYDOWN:
+            if event.key in {pygame.K_UP, pygame.K_w}:
+                self.local_position.y -= self.step_size
+            if event.key in {pygame.K_DOWN, pygame.K_s}:
+                self.local_position.y += self.step_size
+            if event.key in {pygame.K_LEFT, pygame.K_a}:
+                self.local_position.x -= self.step_size
+            if event.key in {pygame.K_RIGHT, pygame.K_d}:
+                self.local_position.x += self.step_size
+
+    def _on_draw(self, screen: Surface) -> None:
+        draw.circle(screen, Color("yellow"), self.world_position, 5)
+
+
 class VisualMaze(Node):
     def __init__(self) -> None:
         super().__init__()
@@ -122,3 +144,7 @@ class VisualMaze(Node):
                 )
 
                 self.add_child(cell)
+
+        self.player = Player(cell_size, self.maze.available_moves)
+        self.player.local_position = Vector2(cell_size) / 2
+        self.add_child(self.player)
