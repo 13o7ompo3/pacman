@@ -5,7 +5,7 @@ from typing import Dict
 from pydantic import BaseModel, Field, ValidationError, model_validator
 import logging
 
-logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
 
 class User(BaseModel):
@@ -21,41 +21,47 @@ class User(BaseModel):
 
 
 class UserManager:
-    def __init__(self, db_dir: str = './database') -> None:
+    def __init__(self, db_dir: str = "./database") -> None:
         self.db_dir = Path(db_dir)
         self.db_dir.mkdir(parents=True, exist_ok=True)
         self.users: Dict[str, User] = {}
         self.load_all_users()
 
     def load_all_users(self) -> None:
-        for user_file in self.db_dir.glob('*.json'):
+        for user_file in self.db_dir.glob("*.json"):
             try:
-                with open(user_file, 'r') as f:
+                with open(user_file, "r") as f:
                     user_data = json.load(f)
                     user = User(**user_data)
                     self.users[user.username] = user
                 logging.info(f"Loaded user '{user.username}' data.")
-            except (json.JSONDecodeError) as e:
+            except json.JSONDecodeError as e:
                 logging.warning(
-                    f"Invalid user JSON in database {user_file}: {e}")
+                    f"Invalid user JSON in database {user_file}: {e}"
+                )
             except ValidationError as e:
                 for error in e.errors():
-                    logging.warning("Invalid user data in database "
-                                    f"{user_file}: {error['msg']}")
+                    logging.warning(
+                        "Invalid user data in database "
+                        f"{user_file}: {error['msg']}"
+                    )
             except ValueError as e:
-                logging.warning("Invalid user data in database "
-                                f"{user_file}: {e}")
+                logging.warning(
+                    f"Invalid user data in database {user_file}: {e}"
+                )
             except Exception as e:
-                logging.warning("Unexpected error while loading user from "
-                                f"{user_file}: {e}")
+                logging.warning(
+                    "Unexpected error while loading user from "
+                    f"{user_file}: {e}"
+                )
         logging.info(f"Total users loaded: {len(self.users)}")
 
     def save_user_data(self, user: User) -> None:
-        path = self.db_dir / f'{user.username}.json'
+        path = self.db_dir / f"{user.username}.json"
         self.db_dir.mkdir(parents=True, exist_ok=True)
         if path.exists():
             path.unlink()
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             json.dump(user.model_dump(), f, indent=4)
 
         logging.info(f"User data for '{user.username}' saved successfully.")
@@ -71,9 +77,10 @@ class UserManager:
         try:
             user = User(username=username, password=hashed_password)
         except ValidationError as e:
-            error_msg = e.errors()[0]['msg']
+            error_msg = e.errors()[0]["msg"]
             raise ValueError(
-                f"Invalid user data for '{username}': {error_msg}")
+                f"Invalid user data for '{username}': {error_msg}"
+            )
 
         self.save_user_data(user)
         self.users[username] = user
