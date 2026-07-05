@@ -23,11 +23,11 @@ class GameComponent(ABC):
         ...
 
     @final
-    def handle_event(self, event: Event) -> None:
+    def handle_input(self, event: Event) -> None:
         """Handle an input event for current and all children."""
         self._on_input(event)
         for child in self.children:
-            child.handle_event(event)
+            child.handle_input(event)
 
     def _on_input(self, event: Event) -> None:
         """Handle input for component"""
@@ -62,12 +62,12 @@ class Node(GameComponent):
     @final
     def render(self, screen: Surface) -> None:
         """Handle drawing the visuals of a component and it's children."""
-        self._draw(screen)
+        self._on_draw(screen)
 
         for child in self.children:
             if isinstance(child, Node):
                 child.render(screen)
 
-    def _draw(self, screen: Surface) -> None:
+    def _on_draw(self, screen: Surface) -> None:
         """Override to draw component."""
         ...
