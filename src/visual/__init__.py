@@ -17,7 +17,6 @@ class GameComponent(ABC):
         for child in self.children:
             child.update(delta)
 
-    @abstractmethod
     def _on_update(self, delta: float) -> None:
         """Inhirit to update component"""
         ...
