@@ -6,7 +6,7 @@ from pygame import draw, Color
 from src.visual import Node
 
 
-class Screen(Node):
+class Scene(Node):
     def _on_update(self, delta: float) -> None:
         self.local_position.x += delta * 10
 

@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from src.visual import Node
 
-class VisualMaze(BaseModel):
+
+class VisualMaze(Node, BaseModel):
     pass
