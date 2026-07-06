@@ -21,9 +21,8 @@ def main():
         content,
         Vector2(64, 32),
         Color("crimson"),
-        5,
-        8,
         lambda: exit(),
+        highlight_color=Color("cyan"),
     )
     button.local_position = Vector2(670, 200)
 
