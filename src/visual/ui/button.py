@@ -1,5 +1,14 @@
 from src.visual import Node
-from pygame import KEYDOWN, MOUSEBUTTONUP, Color, Rect, Surface, Vector2
+from pygame import (
+    BLEND_RGBA_MULT,
+    KEYDOWN,
+    MOUSEBUTTONDOWN,
+    MOUSEBUTTONUP,
+    Color,
+    Rect,
+    Surface,
+    Vector2,
+)
 from pygame.event import Event
 from pygame import draw
 from typing import Any, Callable
@@ -7,21 +16,104 @@ from typing import Any, Callable
 
 class Button(Node):
     def __init__(
-        self, callback: Callable, size: Vector2 = Vector2(35, 20)
+        self,
+        content: Surface,
+        size: Vector2,
+        color: Color,
+        thickness: int,
+        border_radius: int,
+        callback: Callable,
     ) -> None:
-        super().__init__()
-        self.size = size
-        self.callback = callback
-        self.rect = Rect(self.world_position, self.size)
+        self.content = content.convert_alpha()
 
-    def _on_update(self, delta: float) -> None:
-        self.rect = Rect(self.world_position, self.size)
+        self.fg_color = color
+        self.bg_color = color.lerp(Color("darkblue"), 0.4)
+        self.border_color = color.lerp(Color("lightyellow"), 0.4)
+
+        self.thickness = thickness
+        self.border_radius = border_radius
+
+        self.bg_rect = Rect(Vector2(0), size)
+        self.bg_rect.height += thickness
+        self.fg_rect = Rect(Vector2(0), size)
+        self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
+
+        self.pressed_rect = Rect(Vector2(0), size)
+        self.pressed_rect.y += thickness
+
+        self.content_position = Vector2()
+        self.pressed_content_position = Vector2()
+
+        self.is_hovered = False
+        self.is_pressed = False
+
+        self.callback = callback
+
+        super().__init__()
+
+    def __setattr__(self, name: str, value: Any, /) -> None:
+        ret = super().__setattr__(name, value)
+        if name == "local_position":
+            x, y = self.world_position
+            self.bg_rect.topleft = (int(x), int(y))
+            self.fg_rect.topleft = (int(x), int(y))
+            self.pressed_rect.topleft = (int(x), int(y) + self.thickness)
+            self.content_position = (
+                Vector2(self.fg_rect.center)
+                - Vector2(self.content.get_size()) / 2
+                + Vector2(1)
+            )
+            self.pressed_content_position = self.content_position.copy()
+            self.pressed_content_position.y += self.thickness
+        return ret
 
     def _on_input(self, event: Event) -> None:
-        if event.type == MOUSEBUTTONUP:
+        if hasattr(event, "pos"):
             x, y = event.pos
-            if self.rect.collidepoint(x, y):
+            self.is_hovered = self.bg_rect.collidepoint(x, y)
+
+        if self.is_hovered:
+            if event.type == MOUSEBUTTONDOWN:
+                self.is_pressed = True
+            if event.type == MOUSEBUTTONUP:
                 self.callback()
+        else:
+            self.is_pressed = False
 
     def _on_draw(self, screen: Surface) -> None:
-        draw.rect(screen, Color("blue"), self.rect)
+        if self.is_pressed:
+            draw.rect(
+                screen,
+                self.fg_color,
+                self.pressed_rect,
+                border_radius=self.border_radius,
+            )
+            draw.rect(
+                screen,
+                Color("white"),
+                self.pressed_rect,
+                1,
+                self.border_radius,
+            )
+            screen.blit(self.content, self.pressed_content_position)
+        else:
+            draw.rect(
+                screen,
+                self.bg_color,
+                self.bg_rect,
+                border_radius=self.border_radius,
+            )
+            draw.rect(
+                screen,
+                self.fg_color,
+                self.fg_rect,
+                border_radius=self.border_radius,
+            )
+            draw.rect(
+                screen,
+                Color("white") if self.is_hovered else self.border_color,
+                self.bg_rect,
+                1,
+                self.border_radius,
+            )
+            screen.blit(self.content, self.content_position)
