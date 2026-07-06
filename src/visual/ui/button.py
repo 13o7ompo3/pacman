@@ -86,6 +86,7 @@ class Button(Node):
             if event.type == MOUSEBUTTONDOWN:
                 self.is_pressed = True
             if event.type == MOUSEBUTTONUP:
+                self.is_pressed = False
                 self.callback()
         else:
             self.is_pressed = False
