@@ -1,6 +1,7 @@
 SRC_DIR = src
 SRC = $(shell find $(SRC_DIR) -path '*/__pycache__' -prune -o -type f -name '*.py' -print)
 PACKAGE_MANAGER = uv
+CONFIG = config.json
 
 install:
 	echo $(SRC)
