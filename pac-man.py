@@ -9,14 +9,22 @@ from src.visual.ui.button import Button
 def main():
     pygame.init()
     pygame.font.init()
-    font = pygame.font.SysFont("Arial", 16)
+    font = pygame.font.Font("assets/perfect_dos_vga_437.ttf", 16)
 
     WIDTH, HEIGHT = 960, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
     clock = Clock()
 
     scr = VisualMaze()
-    button = Button(lambda: exit(), Vector2(35, 20))
+    content = font.render("Press!", False, Color("white"))
+    button = Button(
+        content,
+        Vector2(64, 32),
+        Color("crimson"),
+        5,
+        8,
+        lambda: exit(),
+    )
     button.local_position = Vector2(670, 200)
 
     while True:
