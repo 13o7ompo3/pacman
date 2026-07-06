@@ -20,15 +20,25 @@ class Button(Node):
         content: Surface,
         size: Vector2,
         color: Color,
-        thickness: int,
-        border_radius: int,
         callback: Callable,
+        thickness: int = 5,
+        border_radius: int = 8,
+        shadow_color: Color | None = None,
+        highlight_color: Color | None = None,
     ) -> None:
         self.content = content.convert_alpha()
 
         self.fg_color = color
-        self.bg_color = color.lerp(Color("darkblue"), 0.4)
-        self.border_color = color.lerp(Color("lightyellow"), 0.4)
+        self.bg_color = (
+            shadow_color
+            if shadow_color
+            else color.lerp(Color("darkblue"), 0.4)
+        )
+        self.border_color = (
+            highlight_color
+            if highlight_color
+            else color.lerp(Color("lightyellow"), 0.4)
+        )
 
         self.thickness = thickness
         self.border_radius = border_radius
