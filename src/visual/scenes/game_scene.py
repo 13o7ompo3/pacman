@@ -3,13 +3,14 @@ from pygame import Rect, Surface
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
-from src.visual import Node
+from src.visual import Context, Node
 from src.logical.maze import LogicalMaze
 
 
 class Cell(Node):
     def __init__(
         self,
+        context: Context,
         top: bool,
         right: bool,
         bottom: bool,
@@ -17,7 +18,7 @@ class Cell(Node):
         size: int,
         wall_thickness: int,
     ) -> None:
-        super().__init__()
+        super().__init__(context)
         self.top = top
         self.right = right
         self.bottom = bottom
@@ -28,10 +29,10 @@ class Cell(Node):
 
         self.maze = LogicalMaze(20, 20)
 
-    def _on_draw(self, screen: Surface) -> None:
+    def _on_draw(self) -> None:
         if self.left and self.right and self.top and self.bottom:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("crimson"),
                 Rect(
                     self.world_position,
@@ -44,7 +45,7 @@ class Cell(Node):
             return
         if self.left:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position,
@@ -56,7 +57,7 @@ class Cell(Node):
             )
         if self.top:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position,
@@ -68,7 +69,7 @@ class Cell(Node):
             )
         if self.right:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position
@@ -81,7 +82,7 @@ class Cell(Node):
             )
         if self.bottom:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position
@@ -95,8 +96,8 @@ class Cell(Node):
 
 
 class VisualMaze(Node):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, context: Context) -> None:
+        super().__init__(context)
 
         self.local_position = Vector2(100, 100)
         self.maze = LogicalMaze(20, 20)
@@ -108,6 +109,7 @@ class VisualMaze(Node):
                 mask = self.maze.grid[y][x]
 
                 cell = Cell(
+                    context,
                     bool(mask & 0b0001),
                     bool(mask & 0b0010),
                     bool(mask & 0b0100),

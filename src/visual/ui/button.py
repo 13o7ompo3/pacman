@@ -1,4 +1,4 @@
-from src.visual import Node
+from src.visual import Context, Node
 from pygame import (
     BLEND_RGBA_MULT,
     KEYDOWN,
@@ -17,6 +17,7 @@ from typing import Any, Callable
 class Button(Node):
     def __init__(
         self,
+        context: Context,
         content: Surface,
         size: Vector2,
         color: Color,
@@ -59,7 +60,7 @@ class Button(Node):
 
         self.callback = callback
 
-        super().__init__()
+        super().__init__(context)
 
     def __setattr__(self, name: str, value: Any, /) -> None:
         ret = super().__setattr__(name, value)
@@ -91,40 +92,42 @@ class Button(Node):
         else:
             self.is_pressed = False
 
-    def _on_draw(self, screen: Surface) -> None:
+    def _on_draw(self) -> None:
         if self.is_pressed:
             draw.rect(
-                screen,
+                self.context.screen,
                 self.fg_color,
                 self.pressed_rect,
                 border_radius=self.border_radius,
             )
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("white"),
                 self.pressed_rect,
                 1,
                 self.border_radius,
             )
-            screen.blit(self.content, self.pressed_content_position)
+            self.context.screen.blit(
+                self.content, self.pressed_content_position
+            )
         else:
             draw.rect(
-                screen,
+                self.context.screen,
                 self.bg_color,
                 self.bg_rect,
                 border_radius=self.border_radius,
             )
             draw.rect(
-                screen,
+                self.context.screen,
                 self.fg_color,
                 self.fg_rect,
                 border_radius=self.border_radius,
             )
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("white") if self.is_hovered else self.border_color,
                 self.bg_rect,
                 1,
                 self.border_radius,
             )
-            screen.blit(self.content, self.content_position)
+            self.context.screen.blit(self.content, self.content_position)

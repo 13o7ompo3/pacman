@@ -2,8 +2,10 @@ import pygame
 from pygame.time import Clock
 from pygame import Color, Vector2
 
+from src.visual import Context
 from src.visual.scenes.game_scene import VisualMaze
 from src.visual.ui.button import Button
+from src.visual.ui.prompt import Prompt
 
 
 def main():
@@ -15,16 +17,26 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
     clock = Clock()
 
-    scr = VisualMaze()
+    context = Context(screen, WIDTH, HEIGHT, font)
+    scr = VisualMaze(context)
     content = font.render("Press!", False, Color("white"))
     button = Button(
+        context,
         content,
         Vector2(64, 32),
         Color("crimson"),
-        lambda: exit(),
-        highlight_color=Color("cyan"),
+        lambda: None,
     )
     button.local_position = Vector2(670, 200)
+    button1 = Button(
+        context,
+        content,
+        Vector2(64, 32),
+        Color("teal"),
+        lambda: None,
+    )
+    button1.local_position = Vector2(750, 200)
+    prompt = Prompt(context, "hello world?", True)
 
     while True:
         for event in pygame.event.get():
@@ -34,15 +46,20 @@ def main():
 
             scr.handle_input(event)
             button.handle_input(event)
+            button1.handle_input(event)
+            prompt.handle_input(event)
 
         screen.fill(Color("#000000"))
         delta = clock.tick() / 1000
 
         scr.update(delta)
         button.update(delta)
+        button1.update(delta)
 
-        scr.render(screen)
-        button.render(screen)
+        scr.render()
+        button.render()
+        button1.render()
+        prompt.render()
 
         pygame.display.flip()
 
