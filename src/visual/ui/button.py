@@ -18,7 +18,7 @@ class Button(Node):
     def __init__(
         self,
         context: Context,
-        content: Surface,
+        content: Surface | str,
         size: Vector2,
         color: Color,
         callback: Callable,
@@ -27,8 +27,6 @@ class Button(Node):
         shadow_color: Color | None = None,
         highlight_color: Color | None = None,
     ) -> None:
-        self.content = content.convert_alpha()
-
         self.fg_color = color
         self.bg_color = (
             shadow_color
@@ -41,13 +39,22 @@ class Button(Node):
             else color.lerp(Color("lightyellow"), 0.4)
         )
 
+        if isinstance(content, str):
+            self.content = context.font.render(
+                content,
+                False,
+                self.bg_color,
+            ).convert_alpha()
+        else:
+            self.content = content.convert_alpha()
+            self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
+
         self.thickness = thickness
         self.border_radius = border_radius
 
         self.bg_rect = Rect(Vector2(0), size)
         self.bg_rect.height += thickness
         self.fg_rect = Rect(Vector2(0), size)
-        self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
 
         self.pressed_rect = Rect(Vector2(0), size)
         self.pressed_rect.y += thickness
