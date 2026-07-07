@@ -4,6 +4,18 @@ from pygame import Surface, Vector2
 from pygame.event import Event
 from typing import final
 
+from pygame.font import Font
+
+
+class Context:
+    def __init__(
+        self, screen: Surface, width: int, height: int, font: Font
+    ) -> None:
+        self.screen = screen
+        self.width = width
+        self.height = height
+        self.font = font
+
 
 class GameComponent(ABC):
     def __init__(self) -> None:
@@ -46,9 +58,10 @@ class GameComponent(ABC):
 
 
 class Node(GameComponent):
-    def __init__(self) -> None:
+    def __init__(self, context: Context) -> None:
         super().__init__()
         self.local_position: Vector2 = Vector2()
+        self.context = context
 
     @property
     def world_position(self) -> Vector2:
@@ -59,14 +72,14 @@ class Node(GameComponent):
             return self.local_position
 
     @final
-    def render(self, screen: Surface) -> None:
+    def render(self) -> None:
         """Handle drawing the visuals of a component and it's children."""
-        self._on_draw(screen)
+        self._on_draw()
 
         for child in self.children:
             if isinstance(child, Node):
-                child.render(screen)
+                child.render()
 
-    def _on_draw(self, screen: Surface) -> None:
+    def _on_draw(self) -> None:
         """Override to draw component."""
         ...
