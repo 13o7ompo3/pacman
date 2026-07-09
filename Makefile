@@ -15,15 +15,26 @@ debug:
 	@printf "\e[32m%s\e[0m\n" "running program in debug mode.."
 	@$(PACKAGE_MANAGER) run python3 -m pdb pac-man.py $(CONFIG)
 
+deploy:
+	@printf "\e[34m%s\e[0m\n" "deploying the game for the current platform.."
+	@$(PACKAGE_MANAGER) run pyinstaller \
+		--onefile \
+		--windowed \
+		--name Pac-man
+		--add-data "assets:assets"
+		pac-man.py
+	@printf "\e[34m%s\e[0m\n" "successfully saved the game to ./dist/Pac-man"
+
+
 clean:
 	@printf "\e[32m%s\e[0m\n" "cleaning residual files.."
 	@rm -rf  __pycache__ .mypy_cache
 
 lint:
 	@printf "\e[33m%s\e[0m\n" "checking flake8.."
-	$(PACKAGE_MANAGER) run flake8 $(SRC)
+	@$(PACKAGE_MANAGER) run flake8 $(SRC)
 	@printf "\e[33m%s\e[0m\n" "checking mypy.."
-	$(PACKAGE_MANAGER) run mypy $(SRC) --warn-return-any \
+	@$(PACKAGE_MANAGER) run mypy $(SRC) --warn-return-any \
 		   --warn-unused-ignores \
 		   --ignore-missing-imports \
 		   --disallow-untyped-defs \
@@ -31,6 +42,6 @@ lint:
 
 lint-strict:
 	@printf "\e[33m%s\e[0m\n" "checking flake8.."
-	$(PACKAGE_MANAGER) run flake8 $(SRC)
+	@$(PACKAGE_MANAGER) run flake8 $(SRC)
 	@printf "\e[33m%s\e[0m\n" "checking mypy strict.."
-	$(PACKAGE_MANAGER) run mypy $(SRC) --strict
+	@$(PACKAGE_MANAGER) run mypy $(SRC) --strict
