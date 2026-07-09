@@ -30,18 +30,24 @@ class GameComponent(ABC):
             child.update(delta)
 
     def _on_update(self, delta: float) -> None:
-        """Inhirit to update component"""
+        """Inherit to update component"""
         ...
 
     @final
-    def handle_input(self, event: Event) -> None:
+    def handle_input(self, event: Event) -> None | Event:
         """Handle an input event for current and all children."""
-        self._on_input(event)
-        for child in self.children:
-            child.handle_input(event)
+        propagate_event = True
 
-    def _on_input(self, event: Event) -> None:
-        """Handle input for component"""
+        for child in self.children:
+            ret = child.handle_input(event)
+            if ret is None:
+                propagate_event = False
+
+        if propagate_event:
+            return self._on_input(event)
+
+    def _on_input(self, event: Event) -> Event | None:
+        """Handle input for component optionally returning it to be passed to it's parent"""
         ...
 
     @final
