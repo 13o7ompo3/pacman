@@ -20,8 +20,8 @@ deploy:
 	@$(PACKAGE_MANAGER) run pyinstaller \
 		--onefile \
 		--windowed \
-		--name Pac-man
-		--add-data "assets:assets"
+		--name Pac-man \
+		--add-data "assets:assets" \
 		pac-man.py
 	@printf "\e[34m%s\e[0m\n" "successfully saved the game to ./dist/Pac-man"
 
