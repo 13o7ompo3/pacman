@@ -113,19 +113,22 @@ class Player(Node):
                 new_pos = (x, y - 1)
                 if self.maze.can_move(self.position, new_pos):
                     self.local_position.y -= self.step_size
+                    self.position = new_pos
             if event.key in {pygame.K_DOWN, pygame.K_s}:
                 new_pos = (x, y + 1)
                 if self.maze.can_move(self.position, new_pos):
                     self.local_position.y += self.step_size
+                    self.position = new_pos
             if event.key in {pygame.K_LEFT, pygame.K_a}:
                 new_pos = (x - 1, y)
                 if self.maze.can_move(self.position, new_pos):
                     self.local_position.x -= self.step_size
+                    self.position = new_pos
             if event.key in {pygame.K_RIGHT, pygame.K_d}:
                 new_pos = (x + 1, y)
                 if self.maze.can_move(self.position, new_pos):
                     self.local_position.x += self.step_size
-        self.position = new_pos
+                    self.position = new_pos
 
     def _on_draw(self) -> None:
         draw.circle(
