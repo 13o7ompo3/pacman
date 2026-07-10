@@ -1,3 +1,5 @@
+import logging
+
 import pygame
 from pygame.time import Clock
 from pygame import Color, Vector2
@@ -6,6 +8,9 @@ from src.visual import Context
 from src.visual.scenes.game_scene import VisualMaze
 from src.visual.ui.button import Button
 from src.visual.ui.prompt import Prompt
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s [%(levelname)s] %(message)s")
 
 
 def main():
