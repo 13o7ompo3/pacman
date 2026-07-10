@@ -1,106 +1,11 @@
 import logging
-from dataclasses import dataclass
-from enum import Enum
 from typing import Tuple, List, Optional
 from mazegenerator import MazeGenerator  # type: ignore[import-not-found]
+from core_types import (Direction, GhostState, PlayerState, RenderState,
+                        TickEvent)
+from entities import Player, Ghost
 
 logger = logging.getLogger(__name__)
-
-
-class Direction(Enum):
-    """Orthogonal movement directions in the maze."""
-
-    UP = (0, -1)
-    DOWN = (0, 1)
-    LEFT = (-1, 0)
-    RIGHT = (1, 0)
-    NONE = (0, 0)
-
-
-class GhostState(Enum):
-    """Behavioral state for a ghost."""
-
-    CHASE = "CHASE"
-    FRIGHTENED = "FRIGHTENED"
-    DEAD = "DEAD"
-
-
-class PlayerState(Enum):
-    """Current player state."""
-
-    NORMAL = "NORMAL"
-    POWERED_UP = "POWERED_UP"
-    DEAD = "DEAD"
-
-
-class TickEvent(Enum):
-    """Events emitted by a single simulation tick."""
-
-    NONE = "NONE"
-    ATE_PACGUM = "ATE_PACGUM"
-    ATE_SUPER_PACGUM = "ATE_SUPER_PACGUM"
-    ATE_GHOST = "ATE_GHOST"
-    PLAYER_DIED = "PLAYER_DIED"
-    GAME_OVER = "GAME_OVER"
-    LEVEL_COMPLETE = "LEVEL_COMPLETE"
-    TIME_UP = "TIME_UP"
-
-
-class Entity:
-    """Base class for movable maze entities."""
-
-    def __init__(self, start_x: int, start_y: int) -> None:
-        """Create an entity at the given grid position."""
-        self.x: int = start_x
-        self.y: int = start_y
-        self.spawn_point: Tuple[int, int] = (start_x, start_y)
-
-    def get_grid_position(self) -> Tuple[int, int]:
-        """Return the entity's current grid position."""
-        return (self.x, self.y)
-
-
-class Player(Entity):
-    """Player-controlled Pac-Man state."""
-
-    def __init__(self, start_x: int, start_y: int) -> None:
-        """Create a player at the given start position."""
-        super().__init__(start_x, start_y)
-        self.lives: int = 3
-        self.score: int = 0
-        self.state: PlayerState = PlayerState.NORMAL
-        self.gum_timer: int = 0
-        self.facing: Direction = Direction.RIGHT
-
-
-class Ghost(Entity):
-    """Ghost state and spawn location."""
-
-    def __init__(self, start_x: int, start_y: int, ghost_id: int = 0) -> None:
-        """Create a ghost at the given start position."""
-        super().__init__(start_x, start_y)
-        self.ghost_id: int = ghost_id
-        self.state: GhostState = GhostState.CHASE
-        self.last_direction: Optional[Direction] = None
-
-
-@dataclass(frozen=True)
-class RenderState:
-    """Read-only snapshot of everything the renderer needs per frame."""
-
-    player_x: int
-    player_y: int
-    player_state: PlayerState
-    player_facing: Direction
-    player_lives: int
-    player_score: int
-    ghosts: tuple[tuple[int, int, GhostState, int], ...]
-    pacgums: frozenset[Tuple[int, int]]
-    super_pacgums: frozenset[Tuple[int, int]]
-    ticks_remaining: int
-    is_level_complete: bool
-    is_game_over: bool
-    time_up: bool
 
 
 class LogicalMaze:
@@ -133,8 +38,7 @@ class LogicalMaze:
         self.maze_generator = MazeGenerator((width, height), seed=seed)
         self.grid: list[list[int]] = self.maze_generator.maze
 
-        self.player = player if player else Player(width // 2, height // 2)
-        self.player.x, self.player.y = width // 2, height // 2
+        self.player = player if player else Player(0, 0)
         self.player.state = PlayerState.NORMAL
 
         self.ghosts: list[Ghost] = self._initialize_ghosts()
@@ -225,6 +129,20 @@ class LogicalMaze:
         if direction_to_wall.get((dx, dy), 0) & self.grid[y1][x1]:
             return False
         return True
+
+    def can_move_direction(self, pos: Tuple[int, int],
+                           direction: Direction) -> bool:
+        """Check whether an entity can move from pos in the given direction."""
+        if direction == Direction.NONE:
+            return False
+        dx, dy = direction.value
+        new_pos = (pos[0] + dx, pos[1] + dy)
+        return self.can_move(pos, new_pos)
+
+    def can_move_player(self, direction: Direction) -> bool:
+        """Check whether the player can move in the given direction."""
+        return self.can_move_direction(
+            self.player.get_grid_position(), direction)
 
     def _get_valid_moves(
             self, current_pos: Tuple[int, int]) -> List[Direction]:
