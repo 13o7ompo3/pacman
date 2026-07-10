@@ -98,41 +98,56 @@ class Cell(Node):
 
 class Player(Node):
     def __init__(
-        self, context: Context, step_size: int, maze: LogicalMaze
+        self,
+        context: Context,
+        maze: LogicalMaze,
+        step_size: int,
+        speed: int = 200,
     ) -> None:
         super().__init__(context)
-        self.position = (0, 0)
+        self.grid_position = (0, 0)
+        self.target_position = Vector2()
+        self.animated_position = Vector2()
         self.step_size = step_size
         self.maze = maze
+        self.speed = speed
 
     def _on_input(self, event: Event) -> None:
-        x, y = self.position
-        new_pos = (0, 0)
+        x, y = self.grid_position
+        new_pos = None
+
         if event.type == KEYDOWN:
-            if event.key in {pygame.K_UP, pygame.K_w}:
+            if event.key in {pygame.K_UP, pygame.K_w, pygame.K_k}:
                 new_pos = (x, y - 1)
-                if self.maze.can_move(self.position, new_pos):
-                    self.local_position.y -= self.step_size
-                    self.position = new_pos
-            if event.key in {pygame.K_DOWN, pygame.K_s}:
+            if event.key in {pygame.K_DOWN, pygame.K_s, pygame.K_j}:
                 new_pos = (x, y + 1)
-                if self.maze.can_move(self.position, new_pos):
-                    self.local_position.y += self.step_size
-                    self.position = new_pos
-            if event.key in {pygame.K_LEFT, pygame.K_a}:
+            if event.key in {pygame.K_LEFT, pygame.K_a, pygame.K_h}:
                 new_pos = (x - 1, y)
-                if self.maze.can_move(self.position, new_pos):
-                    self.local_position.x -= self.step_size
-                    self.position = new_pos
-            if event.key in {pygame.K_RIGHT, pygame.K_d}:
+            if event.key in {pygame.K_RIGHT, pygame.K_d, pygame.K_l}:
                 new_pos = (x + 1, y)
-                if self.maze.can_move(self.position, new_pos):
-                    self.local_position.x += self.step_size
-                    self.position = new_pos
+
+            if new_pos is not None and self.maze.can_move(
+                self.grid_position, new_pos
+            ):
+                self.grid_position = new_pos
+                self.target_position = Vector2(
+                    new_pos[0] * self.step_size,
+                    new_pos[1] * self.step_size,
+                )
+
+    def _on_update(self, delta: float) -> None:
+        self.animated_position = self.animated_position.move_towards(
+            self.target_position, delta * self.speed
+        )
+        print(self.target_position)
 
     def _on_draw(self) -> None:
         draw.circle(
-            self.context.screen, Color("yellow"), self.world_position, 5
+            self.context.screen,
+            Color("yellow"),
+            self.world_position + self.animated_position,
+            5,
+            False,
         )
 
 
@@ -166,6 +181,6 @@ class VisualMaze(Node):
 
                 self.add_child(cell)
 
-        self.player = Player(context, cell_size, self.maze)
+        self.player = Player(context, self.maze, cell_size)
         self.player.local_position = Vector2(cell_size) / 2
         self.add_child(self.player)

@@ -9,8 +9,9 @@ from src.visual.scenes.game_scene import VisualMaze
 from src.visual.ui.button import Button
 from src.visual.ui.prompt import Prompt
 
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 
 def main():
@@ -64,7 +65,6 @@ def main():
         scr.render()
         button.render()
         button1.render()
-        prompt.render()
 
         pygame.display.flip()
 
