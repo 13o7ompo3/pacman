@@ -9,8 +9,9 @@ from src.visual.scenes.game_scene import VisualMaze
 from src.visual.ui.button import Button
 from src.visual.ui.prompt import Prompt
 
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 
 def main():
@@ -30,22 +31,34 @@ def main():
         content,
         Vector2(64, 32),
         Color("crimson"),
-        lambda: None,
+        lambda: exit(),
     )
     button.local_position = Vector2(670, 200)
     button1 = Button(
         context,
-        content,
+        "You?",
         Vector2(64, 32),
         Color("teal"),
         lambda: None,
     )
-    button1.local_position = Vector2(750, 200)
-    prompt = Prompt(context, "hello world?", True)
+    button1.local_position = Vector2(680, 200)
+    button.add_child(button1)
+    button2 = Button(
+        context,
+        "You?",
+        Vector2(64, 32),
+        Color("yellow"),
+        lambda: None,
+    )
+    button2.local_position = Vector2(690, 200)
+    button.add_child(button2)
+    prompt = Prompt(context, "bruh", "hello world?" * 5, True)
 
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or (
+                event.type == pygame.KEYDOWN and event.key == pygame.K_q
+            ):
                 pygame.quit()
                 return
 

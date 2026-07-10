@@ -85,7 +85,7 @@ class Button(Node):
             self.pressed_content_position.y += self.thickness
         return ret
 
-    def _on_input(self, event: Event) -> None:
+    def _on_input(self, event: Event) -> Event | None:
         if hasattr(event, "pos"):
             x, y = event.pos
             self.is_hovered = self.bg_rect.collidepoint(x, y)
