@@ -19,22 +19,52 @@ class Prompt(Node):
     def __init__(
         self,
         context: Context,
+        title: str,
         message: str,
         is_alert: bool,
     ) -> None:
         super().__init__(context)
-        self.text = context.font.render(message, False, Color("white"))
+        self.title = context.font.render(title, False, Color("white"))
+        self.message = context.font.render(message, False, Color("white"))
+
+        self.size = Vector2(
+            max(self.title.get_size()[0], self.message.get_size()[0]),
+            self.title.get_size()[1] + self.message.get_size()[1],
+        )
+
+        self.local_position = (
+            Vector2(self.context.width, self.context.height) / 2
+            - self.size / 2
+        )
+
         ok_text = context.font.render("Ok", False, Color("white"))
         ok_button = Button(
             context, ok_text, Vector2(50, 30), Color("green"), lambda: None
         )
-        ok_button.local_position = Vector2(50, 50)
         self.add_child(ok_button)
 
     def _on_draw(self) -> None:
         draw.rect(
             self.context.screen,
-            Color("grey"),
-            Rect(self.world_position, Vector2(300, 200)),
+            Color("blue"),
+            Rect(self.world_position, self.size),
+            border_radius=7,
         )
-        self.context.screen.blit(self.text, self.world_position)
+        draw.rect(
+            self.context.screen,
+            Color("white"),
+            Rect(self.world_position, self.size),
+            width=1,
+            border_radius=7,
+        )
+        draw.line(
+            self.context.screen,
+            Color("white"),
+            (0, 0),
+            self.world_position + self.size,
+        )
+        self.context.screen.blit(self.title, self.world_position)
+        self.context.screen.blit(
+            self.message,
+            self.world_position + Vector2(0, self.title.get_size()[1]),
+        )
