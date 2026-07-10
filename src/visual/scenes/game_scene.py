@@ -4,13 +4,14 @@ import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
-from src.visual import Node
-from src.logical.maze import Direction, LogicalMaze
+from src.visual import Context, Node
+from src.logical.maze import LogicalMaze
 
 
 class Cell(Node):
     def __init__(
         self,
+        context: Context,
         top: bool,
         right: bool,
         bottom: bool,
@@ -18,7 +19,7 @@ class Cell(Node):
         size: int,
         wall_thickness: int,
     ) -> None:
-        super().__init__()
+        super().__init__(context)
         self.top = top
         self.right = right
         self.bottom = bottom
@@ -29,10 +30,10 @@ class Cell(Node):
 
         self.maze = LogicalMaze(20, 20)
 
-    def _on_draw(self, screen: Surface) -> None:
+    def _on_draw(self) -> None:
         if self.left and self.right and self.top and self.bottom:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("crimson"),
                 Rect(
                     self.world_position,
@@ -45,7 +46,7 @@ class Cell(Node):
             return
         if self.left:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position,
@@ -57,7 +58,7 @@ class Cell(Node):
             )
         if self.top:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position,
@@ -69,7 +70,7 @@ class Cell(Node):
             )
         if self.right:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position
@@ -82,7 +83,7 @@ class Cell(Node):
             )
         if self.bottom:
             draw.rect(
-                screen,
+                self.context.screen,
                 Color("cyan"),
                 Rect(
                     self.world_position
@@ -96,29 +97,45 @@ class Cell(Node):
 
 
 class Player(Node):
-    def __init__(self, step_size: int, moves) -> None:
-        super().__init__()
+    def __init__(
+        self, context: Context, step_size: int, maze: LogicalMaze
+    ) -> None:
+        super().__init__(context)
+        self.position = (0, 0)
         self.step_size = step_size
-        self.moves = moves
+        self.maze = maze
 
     def _on_input(self, event: Event) -> None:
+        x, y = self.position
+        new_pos = (0, 0)
         if event.type == KEYDOWN:
             if event.key in {pygame.K_UP, pygame.K_w}:
-                self.local_position.y -= self.step_size
+                new_pos = (x, y - 1)
+                if self.maze.can_move(self.position, new_pos):
+                    self.local_position.y -= self.step_size
             if event.key in {pygame.K_DOWN, pygame.K_s}:
-                self.local_position.y += self.step_size
+                new_pos = (x, y + 1)
+                if self.maze.can_move(self.position, new_pos):
+                    self.local_position.y += self.step_size
             if event.key in {pygame.K_LEFT, pygame.K_a}:
-                self.local_position.x -= self.step_size
+                new_pos = (x - 1, y)
+                if self.maze.can_move(self.position, new_pos):
+                    self.local_position.x -= self.step_size
             if event.key in {pygame.K_RIGHT, pygame.K_d}:
-                self.local_position.x += self.step_size
+                new_pos = (x + 1, y)
+                if self.maze.can_move(self.position, new_pos):
+                    self.local_position.x += self.step_size
+        self.position = new_pos
 
-    def _on_draw(self, screen: Surface) -> None:
-        draw.circle(screen, Color("yellow"), self.world_position, 5)
+    def _on_draw(self) -> None:
+        draw.circle(
+            self.context.screen, Color("yellow"), self.world_position, 5
+        )
 
 
 class VisualMaze(Node):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, context: Context) -> None:
+        super().__init__(context)
 
         self.local_position = Vector2(100, 100)
         self.maze = LogicalMaze(20, 20)
@@ -130,6 +147,7 @@ class VisualMaze(Node):
                 mask = self.maze.grid[y][x]
 
                 cell = Cell(
+                    context,
                     bool(mask & 0b0001),
                     bool(mask & 0b0010),
                     bool(mask & 0b0100),
@@ -145,6 +163,6 @@ class VisualMaze(Node):
 
                 self.add_child(cell)
 
-        self.player = Player(cell_size, self.maze.available_moves)
+        self.player = Player(context, cell_size, self.maze)
         self.player.local_position = Vector2(cell_size) / 2
         self.add_child(self.player)
