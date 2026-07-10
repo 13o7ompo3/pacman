@@ -133,8 +133,8 @@ class LogicalMaze:
         self.maze_generator = MazeGenerator((width, height), seed=seed)
         self.grid: list[list[int]] = self.maze_generator.maze
 
-        self.player = player if player else Player(width // 2, height // 2)
-        self.player.x, self.player.y = width // 2, height // 2
+        self.player = player if player else Player(0, 0)
+        self.player.x, self.player.y = 0, 0
         self.player.state = PlayerState.NORMAL
 
         self.ghosts: list[Ghost] = self._initialize_ghosts()
@@ -148,7 +148,7 @@ class LogicalMaze:
             (1, 1),
             (self.width - 2, 1),
             (1, self.height - 2),
-            (self.width - 2, self.height - 2)
+            (self.width - 2, self.height - 2),
         ]
         return [
             Ghost(x, y, ghost_id=index)
@@ -162,7 +162,7 @@ class LogicalMaze:
             (1, 1),
             (self.width - 2, 1),
             (1, self.height - 2),
-            (self.width - 2, self.height - 2)
+            (self.width - 2, self.height - 2),
         ]
         for cx, cy in corners:
             if self.grid[cy][cx] != 15:
@@ -220,14 +220,15 @@ class LogicalMaze:
             Direction.UP.value: 1,
             Direction.RIGHT.value: 2,
             Direction.DOWN.value: 4,
-            Direction.LEFT.value: 8
+            Direction.LEFT.value: 8,
         }
         if direction_to_wall.get((dx, dy), 0) & self.grid[y1][x1]:
             return False
         return True
 
     def _get_valid_moves(
-            self, current_pos: Tuple[int, int]) -> List[Direction]:
+        self, current_pos: Tuple[int, int]
+    ) -> List[Direction]:
         """Return the legal orthogonal moves from the current position."""
         valid_moves: List[Direction] = []
         for direction in Direction:
@@ -288,8 +289,10 @@ class LogicalMaze:
         ghost.y += best_dir.value[1]
         ghost.last_direction = best_dir
 
-        if (ghost.state == GhostState.DEAD
-           and ghost.get_grid_position() == ghost.spawn_point):
+        if (
+            ghost.state == GhostState.DEAD
+            and ghost.get_grid_position() == ghost.spawn_point
+        ):
             ghost.state = GhostState.CHASE
             ghost.last_direction = None
 
