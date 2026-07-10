@@ -97,16 +97,16 @@ class Cell(Node):
 
 
 class Player(Node):
-    # enum Direction
     def __init__(
         self,
         context: Context,
         maze: LogicalMaze,
         step_size: int,
-        speed: int = 200,
+        speed: int = 80,
     ) -> None:
         super().__init__(context)
         self.direction = None
+        self.next_direction = None
         self.target_position = self.world_position
         self.animated_position = self.world_position
         self.step_size = step_size
@@ -116,34 +116,30 @@ class Player(Node):
     def _on_input(self, event: Event) -> None:
         if event.type == KEYDOWN:
             if event.key in {pygame.K_UP, pygame.K_w, pygame.K_k}:
-                self.direction = Direction.UP
+                self.next_direction = Direction.UP
             if event.key in {pygame.K_DOWN, pygame.K_s, pygame.K_j}:
-                self.direction = Direction.DOWN
+                self.next_direction = Direction.DOWN
             if event.key in {pygame.K_LEFT, pygame.K_a, pygame.K_h}:
-                self.direction = Direction.LEFT
+                self.next_direction = Direction.LEFT
             if event.key in {pygame.K_RIGHT, pygame.K_d, pygame.K_l}:
-                self.direction = Direction.RIGHT
-
-            if self.direction is not None:
-                _ = self.maze.tick_player(self.direction)
-                x, y = self.maze.player.get_grid_position()
-                print(x, y)
-                self.target_position = Vector2(
-                    x * self.step_size,
-                    y * self.step_size,
-                )
+                self.next_direction = Direction.RIGHT
 
     def _on_update(self, delta: float) -> None:
+        if self.next_direction and self.maze.can_move_direction(
+            self.maze.player.get_grid_position(), self.next_direction
+        ):
+            self.direction = self.next_direction
+
         self.animated_position = self.animated_position.move_towards(
             self.target_position, delta * self.speed
         )
+
         if (
             self.animated_position == self.target_position
             and self.direction is not None
         ):
             _ = self.maze.tick_player(self.direction)
             x, y = self.maze.player.get_grid_position()
-            print(x, y)
             self.target_position = Vector2(
                 x * self.step_size,
                 y * self.step_size,
