@@ -8,7 +8,7 @@ from src.logical.core_types import (
     RenderState,
     TickEvent,
 )
-from entities import Player, Ghost
+from src.logical.entities import Player, Ghost
 
 logger = logging.getLogger(__name__)
 

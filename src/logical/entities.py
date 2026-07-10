@@ -1,9 +1,10 @@
 from typing import Tuple, Optional
-from core_types import Direction, GhostState, PlayerState
+from src.logical.core_types import Direction, GhostState, PlayerState
 
 
 class Entity:
     """Base class for movable maze entities."""
+
     def __init__(self, start_x: int, start_y: int) -> None:
         self.x: int = start_x
         self.y: int = start_y
@@ -15,6 +16,7 @@ class Entity:
 
 class Player(Entity):
     """Player-controlled Pac-Man state."""
+
     def __init__(self, start_x: int, start_y: int) -> None:
         super().__init__(start_x, start_y)
         self.lives: int = 3
@@ -26,6 +28,7 @@ class Player(Entity):
 
 class Ghost(Entity):
     """Ghost state and spawn location."""
+
     def __init__(self, start_x: int, start_y: int, ghost_id: int = 0) -> None:
         super().__init__(start_x, start_y)
         self.ghost_id: int = ghost_id
