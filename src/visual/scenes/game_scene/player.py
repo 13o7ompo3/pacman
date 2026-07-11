@@ -12,13 +12,15 @@ class Player(Node):
         context: Context,
         maze: LogicalMaze,
         step_size: int,
-        speed: int = 80,
+        speed: float = 80,
     ) -> None:
         super().__init__(context)
         self.direction = None
         self.next_direction = None
-        self.target_position = self.world_position
-        self.animated_position = self.world_position
+        self.target_position = (
+            Vector2(maze.player.x, maze.player.y) * step_size
+        )
+        self.animated_position = self.target_position.copy()
         self.step_size = step_size
         self.maze = maze
         self.speed = speed
