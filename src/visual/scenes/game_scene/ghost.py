@@ -5,13 +5,15 @@ from pygame import draw, Color, Vector2
 
 
 class VisualGhost(Node):
-    def __init__(self, context: Context, ghost: Ghost, step_size: int) -> None:
+    def __init__(
+        self, context: Context, ghost: Ghost, step_size: int, speed: float
+    ) -> None:
         super().__init__(context)
         self.logical_ghost = ghost
         self.step_size = step_size
         self.target_position = Vector2(ghost.x, ghost.y) * step_size
         self.animated_position = self.target_position.copy()
-        self.speed = 100
+        self.speed = speed
 
     def _on_update(self, delta: float) -> None:
         self.target_position = (
@@ -27,5 +29,5 @@ class VisualGhost(Node):
             self.context.screen,
             Color("blue"),
             self.world_position + self.animated_position,
-            3,
+            4,
         )

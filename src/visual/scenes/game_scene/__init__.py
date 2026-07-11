@@ -129,21 +129,28 @@ class VisualMaze(Node):
 
                 self.add_child(cell)
 
+        self.ghost_step_timer = 0
+        self.ghost_step_duration = 0.3
+
         for logical_ghost in self.maze.ghosts:
-            ghost = VisualGhost(context, logical_ghost, self.cell_size)
+            ghost = VisualGhost(
+                context,
+                logical_ghost,
+                self.cell_size,
+                self.cell_size / self.ghost_step_duration,
+            )
             ghost.local_position = Vector2(self.cell_size) / 2
             self.add_child(ghost)
 
         self.player = Player(context, self.maze, self.cell_size)
         self.player.local_position = Vector2(self.cell_size) / 2
         self.add_child(self.player)
-        self.ghost_step_timer = 0
 
         self.maze_start_pos = self.world_position + Vector2(self.cell_size) / 2
 
     def _on_update(self, delta: float) -> None:
         self.ghost_step_timer += delta
-        if self.ghost_step_timer > 0.3:
+        if self.ghost_step_timer > self.ghost_step_duration:
             self.maze.tick_ghosts()
             self.ghost_step_timer = 0
         self.maze.tick_timers()
