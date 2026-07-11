@@ -77,7 +77,6 @@ def main():
         scr.render()
         button.render()
         button1.render()
-        prompt.render()
 
         pygame.display.flip()
 

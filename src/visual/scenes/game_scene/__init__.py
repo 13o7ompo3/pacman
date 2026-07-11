@@ -1,10 +1,14 @@
+from inspect import cleandoc
 from pydantic import BaseModel
-from pygame import Rect, Surface
+from pygame import KEYDOWN, Rect, Surface
+import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
 from src.visual import Context, Node
-from src.logical.maze import LogicalMaze
+from src.logical.maze import Direction, LogicalMaze
+from src.visual.scenes.game_scene.ghost import VisualGhost
+from src.visual.scenes.game_scene.player import Player
 
 
 class Cell(Node):
@@ -101,7 +105,7 @@ class VisualMaze(Node):
 
         self.local_position = Vector2(100, 100)
         self.maze = LogicalMaze(20, 20)
-        cell_size = 20
+        self.cell_size = 20
         wall_thickness = 3
 
         for x in range(len(self.maze.grid)):
@@ -114,13 +118,55 @@ class VisualMaze(Node):
                     bool(mask & 0b0010),
                     bool(mask & 0b0100),
                     bool(mask & 0b1000),
-                    cell_size,
+                    self.cell_size,
                     wall_thickness,
                 )
 
                 cell.local_position = Vector2(
-                    cell_size * x,
-                    cell_size * y,
+                    self.cell_size * x,
+                    self.cell_size * y,
                 )
 
                 self.add_child(cell)
+
+        self.ghost_step_timer = 0
+        self.ghost_step_duration = 0.3
+
+        for logical_ghost in self.maze.ghosts:
+            ghost = VisualGhost(
+                context,
+                logical_ghost,
+                self.cell_size,
+                self.cell_size / self.ghost_step_duration,
+            )
+            ghost.local_position = Vector2(self.cell_size) / 2
+            self.add_child(ghost)
+
+        self.player = Player(context, self.maze, self.cell_size)
+        self.player.local_position = Vector2(self.cell_size) / 2
+        self.add_child(self.player)
+
+        self.maze_start_pos = self.world_position + Vector2(self.cell_size) / 2
+
+    def _on_update(self, delta: float) -> None:
+        self.ghost_step_timer += delta
+        if self.ghost_step_timer > self.ghost_step_duration:
+            self.maze.tick_ghosts()
+            self.ghost_step_timer = 0
+        self.maze.tick_timers()
+
+    def _on_draw(self) -> None:
+        for x, y in self.maze.pacgums:
+            draw.circle(
+                self.context.screen,
+                Color("#444444"),
+                self.maze_start_pos + Vector2(x, y) * self.cell_size,
+                2,
+            )
+        for x, y in self.maze.super_pacgums:
+            draw.circle(
+                self.context.screen,
+                Color("gold"),
+                self.maze_start_pos + Vector2(x, y) * self.cell_size,
+                3,
+            )
