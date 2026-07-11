@@ -43,7 +43,8 @@ class LogicalMaze:
         self.maze_generator = MazeGenerator((width, height), seed=seed)
         self.grid: list[list[int]] = self.maze_generator.maze
 
-        self.player = player if player else Player(0, 0)
+        self.player = player if player else Player(
+            width // 2 - 1 + (width % 2), height // 2)
         self.player.state = PlayerState.NORMAL
 
         self.ghosts: list[Ghost] = self._initialize_ghosts()

@@ -108,8 +108,8 @@ class VisualMaze(Node):
         self.cell_size = 20
         wall_thickness = 3
 
-        for x in range(len(self.maze.grid)):
-            for y in range(len(self.maze.grid[x])):
+        for x in range(self.maze.width):
+            for y in range(self.maze.height):
                 mask = self.maze.grid[y][x]
 
                 cell = Cell(
