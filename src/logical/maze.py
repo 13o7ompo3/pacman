@@ -26,9 +26,36 @@ class LogicalMaze:
         points_super_pacgum: int = 50,
         points_ghost: int = 200,
         max_ticks: int = 90 * 60,
-        super_pacgum_duration: int = 600,
+        super_pacgum_duration: int = 2500,
+        respawn_delay: int = 180,
+        invulnerability_duration: int = 120,
+        ghost_respawn_delay: int = 300,
     ) -> None:
-        """Create a new logical maze with a fresh entity layout."""
+        """Create a new logical maze with a fresh entity layout.
+
+        Args:
+            width: Maze width in cells.
+            height: Maze height in cells.
+            seed: RNG seed passed to the maze generator.
+            player: Existing player to carry over between levels (lives and
+                score are preserved). Pass None to create a fresh player.
+            points_pacgum: Score awarded per normal pellet eaten.
+            points_super_pacgum: Score awarded per power pellet eaten.
+            points_ghost: Score awarded per ghost eaten while frightened.
+            max_ticks: Ticks before TIME_UP fires. Pauses while player is
+                in the death countdown so the player is not penalised.
+            super_pacgum_duration: Ticks the FRIGHTENED state lasts.
+            respawn_delay: Ticks between PLAYER_DIED and auto-respawn.
+                The view uses this window to play a death animation.
+                PLAYER_RESPAWNED is emitted when the countdown expires.
+            invulnerability_duration: Ticks of post-respawn invulnerability.
+                Ghost collisions are ignored during this window. The view
+                reads player.invulnerability_timer > 0 to show blinking.
+            ghost_respawn_delay: Ticks between a ghost being eaten and it
+                reappearing at its corner spawn. The view uses
+                ghost.respawn_timer > 0 to know which ghosts are waiting.
+                GHOST_RESPAWNED is emitted for each ghost that reappears.
+        """
         self.width: int = width
         self.height: int = height
         self.points_pacgum: int = points_pacgum
@@ -37,15 +64,25 @@ class LogicalMaze:
         self.max_ticks: int = max_ticks
         self.elapsed_ticks: int = 0
         self.super_pacgum_duration: int = super_pacgum_duration
+        self.respawn_delay: int = respawn_delay
+        self.invulnerability_duration: int = invulnerability_duration
+        self.ghost_respawn_delay: int = ghost_respawn_delay
+        self._death_countdown: int = 0
         self.cheat_invincible: bool = False
         self.cheat_freeze_ghosts: bool = False
 
         self.maze_generator = MazeGenerator((width, height), seed=seed)
         self.grid: list[list[int]] = self.maze_generator.maze
 
+        # Compute spawn position once — used by both __init__ and respawn
+        self._spawn_x: int = width // 2 - 1 + (width % 2)
+        self._spawn_y: int = height // 2
+
         self.player = player if player else Player(
-            width // 2 - 1 + (width % 2), height // 2)
+            self._spawn_x, self._spawn_y)
+        self.player.x, self.player.y = self._spawn_x, self._spawn_y
         self.player.state = PlayerState.NORMAL
+        self.player.invulnerability_timer = 0
 
         self.ghosts: list[Ghost] = self._initialize_ghosts()
         self.super_pacgums: set[Tuple[int, int]] = self._place_super_pacgums()
@@ -111,6 +148,15 @@ class LogicalMaze:
         """Return True when the level timer has expired."""
         return self.elapsed_ticks >= self.max_ticks
 
+    @property
+    def is_player_invulnerable(self) -> bool:
+        """Return True during the post-respawn invulnerability window.
+
+        The view reads this to show a blinking player sprite.
+        Ghost collisions are suppressed while this is True.
+        """
+        return self.player.invulnerability_timer > 0
+
     def can_move(self, p1: Tuple[int, int], p2: Tuple[int, int]) -> bool:
         """Check whether an entity can move from p1 to p2.
 
@@ -167,7 +213,15 @@ class LogicalMaze:
         return valid_moves
 
     def _move_ghost(self, ghost: Ghost) -> None:
-        """Advance a ghost by one step using its current chase behavior."""
+        """Advance a ghost by one step using its current chase behavior.
+
+        Dead ghosts (respawn_timer > 0) are skipped — their respawn is
+        handled by tick_timers(), not by movement.
+        """
+        # Ghost is waiting to respawn — tick_timers handles it
+        if ghost.state == GhostState.DEAD:
+            return
+
         valid_moves = self._get_valid_moves(ghost.get_grid_position())
         if not valid_moves:
             logger.warning(
@@ -177,7 +231,6 @@ class LogicalMaze:
             return
 
         px, py = self.player.get_grid_position()
-        best_dir = valid_moves[0]
         reverse_direction = {
             Direction.UP: Direction.DOWN,
             Direction.DOWN: Direction.UP,
@@ -197,30 +250,16 @@ class LogicalMaze:
                 key=lambda d: abs((ghost.x + d.value[0]) - px)
                 + abs((ghost.y + d.value[1]) - py),
             )
-        elif ghost.state == GhostState.FRIGHTENED:
+        else:
             best_dir = max(
                 candidates,
                 key=lambda d: abs((ghost.x + d.value[0]) - px)
                 + abs((ghost.y + d.value[1]) - py),
             )
-        elif ghost.state == GhostState.DEAD:
-            sx, sy = ghost.spawn_point
-            best_dir = min(
-                candidates,
-                key=lambda d: abs((ghost.x + d.value[0]) - sx)
-                + abs((ghost.y + d.value[1]) - sy),
-            )
 
         ghost.x += best_dir.value[0]
         ghost.y += best_dir.value[1]
         ghost.last_direction = best_dir
-
-        if (
-            ghost.state == GhostState.DEAD
-            and ghost.get_grid_position() == ghost.spawn_point
-        ):
-            ghost.state = GhostState.CHASE
-            ghost.last_direction = None
 
     def level_skip(self) -> None:
         """Cheat: immediately clear all pellets to complete the level."""
@@ -228,14 +267,21 @@ class LogicalMaze:
         self.super_pacgums.clear()
 
     def respawn_player(self) -> None:
-        """Reset the player and ghosts after a death.
+        """Reset the player and all ghosts after a death.
 
-        This preserves the current pellets and power pellets.
+        Pellets and score are preserved — only positions and states reset.
+        Grants invulnerability_duration ticks of post-respawn protection so
+        the player cannot die again the instant they appear.
+
+        Called automatically by tick_timers() when the death countdown
+        expires. The view may also call this directly (e.g. from a cheat).
         """
-        self.player.x, self.player.y = self.width // 2, self.height // 2
+        self.player.x, self.player.y = self._spawn_x, self._spawn_y
         self.player.state = PlayerState.NORMAL
         self.player.facing = Direction.RIGHT
         self.player.gum_timer = 0
+        self.player.invulnerability_timer = self.invulnerability_duration
+        self._death_countdown = 0
 
         for ghost in self.ghosts:
             ghost.x, ghost.y = ghost.spawn_point
@@ -251,13 +297,16 @@ class LogicalMaze:
             player_facing=self.player.facing,
             player_lives=self.player.lives,
             player_score=self.player.score,
+            player_invulnerable=self.is_player_invulnerable,
             ghosts=tuple(
-                (ghost.x, ghost.y, ghost.state, ghost.ghost_id)
+                (ghost.x, ghost.y, ghost.state, ghost.ghost_id,
+                 ghost.respawn_timer)
                 for ghost in self.ghosts
             ),
             pacgums=frozenset(self.pacgums),
             super_pacgums=frozenset(self.super_pacgums),
             ticks_remaining=self.ticks_remaining,
+            death_countdown=self._death_countdown,
             is_level_complete=self.is_level_complete,
             is_game_over=self.is_game_over,
             time_up=self.is_time_up,
@@ -290,17 +339,22 @@ class LogicalMaze:
                 if (
                     ghost.state == GhostState.CHASE
                     and not self.cheat_invincible
+                    and not self.is_player_invulnerable
                 ):
                     self.player.lives -= 1
                     self.player.state = PlayerState.DEAD
                     if self.player.lives <= 0:
                         events.append(TickEvent.GAME_OVER)
                     else:
+                        # Start death countdown — tick_timers auto-respawns
+                        # when it expires and emits PLAYER_RESPAWNED
+                        self._death_countdown = self.respawn_delay
                         events.append(TickEvent.PLAYER_DIED)
                     break
                 elif ghost.state == GhostState.FRIGHTENED:
                     ghost.state = GhostState.DEAD
                     ghost.last_direction = None
+                    ghost.respawn_timer = self.ghost_respawn_delay
                     self.player.score += self.points_ghost
                     events.append(TickEvent.ATE_GHOST)
 
@@ -362,17 +416,52 @@ class LogicalMaze:
     def tick_timers(self) -> List[TickEvent]:
         """Advance all time-based state by one frame.
 
-        Call this every tick regardless of player/ghost speed.
-        Handles the power-up countdown and the level time limit.
+        Call this every frame regardless of player/ghost speed.
+        Handles five independent countdowns:
+
+        - Player death countdown: counts down after PLAYER_DIED, then
+          auto-respawns the player and emits PLAYER_RESPAWNED. The level
+          timer is paused during this window so the player is not penalised.
+        - Player invulnerability: counts down after a respawn. Ghost
+          collisions are suppressed while it is active.
+        - Ghost respawn countdowns: one per dead ghost. When each expires,
+          that ghost teleports to its corner and emits GHOST_RESPAWNED.
+          Multiple ghosts may respawn in the same frame.
+        - Power-up countdown: counts down the FRIGHTENED state duration,
+          then returns ghosts to CHASE and player to NORMAL.
+        - Level clock: advances elapsed_ticks and emits TIME_UP when the
+          level time limit is reached (only while player is alive and not
+          in the death countdown).
 
         Returns:
             List of TickEvents that occurred this frame.
         """
         events: List[TickEvent] = []
 
-        self.elapsed_ticks += 1
+        # 1. Player death countdown — drives the player auto-respawn cycle
+        if self._death_countdown > 0:
+            self._death_countdown -= 1
+            if self._death_countdown == 0:
+                self.respawn_player()
+                events.append(TickEvent.PLAYER_RESPAWNED)
+            # Level timer pauses while player is waiting to respawn
+            return events
 
-        # Power-up countdown
+        # 2. Player invulnerability countdown (post-respawn blinking window)
+        if self.player.invulnerability_timer > 0:
+            self.player.invulnerability_timer -= 1
+
+        # 3. Ghost respawn countdowns — each dead ghost has its own timer
+        for ghost in self.ghosts:
+            if ghost.state == GhostState.DEAD and ghost.respawn_timer > 0:
+                ghost.respawn_timer -= 1
+                if ghost.respawn_timer == 0:
+                    ghost.x, ghost.y = ghost.spawn_point
+                    ghost.state = GhostState.CHASE
+                    ghost.last_direction = None
+                    events.append(TickEvent.GHOST_RESPAWNED)
+
+        # 4. Power-up countdown
         if self.player.gum_timer > 0:
             self.player.gum_timer -= 1
             if self.player.gum_timer <= 0:
@@ -381,7 +470,8 @@ class LogicalMaze:
                     if ghost.state == GhostState.FRIGHTENED:
                         ghost.state = GhostState.CHASE
 
-        # Level time limit
+        # 5. Level clock (only advances while player is alive)
+        self.elapsed_ticks += 1
         if self.is_time_up:
             events.append(TickEvent.TIME_UP)
 
