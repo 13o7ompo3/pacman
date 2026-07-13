@@ -103,7 +103,6 @@ class VisualMaze(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
 
-        self.local_position = Vector2(100, 100)
         self.maze = LogicalMaze(20, 20)
         self.cell_size = 20
         wall_thickness = 3
@@ -146,8 +145,6 @@ class VisualMaze(Node):
         self.player.local_position = Vector2(self.cell_size) / 2
         self.add_child(self.player)
 
-        self.maze_start_pos = self.world_position + Vector2(self.cell_size) / 2
-
     def _on_update(self, delta: float) -> None:
         self.ghost_step_timer += delta
         if self.ghost_step_timer > self.ghost_step_duration:
@@ -160,13 +157,17 @@ class VisualMaze(Node):
             draw.circle(
                 self.context.screen,
                 Color("#444444"),
-                self.maze_start_pos + Vector2(x, y) * self.cell_size,
+                self.world_position
+                + Vector2(self.cell_size) / 2
+                + Vector2(x, y) * self.cell_size,
                 2,
             )
         for x, y in self.maze.super_pacgums:
             draw.circle(
                 self.context.screen,
                 Color("gold"),
-                self.maze_start_pos + Vector2(x, y) * self.cell_size,
+                self.world_position
+                + Vector2(self.cell_size) / 2
+                + Vector2(x, y) * self.cell_size,
                 3,
             )

@@ -11,10 +11,14 @@ class GameComponent(ABC):
     def __init__(self) -> None:
         self.parent: "GameComponent | None" = None
         self.children: "list[GameComponent]" = []
+        self.paused = False
 
     @final
     def update(self, delta: float) -> None:
         """Update a component's state and its children."""
+        if self.paused:
+            return
+
         self._on_update(delta)
         for child in self.children:
             child.update(delta)
@@ -52,12 +56,18 @@ class GameComponent(ABC):
         self.children.remove(child)
         child.parent = None
 
+    @final
+    def clear_children(self) -> None:
+        """Remove a child component to this one."""
+        self.children.clear()
+
 
 class Node(GameComponent):
     def __init__(self, context: "Context") -> None:
         super().__init__()
         self.local_position: Vector2 = Vector2()
         self.context = context
+        self.hidden = False
 
     @property
     def world_position(self) -> Vector2:
@@ -70,6 +80,9 @@ class Node(GameComponent):
     @final
     def render(self) -> None:
         """Handle drawing the visuals of a component and it's children."""
+        if self.hidden:
+            return
+
         self._on_draw()
 
         for child in self.children:
