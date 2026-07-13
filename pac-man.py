@@ -33,7 +33,6 @@ def main():
                 and event.key in {pygame.K_ESCAPE, pygame.K_q}
             ):
                 pygame.quit()
-                return
 
             context.root_scene.handle_input(event)
 

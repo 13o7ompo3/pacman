@@ -12,6 +12,7 @@ class PauseScene(Node):
         from src.visual.scenes.title import TitleScene
 
         super().__init__(context)
+        self.scene_to_pause = scene_to_pause
         scene_to_pause.paused = True
 
         title_text = Label(
@@ -55,7 +56,3 @@ class PauseScene(Node):
         self.add_child(title_text)
         self.add_child(resume_button)
         self.add_child(title_button)
-
-    def _on_input(self, event: Event) -> Event | None:
-        if event.type == MOUSEBUTTONDOWN:
-            self.context.root_scene.remove_child(self)
