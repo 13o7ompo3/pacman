@@ -7,16 +7,6 @@ from typing import final
 from pygame.font import Font
 
 
-class Context:
-    def __init__(
-        self, screen: Surface, width: int, height: int, font: Font
-    ) -> None:
-        self.screen = screen
-        self.width = width
-        self.height = height
-        self.font = font
-
-
 class GameComponent(ABC):
     def __init__(self) -> None:
         self.parent: "GameComponent | None" = None
@@ -48,7 +38,7 @@ class GameComponent(ABC):
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input for component optionally returning it to be passed to it's parent"""
-        ...
+        return event
 
     @final
     def add_child(self, child: "GameComponent") -> None:
@@ -64,7 +54,7 @@ class GameComponent(ABC):
 
 
 class Node(GameComponent):
-    def __init__(self, context: Context) -> None:
+    def __init__(self, context: "Context") -> None:
         super().__init__()
         self.local_position: Vector2 = Vector2()
         self.context = context
@@ -89,3 +79,18 @@ class Node(GameComponent):
     def _on_draw(self) -> None:
         """Override to draw component."""
         ...
+
+
+class Context:
+    def __init__(
+        self,
+        screen: Surface,
+        width: int,
+        height: int,
+        font: Font,
+    ) -> None:
+        self.root_scene = Node(self)
+        self.screen = screen
+        self.width = width
+        self.height = height
+        self.font = font

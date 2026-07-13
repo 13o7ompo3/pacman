@@ -7,8 +7,8 @@ from pygame import draw, Color, Vector2
 
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
-from src.visual.scenes.game_scene.ghost import VisualGhost
-from src.visual.scenes.game_scene.player import Player
+from src.visual.scenes.game.ghost import VisualGhost
+from src.visual.scenes.game.player import Player
 
 
 class Cell(Node):
@@ -130,7 +130,7 @@ class VisualMaze(Node):
                 self.add_child(cell)
 
         self.ghost_step_timer = 0
-        self.ghost_step_duration = 0.3
+        self.ghost_step_duration = 0.6
 
         for logical_ghost in self.maze.ghosts:
             ghost = VisualGhost(

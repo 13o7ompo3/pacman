@@ -40,6 +40,7 @@ class Label(Node):
         )
         self.text = Surface(label_size, pygame.SRCALPHA)
 
+        self.size = box_size
         draw.rect(
             self.text,
             background_color,

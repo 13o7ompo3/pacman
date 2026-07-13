@@ -27,6 +27,7 @@ class Button(Node):
         shadow_color: Color | None = None,
         highlight_color: Color | None = None,
     ) -> None:
+        self.size = size
         self.fg_color = color
         self.bg_color = (
             shadow_color
