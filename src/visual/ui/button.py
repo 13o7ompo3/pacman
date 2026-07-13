@@ -94,11 +94,13 @@ class Button(Node):
         if self.is_hovered:
             if event.type == MOUSEBUTTONDOWN:
                 self.is_pressed = True
-            if event.type == MOUSEBUTTONUP:
+            elif event.type == MOUSEBUTTONUP and self.is_pressed:
                 self.is_pressed = False
                 self.callback()
         else:
             self.is_pressed = False
+
+        return event
 
     def _on_draw(self) -> None:
         if self.is_pressed:

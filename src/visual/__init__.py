@@ -32,10 +32,10 @@ class GameComponent(ABC):
         """Handle an input event for current and all children."""
         propagate_event = True
 
-        for child in self.children:
+        for child in self.children[::-1]:
             ret = child.handle_input(event)
             if ret is None:
-                propagate_event = False
+                return
 
         if propagate_event:
             return self._on_input(event)
