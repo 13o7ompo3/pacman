@@ -53,8 +53,15 @@ class GameComponent(ABC):
     @final
     def remove_child(self, child: "GameComponent") -> None:
         """Remove a child component to this one."""
-        self.children.remove(child)
-        child.parent = None
+        if child in self.children:
+            self.children.remove(child)
+            child.parent = None
+
+    @final
+    def free_from_scene(self) -> None:
+        """Remove a child component to this one."""
+        if self.parent is not None:
+            self.parent.remove_child(self)
 
     @final
     def clear_children(self) -> None:
