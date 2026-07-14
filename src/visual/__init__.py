@@ -107,3 +107,4 @@ class Context:
         self.width = width
         self.height = height
         self.font = font
+        self.game_running = True

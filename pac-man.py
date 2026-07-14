@@ -26,24 +26,27 @@ def main():
     context.root_scene.add_child(title_scene)
 
     clock = Clock()
-    while True:
+    while context.game_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (
                 event.type == pygame.KEYDOWN
                 and event.key in {pygame.K_ESCAPE, pygame.K_q}
             ):
-                pygame.quit()
+                context.game_running = False
 
             context.root_scene.handle_input(event)
 
-        surface.fill(Color("black"))
+        # update the scene tree
         delta = clock.tick() / 1000
-
         context.root_scene.update(delta)
 
+        # render the scene tree
+        surface.fill(Color("black"))
         context.root_scene.render()
 
         pygame.display.flip()
+
+    pygame.quit()
 
 
 if __name__ == "__main__":
