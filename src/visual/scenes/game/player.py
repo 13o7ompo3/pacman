@@ -1,7 +1,8 @@
 import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2, KEYDOWN
-
+from src.logical.core_types import PlayerState
+from src.logical.game_event import PlayerDiedEvent, PlayerRespawnedEvent
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 
@@ -24,6 +25,7 @@ class Player(Node):
         self.step_size = step_size
         self.maze = maze
         self.speed = speed
+        self.dead = False
 
     def _on_input(self, event: Event) -> None:
         if event.type == KEYDOWN:
@@ -42,20 +44,29 @@ class Player(Node):
         ):
             self.direction = self.next_direction
 
-        self.animated_position = self.animated_position.move_towards(
-            self.target_position, delta * self.speed
-        )
+        if not self.dead:
+            self.animated_position = self.animated_position.move_towards(
+                self.target_position, delta * self.speed
+            )
 
         if (
             self.animated_position == self.target_position
             and self.direction is not None
         ):
-            _ = self.maze.tick_player(self.direction)
+            events = self.maze.tick_player(self.direction)
+            for event in events:
+                if isinstance(event, PlayerDiedEvent):
+                    self.dead = True
             x, y = self.maze.player.get_grid_position()
             self.target_position = Vector2(
                 x * self.step_size,
                 y * self.step_size,
             )
+
+    def respawn(self, x, y):
+        self.target_position = Vector2(x, y) * self.step_size
+        self.animated_position = self.target_position.copy()
+        self.dead = False
 
     def _on_draw(self) -> None:
         draw.circle(

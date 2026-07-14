@@ -5,6 +5,7 @@ import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
+from src.logical.game_event import PlayerRespawnedEvent
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
@@ -150,7 +151,10 @@ class VisualMaze(Node):
         if self.ghost_step_timer > self.ghost_step_duration:
             self.maze.tick_ghosts()
             self.ghost_step_timer = 0
-        self.maze.tick_timers()
+        events = self.maze.tick_timers()
+        for event in events:
+            if isinstance(event, PlayerRespawnedEvent):
+                self.player.respawn(event.x, event.y)
 
     def _on_draw(self) -> None:
         for x, y in self.maze.pacgums:
