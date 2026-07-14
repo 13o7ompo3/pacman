@@ -36,8 +36,12 @@ class TitleScene(Node):
             Color("gold"),
             open_leader_board,
         )
+
+        def quit_game():
+            context.game_running = False
+
         exit_button = Button(
-            context, "Quit", button_size, Color("red"), lambda: pygame.quit()
+            context, "Quit", button_size, Color("red"), quit_game
         )
 
         width, height = context.width, context.height
