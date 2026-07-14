@@ -29,21 +29,6 @@ class PlayerState(Enum):
     DEAD = "DEAD"
 
 
-class TickEvent(Enum):
-    """Events emitted by a single simulation tick."""
-
-    NONE = "NONE"
-    ATE_PACGUM = "ATE_PACGUM"
-    ATE_SUPER_PACGUM = "ATE_SUPER_PACGUM"
-    ATE_GHOST = "ATE_GHOST"
-    GHOST_RESPAWNED = "GHOST_RESPAWNED"
-    PLAYER_DIED = "PLAYER_DIED"
-    PLAYER_RESPAWNED = "PLAYER_RESPAWNED"
-    GAME_OVER = "GAME_OVER"
-    LEVEL_COMPLETE = "LEVEL_COMPLETE"
-    TIME_UP = "TIME_UP"
-
-
 @dataclass(frozen=True)
 class RenderState:
     """Read-only snapshot of everything the renderer needs per frame."""
