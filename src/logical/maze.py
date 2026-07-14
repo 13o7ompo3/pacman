@@ -1,12 +1,24 @@
 import logging
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Set
 from mazegenerator import MazeGenerator  # type: ignore[import-not-found]
 from src.logical.core_types import (
     Direction,
     GhostState,
     PlayerState,
-    RenderState,
-    TickEvent,
+    RenderState
+)
+from src.logical.game_event import (
+    GameEvent,
+    AtePacgumEvent,
+    AteSuperPacgumEvent,
+    AteGhostEvent,
+    PlayerDiedEvent,
+    PlayerRespawnedEvent,
+    GhostRespawnedEvent,
+    PowerUpExpiredEvent,
+    LevelCompleteEvent,
+    GameOverEvent,
+    TimeUpEvent,
 )
 from src.logical.entities import Player, Ghost
 
@@ -312,22 +324,29 @@ class LogicalMaze:
             time_up=self.is_time_up,
         )
 
-    def _resolve_collisions(self) -> List[TickEvent]:
+    def _resolve_collisions(self) -> Set[GameEvent]:
         """Apply item and entity collisions and return emitted events."""
-        events: List[TickEvent] = []
+        events: Set[GameEvent] = set()
         p_pos = self.player.get_grid_position()
+        px, py = p_pos
 
         # Items
         if p_pos in self.pacgums:
             self.pacgums.remove(p_pos)
             self.player.score += self.points_pacgum
-            events.append(TickEvent.ATE_PACGUM)
+            events.add(AtePacgumEvent(
+                x=px, y=py,
+                score_gained=self.points_pacgum,
+            ))
         elif p_pos in self.super_pacgums:
             self.super_pacgums.remove(p_pos)
             self.player.score += self.points_super_pacgum
             self.player.gum_timer = self.super_pacgum_duration
             self.player.state = PlayerState.POWERED_UP
-            events.append(TickEvent.ATE_SUPER_PACGUM)
+            events.add(AteSuperPacgumEvent(
+                x=px, y=py,
+                score_gained=self.points_super_pacgum,
+            ))
             for ghost in self.ghosts:
                 if ghost.state != GhostState.DEAD:
                     ghost.state = GhostState.FRIGHTENED
@@ -344,26 +363,33 @@ class LogicalMaze:
                     self.player.lives -= 1
                     self.player.state = PlayerState.DEAD
                     if self.player.lives <= 0:
-                        events.append(TickEvent.GAME_OVER)
+                        events.add(GameOverEvent(
+                            final_score=self.player.score,
+                        ))
                     else:
-                        # Start death countdown — tick_timers auto-respawns
-                        # when it expires and emits PLAYER_RESPAWNED
                         self._death_countdown = self.respawn_delay
-                        events.append(TickEvent.PLAYER_DIED)
+                        events.add(PlayerDiedEvent(
+                            lives_remaining=self.player.lives,
+                        ))
                     break
                 elif ghost.state == GhostState.FRIGHTENED:
                     ghost.state = GhostState.DEAD
                     ghost.last_direction = None
                     ghost.respawn_timer = self.ghost_respawn_delay
                     self.player.score += self.points_ghost
-                    events.append(TickEvent.ATE_GHOST)
+                    events.add(AteGhostEvent(
+                        ghost_id=ghost.ghost_id,
+                        x=ghost.x,
+                        y=ghost.y,
+                        score_gained=self.points_ghost,
+                    ))
 
         if self.is_level_complete:
-            events.append(TickEvent.LEVEL_COMPLETE)
+            events.add(LevelCompleteEvent())
 
         return events
 
-    def tick_player(self, player_dir: Direction) -> List[TickEvent]:
+    def tick_player(self, player_dir: Direction) -> Set[GameEvent]:
         """Move the player one step and resolve collisions.
 
         Call this at whatever rate the player should move.
@@ -373,14 +399,13 @@ class LogicalMaze:
             player_dir: The direction input for this step.
 
         Returns:
-            List of TickEvents that occurred this step.
+            List of GameEvents that occurred this step.
         """
-        events: List[TickEvent] = []
+        events: Set[GameEvent] = set()
 
         if self.player.state == PlayerState.DEAD:
             return events
 
-        # Move
         if player_dir != Direction.NONE:
             nx = self.player.x + player_dir.value[0]
             ny = self.player.y + player_dir.value[1]
@@ -388,20 +413,19 @@ class LogicalMaze:
                 self.player.x, self.player.y = nx, ny
                 self.player.facing = player_dir
 
-        # Collisions after every move
-        events.extend(self._resolve_collisions())
+        events.update(self._resolve_collisions())
         return events
 
-    def tick_ghosts(self) -> List[TickEvent]:
+    def tick_ghosts(self) -> Set[GameEvent]:
         """Move all ghosts one step and resolve collisions.
 
         Call this at whatever rate ghosts should move.
         The caller (view) is responsible for timing.
 
         Returns:
-            List of TickEvents that occurred this step.
+            List of GameEvents that occurred this step.
         """
-        events: List[TickEvent] = []
+        events: Set[GameEvent] = set()
 
         if self.player.state == PlayerState.DEAD:
             return events
@@ -410,56 +434,68 @@ class LogicalMaze:
             for ghost in self.ghosts:
                 self._move_ghost(ghost)
 
-        events.extend(self._resolve_collisions())
+        events.update(self._resolve_collisions())
         return events
 
-    def tick_timers(self) -> List[TickEvent]:
+    def tick_timers(self) -> Set[GameEvent]:
         """Advance all time-based state by one frame.
 
         Call this every frame regardless of player/ghost speed.
         Handles five independent countdowns:
 
-        - Player death countdown: counts down after PLAYER_DIED, then
-          auto-respawns the player and emits PLAYER_RESPAWNED. The level
-          timer is paused during this window so the player is not penalised.
+        - Player death countdown: counts down after PlayerDiedEvent, then
+        auto-respawns the player and emits PlayerRespawnedEvent. The level
+        timer is paused during this window.
         - Player invulnerability: counts down after a respawn. Ghost
-          collisions are suppressed while it is active.
+        collisions are suppressed while it is active.
         - Ghost respawn countdowns: one per dead ghost. When each expires,
-          that ghost teleports to its corner and emits GHOST_RESPAWNED.
-          Multiple ghosts may respawn in the same frame.
-        - Power-up countdown: counts down the FRIGHTENED state duration,
-          then returns ghosts to CHASE and player to NORMAL.
-        - Level clock: advances elapsed_ticks and emits TIME_UP when the
-          level time limit is reached (only while player is alive and not
-          in the death countdown).
+        that specific ghost teleports to its corner and emits
+        GhostRespawnedEvent(ghost_id, x, y) so the view knows exactly
+        which ghost reappeared and where.
+        - Power-up countdown: emits PowerUpExpiredEvent when it runs out
+        and returns all FRIGHTENED ghosts to CHASE.
+        - Level clock: advances elapsed_ticks and emits TimeUpEvent when
+        the time limit is reached.
 
         Returns:
-            List of TickEvents that occurred this frame.
+            List of GameEvents that occurred this frame.
         """
-        events: List[TickEvent] = []
+        events: Set[GameEvent] = set()
 
-        # 1. Player death countdown — drives the player auto-respawn cycle
+        # 1. Player death countdown
         if self._death_countdown > 0:
             self._death_countdown -= 1
             if self._death_countdown == 0:
                 self.respawn_player()
-                events.append(TickEvent.PLAYER_RESPAWNED)
-            # Level timer pauses while player is waiting to respawn
-            return events
+                events.add(PlayerRespawnedEvent(
+                    x=self._spawn_x,
+                    y=self._spawn_y,
+                ))
+            return events  # level timer pauses during death countdown
 
-        # 2. Player invulnerability countdown (post-respawn blinking window)
+        # 2. Player invulnerability countdown
         if self.player.invulnerability_timer > 0:
             self.player.invulnerability_timer -= 1
 
-        # 3. Ghost respawn countdowns — each dead ghost has its own timer
+        # 3. Ghost respawn countdowns
         for ghost in self.ghosts:
             if ghost.state == GhostState.DEAD and ghost.respawn_timer > 0:
                 ghost.respawn_timer -= 1
                 if ghost.respawn_timer == 0:
-                    ghost.x, ghost.y = ghost.spawn_point
-                    ghost.state = GhostState.CHASE
+                    gx, gy = ghost.spawn_point
+                    ghost.x, ghost.y = gx, gy
+                    # Respawn as FRIGHTENED if power-up is still active
+                    ghost.state = (
+                        GhostState.FRIGHTENED
+                        if self.player.state == PlayerState.POWERED_UP
+                        else GhostState.CHASE
+                    )
                     ghost.last_direction = None
-                    events.append(TickEvent.GHOST_RESPAWNED)
+                    events.add(GhostRespawnedEvent(
+                        ghost_id=ghost.ghost_id,
+                        x=gx,
+                        y=gy,
+                    ))
 
         # 4. Power-up countdown
         if self.player.gum_timer > 0:
@@ -469,10 +505,11 @@ class LogicalMaze:
                 for ghost in self.ghosts:
                     if ghost.state == GhostState.FRIGHTENED:
                         ghost.state = GhostState.CHASE
+                events.add(PowerUpExpiredEvent())
 
-        # 5. Level clock (only advances while player is alive)
+        # 5. Level clock
         self.elapsed_ticks += 1
         if self.is_time_up:
-            events.append(TickEvent.TIME_UP)
+            events.add(TimeUpEvent())
 
         return events
