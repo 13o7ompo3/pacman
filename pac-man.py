@@ -2,12 +2,12 @@ import logging
 
 import pygame
 from pygame.time import Clock
-from pygame import Color
+from pygame import Color, Vector2
 
 from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
-from src.visual.ui.prompt import Prompt
+from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -25,13 +25,6 @@ def main():
     context = Context(surface, WIDTH, HEIGHT, font)
     title_scene = TitleScene(context)
     context.root_scene.add_child(title_scene)
-    prompt = Prompt(
-        context,
-        "prompt title",
-        "do you actually want to be here?",
-        lambda: print("bruh"),
-    )
-    title_scene.add_child(prompt)
 
     clock = Clock()
     while context.game_running:
