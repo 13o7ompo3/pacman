@@ -5,6 +5,7 @@ import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
+from src.logical.game_event import PlayerRespawnedEvent
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
@@ -103,13 +104,15 @@ class VisualMaze(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
 
-        self.maze = LogicalMaze(20, 20)
+        width, height = 20, 20
+        self.logical_maze = LogicalMaze(width, height)
         self.cell_size = 20
         wall_thickness = 3
+        self.size = Vector2(width, height) * self.cell_size
 
-        for x in range(self.maze.width):
-            for y in range(self.maze.height):
-                mask = self.maze.grid[y][x]
+        for x in range(self.logical_maze.width):
+            for y in range(self.logical_maze.height):
+                mask = self.logical_maze.grid[y][x]
 
                 cell = Cell(
                     context,
@@ -131,7 +134,7 @@ class VisualMaze(Node):
         self.ghost_step_timer = 0
         self.ghost_step_duration = 0.6
 
-        for logical_ghost in self.maze.ghosts:
+        for logical_ghost in self.logical_maze.ghosts:
             ghost = VisualGhost(
                 context,
                 logical_ghost,
@@ -141,19 +144,22 @@ class VisualMaze(Node):
             ghost.local_position = Vector2(self.cell_size) / 2
             self.add_child(ghost)
 
-        self.player = Player(context, self.maze, self.cell_size)
+        self.player = Player(context, self.logical_maze, self.cell_size)
         self.player.local_position = Vector2(self.cell_size) / 2
         self.add_child(self.player)
 
     def _on_update(self, delta: float) -> None:
         self.ghost_step_timer += delta
         if self.ghost_step_timer > self.ghost_step_duration:
-            self.maze.tick_ghosts()
+            self.logical_maze.tick_ghosts()
             self.ghost_step_timer = 0
-        self.maze.tick_timers()
+        events = self.logical_maze.tick_timers()
+        for event in events:
+            if isinstance(event, PlayerRespawnedEvent):
+                self.player.respawn(event.x, event.y)
 
     def _on_draw(self) -> None:
-        for x, y in self.maze.pacgums:
+        for x, y in self.logical_maze.pacgums:
             draw.circle(
                 self.context.screen,
                 Color("#444444"),
@@ -162,7 +168,7 @@ class VisualMaze(Node):
                 + Vector2(x, y) * self.cell_size,
                 2,
             )
-        for x, y in self.maze.super_pacgums:
+        for x, y in self.logical_maze.super_pacgums:
             draw.circle(
                 self.context.screen,
                 Color("gold"),

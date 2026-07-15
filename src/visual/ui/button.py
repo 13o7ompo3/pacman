@@ -12,6 +12,7 @@ from pygame import (
 from pygame.event import Event
 from pygame import draw
 from typing import Any, Callable
+import pygame
 
 
 class Button(Node):
@@ -22,6 +23,7 @@ class Button(Node):
         size: Vector2,
         color: Color,
         callback: Callable,
+        shortcuts: set[int] = set(),
         thickness: int = 5,
         border_radius: int = 8,
         shadow_color: Color | None = None,
@@ -65,8 +67,10 @@ class Button(Node):
 
         self.is_hovered = False
         self.is_pressed = False
+        self.is_shortcut_down = False
 
         self.callback = callback
+        self.shortcuts = shortcuts
 
         super().__init__(context)
 
@@ -97,8 +101,16 @@ class Button(Node):
             elif event.type == MOUSEBUTTONUP and self.is_pressed:
                 self.is_pressed = False
                 self.callback()
-        else:
+        elif not self.is_shortcut_down:
             self.is_pressed = False
+
+        if event.type == pygame.KEYDOWN and event.key in self.shortcuts:
+            self.is_pressed = True
+            self.is_shortcut_down = True
+        elif event.type == pygame.KEYUP and event.key in self.shortcuts:
+            self.is_pressed = False
+            self.is_shortcut_down = False
+            self.callback()
 
         return event
 

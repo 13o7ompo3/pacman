@@ -23,7 +23,12 @@ class TitleScene(Node):
             context.root_scene.add_child(GameScene(context))
 
         start_button = Button(
-            context, "Start", button_size, Color("cyan"), start_game
+            context,
+            "Start",
+            button_size,
+            Color("cyan"),
+            start_game,
+            shortcuts={pygame.K_SPACE},
         )
 
         def open_leader_board():
