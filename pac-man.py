@@ -2,11 +2,12 @@ import logging
 
 import pygame
 from pygame.time import Clock
-from pygame import Color
+from pygame import Color, Vector2
 
 from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
+from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"

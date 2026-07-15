@@ -60,3 +60,6 @@ class Label(Node):
 
     def _on_draw(self) -> None:
         self.context.screen.blit(self.text, self.world_position)
+
+    def get_as_surface(self) -> Surface:
+        return self.text

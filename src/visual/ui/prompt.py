@@ -10,7 +10,7 @@ from pygame import (
 )
 from pygame.font import Font
 from pygame.event import Event
-from pygame import draw
+from pygame import draw, Surface
 from typing import Any, Callable
 from src.visual.ui.button import Button
 
@@ -21,50 +21,87 @@ class Prompt(Node):
         context: Context,
         title: str,
         message: str,
-        is_alert: bool,
+        on_accept: Callable,
     ) -> None:
         super().__init__(context)
         self.title = context.font.render(title, False, Color("white"))
         self.message = context.font.render(message, False, Color("white"))
 
+        padding = Vector2(10, 10)
+        button_size = Vector2(50, 30)
+
         self.size = Vector2(
             max(self.title.get_size()[0], self.message.get_size()[0]),
             self.title.get_size()[1] + self.message.get_size()[1],
-        )
+        ) + Vector2(padding.x * 2, padding.y * 5 + button_size.y)
 
         self.local_position = (
             Vector2(self.context.width, self.context.height) / 2
             - self.size / 2
         )
+        self.content = Surface(self.size)
 
-        ok_text = context.font.render("Ok", False, Color("white"))
-        ok_button = Button(
-            context, ok_text, Vector2(50, 30), Color("green"), lambda: None
-        )
-        self.add_child(ok_button)
-
-    def _on_draw(self) -> None:
         draw.rect(
-            self.context.screen,
+            self.content,
             Color("blue"),
-            Rect(self.world_position, self.size),
+            Rect((0, 0), self.size),
             border_radius=7,
         )
         draw.rect(
-            self.context.screen,
+            self.content,
             Color("white"),
-            Rect(self.world_position, self.size),
+            Rect((0, 0), self.size),
             width=1,
             border_radius=7,
         )
         draw.line(
-            self.context.screen,
+            self.content,
             Color("white"),
-            (0, 0),
-            self.world_position + self.size,
+            (padding.x, self.title.get_size()[1] + padding.y * 2),
+            (
+                self.size.x - padding.x,
+                self.title.get_size()[1] + padding.y * 2,
+            ),
         )
-        self.context.screen.blit(self.title, self.world_position)
-        self.context.screen.blit(
+        self.content.blit(
+            self.title,
+            (
+                self.size.x / 2 - self.title.get_size()[0] / 2,
+                padding.y,
+            ),
+        )
+        self.content.blit(
             self.message,
-            self.world_position + Vector2(0, self.title.get_size()[1]),
+            (padding.x, padding.y * 3 + self.title.get_size()[1]),
         )
+
+        def on_accept_fn():
+            on_accept()
+            self.free_from_scene()
+
+        buttons = [
+            Button(
+                context,
+                "Ok",
+                button_size,
+                Color("green"),
+                on_accept_fn,
+            ),
+        ]
+
+        for i, button in enumerate(buttons):
+            button.local_position = self.world_position + Vector2(
+                self.size.x * i / len(buttons)
+                + self.size.x * 0.5 / len(buttons)
+                - button_size.x / 2,
+                padding.y * 4
+                + self.title.get_size()[1]
+                + self.message.get_size()[1],
+            )
+            self.add_child(button)
+
+    def _on_draw(self) -> None:
+        self.context.screen.blit(self.content, self.world_position)
+
+    def _on_input(self, event: Event) -> Event | None:
+        return
