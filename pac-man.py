@@ -9,6 +9,7 @@ from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
+from src.visual.ui.text_box import TextBox
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -27,6 +28,8 @@ def main():
     context = Context(surface, WIDTH, HEIGHT, font, user_manager)
     title_scene = TitleScene(context)
     context.root_scene.add_child(title_scene)
+    text = TextBox(context, Vector2(200, 10))
+    context.root_scene.add_child(text)
 
     clock = Clock()
     while context.game_running:
