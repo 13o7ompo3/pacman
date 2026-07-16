@@ -166,6 +166,8 @@ class VisualMaze(Node):
         for event in events:
             if isinstance(event, PlayerDiedEvent):
                 self.player.hidden = True
+                self.player.direction = None
+                self.player.next_direction = None
             if isinstance(event, PlayerRespawnedEvent):
                 self.player.hidden = False
                 self.player.respawn(event.x, event.y)
