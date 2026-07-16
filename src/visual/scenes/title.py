@@ -18,7 +18,7 @@ class TitleScene(Node):
             4,
         )
 
-        def start_game():
+        def start_game(_):
             context.root_scene.remove_child(self)
             context.root_scene.add_child(GameScene(context))
 
@@ -31,7 +31,7 @@ class TitleScene(Node):
             shortcuts={pygame.K_SPACE},
         )
 
-        def open_leader_board():
+        def open_leader_board(_):
             context.root_scene.add_child(LeaderBoardScene(context))
 
         leaderboard_button = Button(
@@ -42,7 +42,7 @@ class TitleScene(Node):
             open_leader_board,
         )
 
-        def quit_game():
+        def quit_game(_):
             context.game_running = False
 
         exit_button = Button(

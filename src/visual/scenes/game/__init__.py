@@ -21,7 +21,7 @@ class GameScene(Node):
             "=",
             Vector2(30, 30),
             Color("white"),
-            lambda: context.root_scene.add_child(PauseScene(context, maze)),
+            lambda _: context.root_scene.add_child(PauseScene(context, maze)),
         )
 
         self.progress = ProgressBar(
