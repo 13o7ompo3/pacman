@@ -5,7 +5,11 @@ import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
-from src.logical.game_event import PlayerRespawnedEvent
+from src.logical.game_event import (
+    GhostRespawnedEvent,
+    PlayerDiedEvent,
+    PlayerRespawnedEvent,
+)
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
@@ -131,17 +135,18 @@ class VisualMaze(Node):
 
                 self.add_child(cell)
 
-        self.ghost_step_timer = 0
-        self.ghost_step_duration = 0.6
-
-        for logical_ghost in self.logical_maze.ghosts:
+        self.ghosts = []
+        for i, logical_ghost in enumerate(self.logical_maze.ghosts):
             ghost = VisualGhost(
                 context,
+                i,
+                self.logical_maze,
                 logical_ghost,
                 self.cell_size,
-                self.cell_size / self.ghost_step_duration,
+                20,
             )
             ghost.local_position = Vector2(self.cell_size) / 2
+            self.ghosts.append(ghost)
             self.add_child(ghost)
 
         self.player = Player(context, self.logical_maze, self.cell_size)
@@ -149,14 +154,16 @@ class VisualMaze(Node):
         self.add_child(self.player)
 
     def _on_update(self, delta: float) -> None:
-        self.ghost_step_timer += delta
-        if self.ghost_step_timer > self.ghost_step_duration:
-            self.logical_maze.tick_ghosts()
-            self.ghost_step_timer = 0
-        events = self.logical_maze.tick_timers()
+        self.logical_maze.tick_timers()
+        events = self.logical_maze.flush_events()
         for event in events:
             if isinstance(event, PlayerRespawnedEvent):
+                self.player.hidden = False
                 self.player.respawn(event.x, event.y)
+            if isinstance(event, PlayerDiedEvent):
+                self.player.hidden = True
+            if isinstance(event, GhostRespawnedEvent):
+                self.ghosts[event.ghost_id].respawn(event.x, event.y)
 
     def _on_draw(self) -> None:
         for x, y in self.logical_maze.pacgums:
