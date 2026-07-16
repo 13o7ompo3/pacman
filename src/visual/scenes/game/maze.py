@@ -6,6 +6,7 @@ from pygame.event import Event
 from pygame import draw, Color, Vector2
 
 from src.logical.game_event import (
+    AteGhostEvent,
     GhostRespawnedEvent,
     PlayerDiedEvent,
     PlayerRespawnedEvent,
@@ -162,8 +163,11 @@ class VisualMaze(Node):
                 self.player.respawn(event.x, event.y)
             if isinstance(event, PlayerDiedEvent):
                 self.player.hidden = True
+            if isinstance(event, AteGhostEvent):
+                self.ghosts[event.ghost_id].hidden = True
             if isinstance(event, GhostRespawnedEvent):
                 self.ghosts[event.ghost_id].respawn(event.x, event.y)
+                self.ghosts[event.ghost_id].hidden = False
 
     def _on_draw(self) -> None:
         for x, y in self.logical_maze.pacgums:
