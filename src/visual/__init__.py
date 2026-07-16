@@ -5,6 +5,7 @@ from pygame.event import Event
 from typing import final
 
 from pygame.font import Font
+from src.db_manager.user import UserManager
 
 
 class GameComponent(ABC):
@@ -108,10 +109,12 @@ class Context:
         width: int,
         height: int,
         font: Font,
+        user_manager: UserManager,
     ) -> None:
         self.root_scene = Node(self)
         self.screen = screen
         self.width = width
         self.height = height
         self.font = font
+        self.user_manager = user_manager
         self.game_running = True
