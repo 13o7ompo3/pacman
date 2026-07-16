@@ -76,7 +76,7 @@ class UserManager:
     def is_existing_user(self, username: str) -> bool:
         return username in self.users
 
-    def create_new_user(self, username: str, password: str) -> User:
+    def create_new_user(self, username: str, password: str) -> None:
         if self.is_existing_user(username):
             raise ValueError(f"User '{username}' already exists.")
 
@@ -93,7 +93,8 @@ class UserManager:
         self.users[username] = user
 
         logger.info(f"User created successfully: {username}")
-        return user
+        logger.info(f"User '{username}' is now logged in.")
+        self.loged_in_user = user
 
     def authenticate_user(self, username: str, password: str) -> None:
         if not self.is_existing_user(username):
