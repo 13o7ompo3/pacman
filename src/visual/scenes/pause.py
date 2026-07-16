@@ -74,6 +74,6 @@ class PauseScene(Node):
     def _on_draw(self) -> None:
         draw.rect(
             self.context.screen,
-            Color("#00000066"),
+            Color("black"),
             Rect((0, 0), (self.context.width, self.context.width)),
         )
