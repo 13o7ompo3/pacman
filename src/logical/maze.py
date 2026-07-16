@@ -100,6 +100,8 @@ class LogicalMaze:
         self.super_pacgums: set[Tuple[int, int]] = self._place_super_pacgums()
         self.pacgums: set[Tuple[int, int]] = self._place_pacgums()
 
+        self._pending_events: set[GameEvent] = set()
+
     def _initialize_ghosts(self) -> list[Ghost]:
         """Place ghosts in their four corner spawn points."""
         # 4 corners per PDF specification
@@ -393,17 +395,17 @@ class LogicalMaze:
 
         return events
 
-    def tick_player(self, player_dir: Direction) -> Set[GameEvent]:
+    def tick_player(self, player_dir: Direction) -> None:
         """Move the player one step and resolve all collisions.
         Arguments:
             player_dir: The direction the player is attempting to move.
         Returns:
-            A set of GameEvents that occurred due to the player's movement.
+            None
         """
         events: Set[GameEvent] = set()
 
         if self.player.state == PlayerState.DEAD:
-            return events
+            return
 
         # 1. Move Player
         if player_dir != Direction.NONE:
@@ -422,24 +424,25 @@ class LogicalMaze:
             if self.player.state == PlayerState.DEAD:
                 break
 
-        return events
+        self._pending_events.update(events)
+        return
 
-    def tick_ghost(self, ghost_id: int) -> Set[GameEvent]:
+    def tick_ghost(self, ghost_id: int) -> None:
         """Move a single ghost one step and check if it caught the player.
         Arguments:
             ghost_id: The identity of the ghost to move (0–3).
         Returns:
-            A set of GameEvents that occurred due to the ghost's movement.
+            None
         """
         events: Set[GameEvent] = set()
 
         if self.player.state == PlayerState.DEAD or self.cheat_freeze_ghosts:
-            return events
+            return
 
         # Locate the specific ghost
         ghost = next((g for g in self.ghosts if g.ghost_id == ghost_id), None)
         if not ghost:
-            return events
+            return
 
         # 1. Move the Ghost
         self._move_ghost(ghost)
@@ -447,9 +450,10 @@ class LogicalMaze:
         # 2. Check Collision with Player ONLY
         events.update(self._resolve_ghost_collision(ghost))
 
-        return events
+        self._pending_events.update(events)
+        return
 
-    def tick_timers(self) -> Set[GameEvent]:
+    def tick_timers(self) -> None:
         """Advance all time-based state by one frame.
 
         Call this every frame regardless of player/ghost speed.
@@ -470,7 +474,7 @@ class LogicalMaze:
         the time limit is reached.
 
         Returns:
-            List of GameEvents that occurred this frame.
+            None
         """
         events: Set[GameEvent] = set()
 
@@ -483,7 +487,8 @@ class LogicalMaze:
                     x=self._spawn_x,
                     y=self._spawn_y,
                 ))
-            return events  # level timer pauses during death countdown
+            self._pending_events.update(events)
+            return  # level timer pauses during death countdown
 
         # 2. Player invulnerability countdown
         if self.player.invulnerability_timer > 0:
@@ -524,4 +529,11 @@ class LogicalMaze:
         if self.is_time_up:
             events.add(TimeUpEvent())
 
-        return events
+        self._pending_events.update(events)
+        return
+
+    def flush_events(self) -> set[GameEvent]:
+        """Returns all queued events and clears the internal queue."""
+        events_to_return = self._pending_events.copy()
+        self._pending_events.clear()
+        return events_to_return
