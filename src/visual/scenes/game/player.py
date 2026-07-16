@@ -53,10 +53,7 @@ class Player(Node):
             self.animated_position == self.target_position
             and self.direction is not None
         ):
-            events = self.maze.tick_player(self.direction)
-            for event in events:
-                if isinstance(event, PlayerDiedEvent):
-                    self.dead = True
+            self.maze.tick_player(self.direction)
             x, y = self.maze.player.get_grid_position()
             self.target_position = Vector2(
                 x * self.step_size,
