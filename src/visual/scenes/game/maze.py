@@ -5,7 +5,11 @@ import pygame
 from pygame.event import Event
 from pygame import draw, Color, Vector2
 
-from src.logical.game_event import PlayerRespawnedEvent
+from src.logical.game_event import (
+    GhostRespawnedEvent,
+    PlayerDiedEvent,
+    PlayerRespawnedEvent,
+)
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
@@ -131,6 +135,7 @@ class VisualMaze(Node):
 
                 self.add_child(cell)
 
+        self.ghosts = []
         for i, logical_ghost in enumerate(self.logical_maze.ghosts):
             ghost = VisualGhost(
                 context,
@@ -141,6 +146,7 @@ class VisualMaze(Node):
                 20,
             )
             ghost.local_position = Vector2(self.cell_size) / 2
+            self.ghosts.append(ghost)
             self.add_child(ghost)
 
         self.player = Player(context, self.logical_maze, self.cell_size)
@@ -148,10 +154,16 @@ class VisualMaze(Node):
         self.add_child(self.player)
 
     def _on_update(self, delta: float) -> None:
-        events = self.logical_maze.tick_timers()
+        self.logical_maze.tick_timers()
+        events = self.logical_maze.flush_events()
         for event in events:
             if isinstance(event, PlayerRespawnedEvent):
+                self.player.hidden = False
                 self.player.respawn(event.x, event.y)
+            if isinstance(event, PlayerDiedEvent):
+                self.player.hidden = True
+            if isinstance(event, GhostRespawnedEvent):
+                self.ghosts[event.ghost_id].respawn(event.x, event.y)
 
     def _on_draw(self) -> None:
         for x, y in self.logical_maze.pacgums:

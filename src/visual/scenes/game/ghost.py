@@ -30,13 +30,7 @@ class VisualGhost(Node):
     def _on_update(self, delta: float) -> None:
         self.ghost_step_timer += delta
         if self.ghost_step_timer > self.ghost_step_duration:
-            events = self.logical_maze.tick_ghost(self.id)
-            for event in events:
-                if isinstance(event, AteGhostEvent):
-                    self.target_position = (
-                        Vector2(event.x, event.y) * self.step_size
-                    )
-                    self.animated_position = self.target_position.copy()
+            self.logical_maze.tick_ghost(self.id)
             self.ghost_step_timer = 0
 
         self.target_position = (
@@ -54,3 +48,8 @@ class VisualGhost(Node):
             self.world_position + self.animated_position,
             4,
         )
+
+    def respawn(self, x, y):
+        self.target_position = Vector2(x, y) * self.step_size
+        self.animated_position = self.target_position.copy()
+        self.dead = False
