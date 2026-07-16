@@ -100,6 +100,8 @@ class LogicalMaze:
         self.super_pacgums: set[Tuple[int, int]] = self._place_super_pacgums()
         self.pacgums: set[Tuple[int, int]] = self._place_pacgums()
 
+        self._pending_events: set[GameEvent] = set()
+
     def _initialize_ghosts(self) -> list[Ghost]:
         """Place ghosts in their four corner spawn points."""
         # 4 corners per PDF specification
@@ -324,88 +326,88 @@ class LogicalMaze:
             time_up=self.is_time_up,
         )
 
-    def _resolve_collisions(self) -> Set[GameEvent]:
-        """Apply item and entity collisions and return emitted events."""
+    def _resolve_item_collisions(self) -> Set[GameEvent]:
+        """Check if the player landed on a pellet or power-up."""
         events: Set[GameEvent] = set()
         p_pos = self.player.get_grid_position()
         px, py = p_pos
 
-        # Items
         if p_pos in self.pacgums:
             self.pacgums.remove(p_pos)
             self.player.score += self.points_pacgum
-            events.add(AtePacgumEvent(
-                x=px, y=py,
-                score_gained=self.points_pacgum,
-            ))
+            events.add(AtePacgumEvent(x=px, y=py,
+                                      score_gained=self.points_pacgum))
+
         elif p_pos in self.super_pacgums:
             self.super_pacgums.remove(p_pos)
             self.player.score += self.points_super_pacgum
             self.player.gum_timer = self.super_pacgum_duration
             self.player.state = PlayerState.POWERED_UP
             events.add(AteSuperPacgumEvent(
-                x=px, y=py,
-                score_gained=self.points_super_pacgum,
-            ))
+                x=px, y=py, score_gained=self.points_super_pacgum))
+
             for ghost in self.ghosts:
                 if ghost.state != GhostState.DEAD:
                     ghost.state = GhostState.FRIGHTENED
                     ghost.last_direction = None
-
-        # Entities
-        for ghost in self.ghosts:
-            if ghost.get_grid_position() == p_pos:
-                if (
-                    ghost.state == GhostState.CHASE
-                    and not self.cheat_invincible
-                    and not self.is_player_invulnerable
-                ):
-                    self.player.lives -= 1
-                    self.player.state = PlayerState.DEAD
-                    if self.player.lives <= 0:
-                        events.add(GameOverEvent(
-                            final_score=self.player.score,
-                        ))
-                    else:
-                        self._death_countdown = self.respawn_delay
-                        events.add(PlayerDiedEvent(
-                            lives_remaining=self.player.lives,
-                        ))
-                    break
-                elif ghost.state == GhostState.FRIGHTENED:
-                    ghost.state = GhostState.DEAD
-                    ghost.last_direction = None
-                    ghost.respawn_timer = self.ghost_respawn_delay
-                    self.player.score += self.points_ghost
-                    events.add(AteGhostEvent(
-                        ghost_id=ghost.ghost_id,
-                        x=ghost.x,
-                        y=ghost.y,
-                        score_gained=self.points_ghost,
-                    ))
 
         if self.is_level_complete:
             events.add(LevelCompleteEvent())
 
         return events
 
-    def tick_player(self, player_dir: Direction) -> Set[GameEvent]:
-        """Move the player one step and resolve collisions.
-
-        Call this at whatever rate the player should move.
-        The caller (view) is responsible for timing.
-
-        Args:
-            player_dir: The direction input for this step.
-
+    def _resolve_ghost_collision(self, ghost: Ghost) -> Set[GameEvent]:
+        """Check if a specific ghost is occupying the same tile as the player.
+        Arguments:
+            ghost: The ghost to check for collision with the player.
         Returns:
-            List of GameEvents that occurred this step.
+            A set of GameEvents that occurred due to the collision.
+        """
+        events: Set[GameEvent] = set()
+
+        if ghost.get_grid_position() == self.player.get_grid_position():
+
+            if (ghost.state == GhostState.CHASE
+                and not self.cheat_invincible
+                    and not self.is_player_invulnerable):
+
+                self.player.lives -= 1
+                self.player.state = PlayerState.DEAD
+
+                if self.player.lives <= 0:
+                    events.add(GameOverEvent(final_score=self.player.score))
+                else:
+                    self._death_countdown = self.respawn_delay
+                    events.add(PlayerDiedEvent(self.player.lives))
+
+            elif ghost.state == GhostState.FRIGHTENED:
+                ghost.state = GhostState.DEAD
+                ghost.last_direction = None
+                ghost.respawn_timer = self.ghost_respawn_delay
+                self.player.score += self.points_ghost
+
+                events.add(AteGhostEvent(
+                    ghost_id=ghost.ghost_id,
+                    x=ghost.x,
+                    y=ghost.y,
+                    score_gained=self.points_ghost,
+                ))
+
+        return events
+
+    def tick_player(self, player_dir: Direction) -> None:
+        """Move the player one step and resolve all collisions.
+        Arguments:
+            player_dir: The direction the player is attempting to move.
+        Returns:
+            None
         """
         events: Set[GameEvent] = set()
 
         if self.player.state == PlayerState.DEAD:
-            return events
+            return
 
+        # 1. Move Player
         if player_dir != Direction.NONE:
             nx = self.player.x + player_dir.value[0]
             ny = self.player.y + player_dir.value[1]
@@ -413,31 +415,45 @@ class LogicalMaze:
                 self.player.x, self.player.y = nx, ny
                 self.player.facing = player_dir
 
-        events.update(self._resolve_collisions())
-        return events
+        # 2. Check Items
+        events.update(self._resolve_item_collisions())
 
-    def tick_ghosts(self) -> Set[GameEvent]:
-        """Move all ghosts one step and resolve collisions.
+        # 3. Check All Ghosts
+        for ghost in self.ghosts:
+            events.update(self._resolve_ghost_collision(ghost))
+            if self.player.state == PlayerState.DEAD:
+                break
 
-        Call this at whatever rate ghosts should move.
-        The caller (view) is responsible for timing.
+        self._pending_events.update(events)
+        return
 
+    def tick_ghost(self, ghost_id: int) -> None:
+        """Move a single ghost one step and check if it caught the player.
+        Arguments:
+            ghost_id: The identity of the ghost to move (0–3).
         Returns:
-            List of GameEvents that occurred this step.
+            None
         """
         events: Set[GameEvent] = set()
 
-        if self.player.state == PlayerState.DEAD:
-            return events
+        if self.player.state == PlayerState.DEAD or self.cheat_freeze_ghosts:
+            return
 
-        if not self.cheat_freeze_ghosts:
-            for ghost in self.ghosts:
-                self._move_ghost(ghost)
+        # Locate the specific ghost
+        ghost = next((g for g in self.ghosts if g.ghost_id == ghost_id), None)
+        if not ghost:
+            return
 
-        events.update(self._resolve_collisions())
-        return events
+        # 1. Move the Ghost
+        self._move_ghost(ghost)
 
-    def tick_timers(self) -> Set[GameEvent]:
+        # 2. Check Collision with Player ONLY
+        events.update(self._resolve_ghost_collision(ghost))
+
+        self._pending_events.update(events)
+        return
+
+    def tick_timers(self) -> None:
         """Advance all time-based state by one frame.
 
         Call this every frame regardless of player/ghost speed.
@@ -458,7 +474,7 @@ class LogicalMaze:
         the time limit is reached.
 
         Returns:
-            List of GameEvents that occurred this frame.
+            None
         """
         events: Set[GameEvent] = set()
 
@@ -471,7 +487,8 @@ class LogicalMaze:
                     x=self._spawn_x,
                     y=self._spawn_y,
                 ))
-            return events  # level timer pauses during death countdown
+            self._pending_events.update(events)
+            return  # level timer pauses during death countdown
 
         # 2. Player invulnerability countdown
         if self.player.invulnerability_timer > 0:
@@ -512,4 +529,11 @@ class LogicalMaze:
         if self.is_time_up:
             events.add(TimeUpEvent())
 
-        return events
+        self._pending_events.update(events)
+        return
+
+    def flush_events(self) -> set[GameEvent]:
+        """Returns all queued events and clears the internal queue."""
+        events_to_return = self._pending_events.copy()
+        self._pending_events.clear()
+        return events_to_return
