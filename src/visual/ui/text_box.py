@@ -5,15 +5,34 @@ import pygame
 
 
 class TextBox(Node):
-    def __init__(self, context: Context, size: Vector2) -> None:
+    def __init__(
+        self, context: Context, length: int, is_password: bool = False
+    ) -> None:
         super().__init__(context)
-        self.size = size
         self.content = ""
-        self.text: Surface | None = None
+        self.length = length
+        box_size = Vector2(
+            context.font.size(" ")[0] * length, context.font.size(" ")[1]
+        )
+        self.size = Vector2(
+            box_size.y * 0.4 + box_size.x,
+            box_size.y * 1.4,
+        )
+        self.text_pos = Vector2(
+            box_size.y * 0.2,
+            self.size.y / 2 - box_size.y / 2,
+        )
+        self.text = self.context.font.render(self.content, False, Color("red"))
 
     def _on_input(self, event: Event) -> Event | None:
         if event.type == pygame.KEYDOWN:
-            self.text += event.unicode
+            if event.key == pygame.K_BACKSPACE:
+                self.content = self.content[:-1]
+            elif len(self.content) < self.length:
+                self.content += event.unicode
+            self.text = self.context.font.render(
+                self.content, False, Color("red")
+            )
         return event
 
     def _on_draw(self) -> None:
@@ -30,3 +49,7 @@ class TextBox(Node):
             width=2,
             border_radius=2,
         )
+        if self.text is not None:
+            self.context.screen.blit(
+                self.text, self.world_position + self.text_pos
+            )
