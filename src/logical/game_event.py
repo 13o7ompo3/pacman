@@ -126,5 +126,15 @@ class GameOverEvent(GameEvent):
 
 
 @dataclass(frozen=True)
+class WinEvent(GameEvent):
+    """Player won the game by completing all levels.
+
+    Attributes:
+        final_score: Total score at the moment of winning.
+    """
+    final_score: int
+
+
+@dataclass(frozen=True)
 class TimeUpEvent(GameEvent):
     """Level time limit reached."""
