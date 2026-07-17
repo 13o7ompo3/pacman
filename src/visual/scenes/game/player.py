@@ -28,6 +28,8 @@ class Player(Node):
         self.dead = False
 
     def _on_input(self, event: Event) -> None:
+        if self.hidden:
+            return
         if event.type == KEYDOWN:
             if event.key in {pygame.K_UP, pygame.K_w, pygame.K_k}:
                 self.next_direction = Direction.UP
@@ -63,7 +65,6 @@ class Player(Node):
     def respawn(self, x, y):
         self.target_position = Vector2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
-        self.dead = False
 
     def _on_draw(self) -> None:
         draw.circle(
