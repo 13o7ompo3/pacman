@@ -116,7 +116,7 @@ class VisualMaze(Node):
         super().__init__(context)
 
         width, height = logical_maze.width, logical_maze.height
-        self.logical_maze = LogicalMaze(width, height)
+        self.logical_maze = logical_maze
         self.cell_size = 20
         wall_thickness = 3
         self.size = Vector2(width, height) * self.cell_size
