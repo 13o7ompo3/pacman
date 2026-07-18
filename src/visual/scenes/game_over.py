@@ -104,6 +104,21 @@ class GameOverScene(Node):
                         username_form.value, password_form.value
                     )
                 user_manager.update_highscore(final_score)
+
+                from src.visual.scenes.title import TitleScene
+
+                def go_to_title(_):
+                    context.root_scene.clear_children()
+                    context.root_scene.add_child(TitleScene(context))
+
+                self.add_child(
+                    Prompt(
+                        context,
+                        "Success",
+                        f"Updated score for {username_form.value}",
+                        go_to_title,
+                    )
+                )
             except Exception as error:
                 print(error)
 
