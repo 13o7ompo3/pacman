@@ -13,6 +13,7 @@ class GameComponent(ABC):
         self.parent: "GameComponent | None" = None
         self.children: "list[GameComponent]" = []
         self.paused = False
+        self.hidden = False
 
     @final
     def update(self, delta: float) -> None:
@@ -31,6 +32,9 @@ class GameComponent(ABC):
     @final
     def handle_input(self, event: Event) -> None | Event:
         """Handle an input event for current and all children."""
+        if self.hidden:
+            return event
+
         propagate_event = True
 
         for child in self.children[::-1]:
@@ -75,7 +79,6 @@ class Node(GameComponent):
         super().__init__()
         self.local_position: Vector2 = Vector2()
         self.context = context
-        self.hidden = False
 
     @property
     def world_position(self) -> Vector2:

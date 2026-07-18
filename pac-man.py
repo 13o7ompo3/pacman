@@ -9,6 +9,7 @@ from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
+from src.visual.ui.text_box import TextBox
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
