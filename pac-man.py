@@ -28,8 +28,6 @@ def main():
     context = Context(surface, WIDTH, HEIGHT, font, user_manager)
     title_scene = TitleScene(context)
     context.root_scene.add_child(title_scene)
-    text = TextBox(context, Vector2(200, 10))
-    context.root_scene.add_child(text)
 
     clock = Clock()
     while context.game_running:
