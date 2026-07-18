@@ -5,6 +5,7 @@ from pygame.event import Event
 from typing import final
 
 from pygame.font import Font
+from src.db_manager.user import UserManager
 
 
 class GameComponent(ABC):
@@ -12,6 +13,7 @@ class GameComponent(ABC):
         self.parent: "GameComponent | None" = None
         self.children: "list[GameComponent]" = []
         self.paused = False
+        self.hidden = False
 
     @final
     def update(self, delta: float) -> None:
@@ -30,6 +32,9 @@ class GameComponent(ABC):
     @final
     def handle_input(self, event: Event) -> None | Event:
         """Handle an input event for current and all children."""
+        if self.hidden:
+            return event
+
         propagate_event = True
 
         for child in self.children[::-1]:
@@ -74,7 +79,6 @@ class Node(GameComponent):
         super().__init__()
         self.local_position: Vector2 = Vector2()
         self.context = context
-        self.hidden = False
 
     @property
     def world_position(self) -> Vector2:
@@ -108,10 +112,12 @@ class Context:
         width: int,
         height: int,
         font: Font,
+        user_manager: UserManager,
     ) -> None:
         self.root_scene = Node(self)
         self.screen = screen
         self.width = width
         self.height = height
         self.font = font
+        self.user_manager = user_manager
         self.game_running = True

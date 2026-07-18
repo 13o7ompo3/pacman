@@ -7,6 +7,7 @@ from pygame import draw, Color, Vector2
 
 from src.logical.game_event import (
     AteGhostEvent,
+    GameOverEvent,
     GhostRespawnedEvent,
     PlayerDiedEvent,
     PlayerRespawnedEvent,
@@ -15,6 +16,7 @@ from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
 from src.visual.scenes.game.player import Player
+from src.visual.scenes.game_over import GameOverScene
 
 
 class Cell(Node):
@@ -106,10 +108,14 @@ class Cell(Node):
 
 
 class VisualMaze(Node):
-    def __init__(self, context: Context) -> None:
+    def __init__(
+        self,
+        context: Context,
+        logical_maze: LogicalMaze,
+    ) -> None:
         super().__init__(context)
 
-        width, height = 20, 20
+        width, height = logical_maze.width, logical_maze.height
         self.logical_maze = LogicalMaze(width, height)
         self.cell_size = 20
         wall_thickness = 3
@@ -157,17 +163,26 @@ class VisualMaze(Node):
     def _on_update(self, delta: float) -> None:
         self.logical_maze.tick_timers()
         events = self.logical_maze.flush_events()
+
         for event in events:
+            if isinstance(event, PlayerDiedEvent):
+                self.player.hidden = True
+                self.player.direction = None
+                self.player.next_direction = None
             if isinstance(event, PlayerRespawnedEvent):
                 self.player.hidden = False
                 self.player.respawn(event.x, event.y)
-            if isinstance(event, PlayerDiedEvent):
-                self.player.hidden = True
+                for ghost in self.ghosts:
+                    ghost.respawn(ghost.logical_ghost.x, ghost.logical_ghost.y)
             if isinstance(event, AteGhostEvent):
                 self.ghosts[event.ghost_id].hidden = True
             if isinstance(event, GhostRespawnedEvent):
                 self.ghosts[event.ghost_id].respawn(event.x, event.y)
                 self.ghosts[event.ghost_id].hidden = False
+            if isinstance(event, GameOverEvent):
+                self.context.root_scene.add_child(
+                    GameOverScene(self.context, event.final_score)
+                )
 
     def _on_draw(self) -> None:
         for x, y in self.logical_maze.pacgums:

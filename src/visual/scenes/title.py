@@ -1,6 +1,7 @@
 import pygame
 from src.visual import Node, Context
 from src.visual.scenes.game import GameScene
+from src.visual.scenes.game_over import GameOverScene
 from src.visual.scenes.leaderboard import LeaderBoardScene
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
@@ -18,7 +19,7 @@ class TitleScene(Node):
             4,
         )
 
-        def start_game():
+        def start_game(_):
             context.root_scene.remove_child(self)
             context.root_scene.add_child(GameScene(context))
 
@@ -31,7 +32,7 @@ class TitleScene(Node):
             shortcuts={pygame.K_SPACE},
         )
 
-        def open_leader_board():
+        def open_leader_board(_):
             context.root_scene.add_child(LeaderBoardScene(context))
 
         leaderboard_button = Button(
@@ -42,7 +43,7 @@ class TitleScene(Node):
             open_leader_board,
         )
 
-        def quit_game():
+        def quit_game(_):
             context.game_running = False
 
         exit_button = Button(

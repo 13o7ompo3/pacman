@@ -3,3 +3,4 @@ __pycache__
 dist
 Pac-man.spec
 build
+database/

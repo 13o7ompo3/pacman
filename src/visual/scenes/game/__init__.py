@@ -1,4 +1,5 @@
 from src.visual import Node, Context
+from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.maze import VisualMaze
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from pygame import Color, Vector2, draw
@@ -10,7 +11,8 @@ from src.visual.scenes.pause import PauseScene
 class GameScene(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
-        maze = VisualMaze(context)
+        self.logical_maze = LogicalMaze(20, 20)
+        maze = VisualMaze(context, self.logical_maze)
         self.maze = maze
         maze.local_position = (
             Vector2(context.width, context.height) / 2 - maze.size / 2
@@ -21,7 +23,7 @@ class GameScene(Node):
             "=",
             Vector2(30, 30),
             Color("white"),
-            lambda: context.root_scene.add_child(PauseScene(context, maze)),
+            lambda _: context.root_scene.add_child(PauseScene(context, maze)),
         )
 
         self.progress = ProgressBar(

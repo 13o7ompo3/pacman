@@ -100,7 +100,7 @@ class Button(Node):
                 self.is_pressed = True
             elif event.type == MOUSEBUTTONUP and self.is_pressed:
                 self.is_pressed = False
-                self.callback()
+                self.callback(self)
         elif not self.is_shortcut_down:
             self.is_pressed = False
 
@@ -110,7 +110,7 @@ class Button(Node):
         elif event.type == pygame.KEYUP and event.key in self.shortcuts:
             self.is_pressed = False
             self.is_shortcut_down = False
-            self.callback()
+            self.callback(self)
 
         return event
 
