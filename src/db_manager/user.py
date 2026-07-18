@@ -108,7 +108,7 @@ class UserManager:
 
         logger.info(f"User authenticated successfully: {username}")
         self.loged_in_user = user
-    
+
     def update_highscore(self, new_score: int) -> None:
         if self.loged_in_user is None:
             raise ValueError("No user is currently logged in.")
@@ -126,14 +126,14 @@ class UserManager:
                 f"highscore {self.loged_in_user.highscore} for user "
                 f"'{self.loged_in_user.username}'."
             )
-    
+
     def logout_user(self) -> None:
         if self.loged_in_user is not None:
             logger.info(f"User '{self.loged_in_user.username}' logged out.")
             self.loged_in_user = None
         else:
             logger.warning("No user is currently logged in to log out.")
-    
+
     def get_leaderboard(self) -> list[User]:
         return sorted(
             self.users.values(), key=lambda user: user.highscore, reverse=True

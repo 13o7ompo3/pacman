@@ -4,6 +4,7 @@ from src.visual import Node, Context
 from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
 from src.visual.ui.text_box import TextBox
+from src.visual.ui.prompt import Prompt
 from typing import Callable
 
 
@@ -89,23 +90,30 @@ class GameOverScene(Node):
         password_form: InputForm
 
         def on_username_submit(_):
-            username_form.text_box.hidden = True
             username_form.hidden = True
-            password_form.text_box.hidden = False
             password_form.hidden = False
-            print(f"username::::::; ({username_form.value})")
 
         def on_password_submit(_):
-            if user_manager.is_existing_user(username_form.value):
-                user_manager.authenticate_user(
-                    username_form.value, password_form.value
+            try:
+                if user_manager.is_existing_user(username_form.value):
+                    user_manager.authenticate_user(
+                        username_form.value, password_form.value
+                    )
+                else:
+                    user_manager.create_new_user(
+                        username_form.value, password_form.value
+                    )
+                user_manager.update_highscore(final_score)
+            except Exception as error:
+                print(error)
+
+                self.add_child(
+                    Prompt(context, "Error", str(error), lambda x: None)
                 )
-            else:
-                user_manager.create_new_user(
-                    username_form.value, password_form.value
-                )
-            user_manager.update_highscore(final_score)
-            exit()
+                username_form.hidden = False
+                password_form.hidden = True
+                username_form.text_box.content = ""
+                password_form.text_box.content = ""
 
         username_form = InputForm(
             context, "Username: ", False, on_username_submit
@@ -114,7 +122,6 @@ class GameOverScene(Node):
             context, "Password: ", False, on_password_submit
         )
         password_form.hidden = True
-        password_form.text_box.hidden = True
 
         self.add_child(panel)
         self.add_child(title)

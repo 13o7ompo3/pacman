@@ -1,6 +1,7 @@
 import pygame
 from src.visual import Node, Context
 from src.visual.scenes.game import GameScene
+from src.visual.scenes.game_over import GameOverScene
 from src.visual.scenes.leaderboard import LeaderBoardScene
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
