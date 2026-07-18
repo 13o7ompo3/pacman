@@ -1,13 +1,12 @@
 from src.visual import Context, Node
 from pygame import (
-    BLEND_RGBA_MULT,
-    MOUSEBUTTONDOWN,
-    MOUSEBUTTONUP,
+    K_RETURN,
     Color,
     Rect,
     Surface,
     Vector2,
 )
+import pygame
 from pygame.font import Font
 from pygame.event import Event
 from pygame import draw, Surface
@@ -39,7 +38,7 @@ class Prompt(Node):
             Vector2(self.context.width, self.context.height) / 2
             - self.size / 2
         )
-        self.content = Surface(self.size)
+        self.content = Surface(self.size, flags=pygame.SRCALPHA)
 
         draw.rect(
             self.content,
@@ -75,8 +74,8 @@ class Prompt(Node):
             (padding.x, padding.y * 3 + self.title.get_size()[1]),
         )
 
-        def on_accept_fn():
-            on_accept()
+        def on_accept_fn(_):
+            on_accept(self)
             self.free_from_scene()
 
         buttons = [
@@ -86,6 +85,7 @@ class Prompt(Node):
                 button_size,
                 Color("green"),
                 on_accept_fn,
+                {K_RETURN},
             ),
         ]
 

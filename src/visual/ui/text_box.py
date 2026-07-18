@@ -14,6 +14,7 @@ class TextBox(Node):
         is_password: bool = False,
     ) -> None:
         super().__init__(context)
+        self.is_password = is_password
         self.content = ""
         self.length = length
         self.on_submit = on_submit
@@ -28,26 +29,31 @@ class TextBox(Node):
             box_size.y * 0.2,
             self.size.y / 2 - box_size.y / 2,
         )
-        self.text = self.context.font.render(self.content, False, Color("red"))
-        self.is_password = is_password
+
+    @property
+    def content(self) -> str:
+        return self._content
+
+    @content.setter
+    def content(self, val: str):
+        self._content = val
+        if self.is_password:
+            content = "*" * len(self.content)
+        else:
+            content = self.content
+        self.text = self.context.font.render(content, False, Color("red"))
 
     def _on_input(self, event: Event) -> Event | None:
         if self.hidden:
             return event
 
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYUP:
             if event.key == pygame.K_RETURN:
                 self.on_submit(self)
             elif event.key == pygame.K_BACKSPACE:
                 self.content = self.content[:-1]
             elif len(self.content) < self.length:
                 self.content += event.unicode
-            if self.is_password:
-                content = "*" * len(self.content)
-            else:
-                content = self.content
-            self.text = self.context.font.render(content, False, Color("red"))
-        return event
 
     def _on_draw(self) -> None:
         draw.rect(
