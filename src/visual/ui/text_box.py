@@ -2,15 +2,21 @@ from pygame import Color, Rect, Surface, Vector2, draw
 from src.visual import Node, Context
 from pygame.event import Event
 import pygame
+from typing import Callable
 
 
 class TextBox(Node):
     def __init__(
-        self, context: Context, length: int, is_password: bool = False
+        self,
+        context: Context,
+        length: int,
+        on_submit: Callable,
+        is_password: bool = False,
     ) -> None:
         super().__init__(context)
         self.content = ""
         self.length = length
+        self.on_submit = on_submit
         box_size = Vector2(
             context.font.size(" ")[0] * length, context.font.size(" ")[1]
         )
@@ -23,16 +29,24 @@ class TextBox(Node):
             self.size.y / 2 - box_size.y / 2,
         )
         self.text = self.context.font.render(self.content, False, Color("red"))
+        self.is_password = is_password
 
     def _on_input(self, event: Event) -> Event | None:
+        if self.hidden:
+            return event
+
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_RETURN:
+                self.on_submit(self)
+            elif event.key == pygame.K_BACKSPACE:
                 self.content = self.content[:-1]
             elif len(self.content) < self.length:
                 self.content += event.unicode
-            self.text = self.context.font.render(
-                self.content, False, Color("red")
-            )
+            if self.is_password:
+                content = "*" * len(self.content)
+            else:
+                content = self.content
+            self.text = self.context.font.render(content, False, Color("red"))
         return event
 
     def _on_draw(self) -> None:

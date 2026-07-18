@@ -7,6 +7,7 @@ from pygame import draw, Color, Vector2
 
 from src.logical.game_event import (
     AteGhostEvent,
+    GameOverEvent,
     GhostRespawnedEvent,
     PlayerDiedEvent,
     PlayerRespawnedEvent,
@@ -15,6 +16,7 @@ from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
 from src.visual.scenes.game.player import Player
+from src.visual.scenes.game_over import GameOverScene
 
 
 class Cell(Node):
@@ -168,6 +170,10 @@ class VisualMaze(Node):
             if isinstance(event, GhostRespawnedEvent):
                 self.ghosts[event.ghost_id].respawn(event.x, event.y)
                 self.ghosts[event.ghost_id].hidden = False
+            if isinstance(event, GameOverEvent):
+                self.context.root_scene.add_child(
+                    GameOverScene(self.context, event.final_score)
+                )
 
     def _on_draw(self) -> None:
         for x, y in self.logical_maze.pacgums:
