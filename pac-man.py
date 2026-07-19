@@ -2,7 +2,8 @@ import logging
 
 import pygame
 from pygame.time import Clock
-from pygame import Color, Vector2
+from pygame import Color, Vector2, Rect
+from pygame import draw
 
 from src.db_manager.user import UserManager
 from src.visual import Context, GameComponent, Node
