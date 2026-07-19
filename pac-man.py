@@ -3,7 +3,7 @@ import logging
 import pygame
 from pygame.time import Clock
 from pygame import Color, Vector2, Rect
-from pygame import draw
+from src.visual.draw import Draw
 
 from src.db_manager.user import UserManager
 from src.visual import Context, GameComponent, Node
@@ -49,6 +49,15 @@ def main():
         surface.fill(Color("black"))
         context.root_scene.render()
 
+        Draw.sector(
+            surface,
+            Color("crimson"),
+            Vector2(100, 100),
+            20,
+            0,
+            3.1415,
+            True,
+        )
         pygame.display.flip()
 
     pygame.quit()

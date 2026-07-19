@@ -208,7 +208,8 @@ class GameOverScene(Node):
             self.add_child(login_forms)
 
         if context.user_manager.loged_in_user is None:
-            show_login()
+            login_forms = LoginForms(context, final_score)
+            self.add_child(login_forms)
         else:
             logout_form = LogoutForm(
                 context,
