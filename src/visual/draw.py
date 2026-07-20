@@ -27,7 +27,17 @@ class Draw:
             rect = Surface(size)
             array = PixelArray(rect)
 
-            Draw._rect_filled(array, color, size)
+            for x in range(size[0]):
+                for y in range(size[1]):
+                    if filled:
+                        array[x, y] = color
+                    elif (
+                        x == 0
+                        or x == size[0] - 1
+                        or y == 0
+                        or y == size[1] - 1
+                    ):
+                        array[x, y] = color
 
             array.close()
             Draw.cache[cache_key] = rect
@@ -35,12 +45,6 @@ class Draw:
             rect = Draw.cache[cache_key]
 
         surface.blit(rect, position)
-
-    @staticmethod
-    def _rect_filled(array: PixelArray, color: Color, size: tuple) -> None:
-        for x in range(size[0]):
-            for y in range(size[1]):
-                array[x, y] = color
 
     @staticmethod
     def sector(
@@ -72,17 +76,15 @@ class Draw:
             rect = Surface(size)
             array = PixelArray(rect)
 
-            for x in range(size[0]):
-                for y in range(size[1]):
-                    length = round(
-                        math.sqrt((x - radius) ** 2 + (y - radius) ** 2)
-                    )
-                    angle = math.atan2(x - radius, y - radius)
-                    in_sector = start_angle < angle <= end_angle
+            for x in range(-radius, radius + 1):
+                for y in range(-radius, radius + 1):
+                    length = round(math.sqrt((x) ** 2 + (y) ** 2))
+                    angle = math.atan2(y, -x)
+                    in_sector = start_angle < angle + math.pi <= end_angle
                     if filled and (length <= radius) and in_sector:
-                        array[x, y] = color
+                        array[x + radius, y + radius] = color
                     elif (length == radius) and in_sector:
-                        array[x, y] = color
+                        array[x + radius, y + radius] = color
 
             array.close()
             Draw.cache[cache_key] = rect
