@@ -19,8 +19,10 @@ from src.logical.game_event import (
     LevelCompleteEvent,
     GameOverEvent,
     TimeUpEvent,
+    WinEvent,
 )
 from src.logical.entities import Player, Ghost
+from parser import LevelConfig
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +32,7 @@ class LogicalMaze:
 
     def __init__(
         self,
-        width: int,
-        height: int,
-        seed: int = 1337,
-        player: Optional[Player] = None,
+        levels: List[LevelConfig],
         points_pacgum: int = 10,
         points_super_pacgum: int = 50,
         points_ghost: int = 200,
@@ -46,11 +45,7 @@ class LogicalMaze:
         """Create a new logical maze with a fresh entity layout.
 
         Args:
-            width: Maze width in cells.
-            height: Maze height in cells.
-            seed: RNG seed passed to the maze generator.
-            player: Existing player to carry over between levels (lives and
-                score are preserved). Pass None to create a fresh player.
+            levels: List of level configurations.
             points_pacgum: Score awarded per normal pellet eaten.
             points_super_pacgum: Score awarded per power pellet eaten.
             points_ghost: Score awarded per ghost eaten while frightened.
@@ -68,8 +63,12 @@ class LogicalMaze:
                 ghost.respawn_timer > 0 to know which ghosts are waiting.
                 GHOST_RESPAWNED is emitted for each ghost that reappears.
         """
-        self.width: int = width
-        self.height: int = height
+        self.levels: List[LevelConfig] = levels
+        self.current_level_index: int = 0
+        self.current_level = levels[0]
+        self.width: int = self.current_level.width
+        self.height: int = self.current_level.height
+        self.base_seed: int = self.current_level.seed
         self.points_pacgum: int = points_pacgum
         self.points_super_pacgum: int = points_super_pacgum
         self.points_ghost: int = points_ghost
@@ -82,25 +81,56 @@ class LogicalMaze:
         self._death_countdown: int = 0
         self.cheat_invincible: bool = False
         self.cheat_freeze_ghosts: bool = False
+        self._pending_events: set[GameEvent] = set()
+        self.player: Player = Player(0, 0)
+        self.load_level(0)
 
-        self.maze_generator = MazeGenerator((width, height), seed=seed)
-        self.grid: list[list[int]] = self.maze_generator.maze
+    def load_level(self, level_idx: int) -> None:
+        """Loads a specific level, regenerating the maze and resetting positions."""
+        if level_idx < 0 or level_idx >= len(self.levels):
+            logger.error(f"Level index {level_idx} out of bounds.")
+            return
 
-        # Compute spawn position once — used by both __init__ and respawn
-        self._spawn_x: int = width // 2 - 1 + (width % 2)
-        self._spawn_y: int = height // 2
+        self.current_level_idx = level_idx
+        self.current_level = self.levels[level_idx]
+        self.width = self.current_level.width
+        self.height = self.current_level.height
+        self.base_seed = self.current_level.seed
 
-        self.player = player if player else Player(
-            self._spawn_x, self._spawn_y)
+        seed = self.base_seed
+        self.maze_generator = MazeGenerator((self.width, self.height), seed=seed)
+        self.grid = self.maze_generator.maze
+
+        self.elapsed_ticks = 0
+        self._death_countdown = 0
+        self._pending_events.clear()
+
+        self._spawn_x = self.width // 2 - 1 + (self.width % 2)
+        self._spawn_y = self.height // 2
+
+        # Reset Player physical state (KEEP lives and score!)
         self.player.x, self.player.y = self._spawn_x, self._spawn_y
         self.player.state = PlayerState.NORMAL
+        self.player.facing = Direction.RIGHT
+        self.player.gum_timer = 0
         self.player.invulnerability_timer = 0
 
-        self.ghosts: list[Ghost] = self._initialize_ghosts()
-        self.super_pacgums: set[Tuple[int, int]] = self._place_super_pacgums()
-        self.pacgums: set[Tuple[int, int]] = self._place_pacgums()
+        self.ghosts = self._initialize_ghosts()
+        self.super_pacgums = self._place_super_pacgums()
+        self.pacgums = self._place_pacgums()
 
-        self._pending_events: set[GameEvent] = set()
+    def next_level(self) -> bool:
+        """Advances to the next level. Returns False if game is won."""
+        if self.current_level_idx + 1 < len(self.levels):
+            self.load_level(self.current_level_idx + 1)
+            return True
+        return False
+
+    def restart_game(self) -> None:
+        """Hard reset for a brand new game session."""
+        self.player.lives = 3
+        self.player.score = 0
+        self.load_level(0)
 
     def _initialize_ghosts(self) -> list[Ghost]:
         """Place ghosts in their four corner spawn points."""
@@ -275,10 +305,6 @@ class LogicalMaze:
         ghost.y += best_dir.value[1]
         ghost.last_direction = best_dir
 
-    def level_skip(self) -> None:
-        """Cheat: immediately clear all pellets to complete the level."""
-        self.pacgums.clear()
-        self.super_pacgums.clear()
 
     def respawn_player(self) -> None:
         """Reset the player and all ghosts after a death.
@@ -352,7 +378,10 @@ class LogicalMaze:
                     ghost.last_direction = None
 
         if self.is_level_complete:
-            events.add(LevelCompleteEvent())
+            if self.next_level():
+                events.add(LevelCompleteEvent())
+            else:
+                events.add(WinEvent(final_score=self.player.score))
 
         return events
 
