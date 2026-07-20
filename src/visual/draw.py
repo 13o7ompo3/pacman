@@ -1,5 +1,6 @@
 from pygame import Surface, PixelArray, Vector2, Color
 import math
+import pygame
 
 
 class Draw:
@@ -24,7 +25,7 @@ class Draw:
         cache_key = ("rect", size, color, filled, border_radius)
 
         if cache_key not in Draw.cache:
-            rect = Surface(size)
+            rect = Surface(size, flags=pygame.SRCALPHA)
             array = PixelArray(rect)
 
             for x in range(size[0]):
@@ -73,14 +74,14 @@ class Draw:
 
         if cache_key not in Draw.cache:
             size = (radius * 2 + 1, radius * 2 + 1)
-            rect = Surface(size)
+            rect = Surface(size, flags=pygame.SRCALPHA)
             array = PixelArray(rect)
 
             for x in range(-radius, radius + 1):
                 for y in range(-radius, radius + 1):
                     length = round(math.sqrt((x) ** 2 + (y) ** 2))
                     angle = math.atan2(y, -x)
-                    in_sector = start_angle < angle + math.pi <= end_angle
+                    in_sector = start_angle <= angle + math.pi <= end_angle
                     if filled and (length <= radius) and in_sector:
                         array[x + radius, y + radius] = color
                     elif (length == radius) and in_sector:
@@ -116,14 +117,14 @@ class Draw:
                 surface,
                 color,
                 (position[0] + radius, position[1]),
-                (size[0] - 2 * radius, size[1]),
+                (size[0] - 2 * radius, size[1] + 1),
                 filled,
             )
             Draw.rect(
                 surface,
                 color,
                 (position[0], position[1] + radius),
-                (size[0], size[1] - 2 * radius),
+                (size[0] + 1, size[1] - 2 * radius + 1),
                 filled,
             )
         else:
@@ -137,7 +138,7 @@ class Draw:
             Draw.rect(
                 surface,
                 color,
-                (position[0] + radius, position[1] + size[1] - 1),
+                (position[0] + radius, position[1] + size[1]),
                 (size[0] - 2 * radius, 1),
                 filled,
             )
@@ -151,7 +152,7 @@ class Draw:
             Draw.rect(
                 surface,
                 color,
-                (position[0] + size[0] - 1, position[1] + radius),
+                (position[0] + size[0], position[1] + radius),
                 (1, size[1] - 2 * radius),
                 filled,
             )
@@ -177,7 +178,10 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0] + size[0] - 2 * radius, position[1] + size[1] - 2 * radius),
+            (
+                position[0] + size[0] - 2 * radius,
+                position[1] + size[1] - 2 * radius,
+            ),
             radius,
             1.5 * math.pi,
             2 * math.pi,
@@ -192,4 +196,3 @@ class Draw:
             1.5 * math.pi,
             filled,
         )
-

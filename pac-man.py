@@ -55,7 +55,7 @@ def main():
             Color("red"),
             (100, 100),
             (50, 20),
-            False,
+            True,
             12,
         )
         pygame.display.flip()
