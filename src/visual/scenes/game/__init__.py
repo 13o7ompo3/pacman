@@ -14,7 +14,7 @@ class GameScene(Node):
         super().__init__(context)
         levels = [
             LevelConfig(width=10, height=10, seed=1337),
-            LevelConfig(width=10, height=13, seed=42),
+            # LevelConfig(width=10, height=13, seed=42),
         ]
         self.logical_maze = LogicalMaze(levels, 10, 10)
         maze = VisualMaze(context, self.logical_maze)

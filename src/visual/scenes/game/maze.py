@@ -12,12 +12,13 @@ from src.logical.game_event import (
     LevelCompleteEvent,
     PlayerDiedEvent,
     PlayerRespawnedEvent,
+    WinEvent,
 )
 from src.visual import Context, Node
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
 from src.visual.scenes.game.player import Player
-from src.visual.scenes.game_over import GameOverScene
+from src.visual.scenes.game_over import GameOverScene, TerminalState
 
 
 class Cell(Node):
@@ -188,9 +189,18 @@ class VisualMaze(Node):
                 self.ghosts[event.ghost_id].hidden = False
             if isinstance(event, GameOverEvent):
                 self.context.root_scene.add_child(
-                    GameOverScene(self.context, event.final_score)
+                    GameOverScene(
+                        self.context, event.final_score, TerminalState.LOST
+                    )
                 )
             if isinstance(event, LevelCompleteEvent):
+                self.refresh()
+            if isinstance(event, WinEvent):
+                self.context.root_scene.add_child(
+                    GameOverScene(
+                        self.context, event.final_score, TerminalState.WON
+                    )
+                )
                 self.refresh()
 
     def _on_draw(self) -> None:
