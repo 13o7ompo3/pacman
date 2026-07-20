@@ -1,3 +1,4 @@
+from parser import LevelConfig
 from src.visual import Node, Context
 from src.logical.maze import Direction, LogicalMaze
 from src.visual.scenes.game.maze import VisualMaze
@@ -11,7 +12,11 @@ from src.visual.scenes.pause import PauseScene
 class GameScene(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
-        self.logical_maze = LogicalMaze(20, 20)
+        levels = [
+            LevelConfig(width=10, height=10, seed=1337),
+            LevelConfig(width=10, height=13, seed=42),
+        ]
+        self.logical_maze = LogicalMaze(levels, 10, 10)
         maze = VisualMaze(context, self.logical_maze)
         self.maze = maze
         maze.local_position = (
