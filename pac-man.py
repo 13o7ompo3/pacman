@@ -31,7 +31,6 @@ def main():
     title_scene = TitleScene(context)
     context.root_scene.add_child(title_scene)
 
-    angle = 0
     clock = Clock()
     while context.game_running:
         for event in pygame.event.get():
@@ -51,17 +50,14 @@ def main():
         surface.fill(Color("black"))
         context.root_scene.render()
 
-        Draw.sector(
+        Draw.rounded_rect(
             surface,
-            Color("crimson"),
-            Vector2(100, 100),
-            20,
-            math.pi / 2,
-            angle,
-            True,
+            Color("red"),
+            (100, 100),
+            (50, 20),
+            False,
+            12,
         )
-        if angle < math.pi:
-            angle += 0.003
         pygame.display.flip()
 
     pygame.quit()
