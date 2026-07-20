@@ -159,7 +159,7 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0] + radius, position[1] + radius),
+            (position[0], position[1]),
             radius,
             0.5 * math.pi,
             1 * math.pi,
@@ -168,7 +168,7 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0] + size[0] - radius, position[1] + radius),
+            (position[0] + size[0] - 2 * radius, position[1]),
             radius,
             0 * math.pi,
             0.5 * math.pi,
@@ -177,7 +177,7 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0] + size[0] - radius, position[1] + size[1] - radius),
+            (position[0] + size[0] - 2 * radius, position[1] + size[1] - 2 * radius),
             radius,
             1.5 * math.pi,
             2 * math.pi,
@@ -186,10 +186,10 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0] + radius, position[1] + size[1] - radius),
+            (position[0], position[1] + size[1] - 2 * radius),
             radius,
             1 * math.pi,
             1.5 * math.pi,
             filled,
         )
-            
+
