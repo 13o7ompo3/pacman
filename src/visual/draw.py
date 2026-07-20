@@ -92,3 +92,104 @@ class Draw:
             rect = Draw.cache[cache_key]
 
         surface.blit(rect, position)
+
+    @staticmethod
+    def rounded_rect(
+        surface: Surface,
+        color: Color | tuple[int, int, int],
+        position: Vector2 | tuple[int, int],
+        size: Vector2 | tuple[int, int],
+        filled: bool,
+        radius: int = 0,
+    ):
+        if isinstance(position, Vector2):
+            position = (int(position.x), int(position.y))
+        if isinstance(size, Vector2):
+            size = (int(size.x), int(size.y))
+        if isinstance(color, Color):
+            color = (color.r, color.g, color.b)
+
+        radius = min(radius, size[0] // 2, size[1] // 2)
+
+        if filled:
+            Draw.rect(
+                surface,
+                color,
+                (position[0] + radius, position[1]),
+                (size[0] - 2 * radius, size[1]),
+                filled,
+            )
+            Draw.rect(
+                surface,
+                color,
+                (position[0], position[1] + radius),
+                (size[0], size[1] - 2 * radius),
+                filled,
+            )
+        else:
+            Draw.rect(
+                surface,
+                color,
+                (position[0] + radius, position[1]),
+                (size[0] - 2 * radius, 1),
+                filled,
+            )
+            Draw.rect(
+                surface,
+                color,
+                (position[0] + radius, position[1] + size[1] - 1),
+                (size[0] - 2 * radius, 1),
+                filled,
+            )
+            Draw.rect(
+                surface,
+                color,
+                (position[0], position[1] + radius),
+                (1, size[1] - 2 * radius),
+                filled,
+            )
+            Draw.rect(
+                surface,
+                color,
+                (position[0] + size[0] - 1, position[1] + radius),
+                (1, size[1] - 2 * radius),
+                filled,
+            )
+
+        Draw.sector(
+            surface,
+            color,
+            (position[0] + radius, position[1] + radius),
+            radius,
+            0.5 * math.pi,
+            1 * math.pi,
+            filled,
+        )
+        Draw.sector(
+            surface,
+            color,
+            (position[0] + size[0] - radius, position[1] + radius),
+            radius,
+            0 * math.pi,
+            0.5 * math.pi,
+            filled,
+        )
+        Draw.sector(
+            surface,
+            color,
+            (position[0] + size[0] - radius, position[1] + size[1] - radius),
+            radius,
+            1.5 * math.pi,
+            2 * math.pi,
+            filled,
+        )
+        Draw.sector(
+            surface,
+            color,
+            (position[0] + radius, position[1] + size[1] - radius),
+            radius,
+            1 * math.pi,
+            1.5 * math.pi,
+            filled,
+        )
+            
