@@ -9,6 +9,11 @@ from src.visual.ui.prompt import Prompt
 from typing import Callable
 
 
+class TerminalState(Enum):
+    WON = "won"
+    LOST = "lost"
+
+
 class InputForm(Node):
     def __init__(
         self,
@@ -17,6 +22,8 @@ class InputForm(Node):
         is_password: bool,
         on_submit: Callable,
     ) -> None:
+        from src.visual.scenes.title import TitleScene
+
         super().__init__(context)
 
         label = Label(
@@ -35,8 +42,26 @@ class InputForm(Node):
             Vector2(context.width / 2, context.height * 5 / 8)
             - self.text_box.size / 2
         )
+
+        def go_to_title(_):
+            context.root_scene.clear_children()
+            context.root_scene.add_child(TitleScene(context))
+
+        title_button = Button(
+            context,
+            "Quit To Tittle",
+            Vector2(150, 30),
+            Color("red"),
+            go_to_title,
+        )
+        title_button.local_position = (
+            Vector2(context.width / 2, context.height * 6 / 8)
+            - title_button.size / 2
+        )
+
         self.add_child(label)
         self.add_child(self.text_box)
+        self.add_child(title_button)
 
     @property
     def value(self) -> str:
@@ -164,7 +189,9 @@ class LogoutForm(Node):
 
 
 class GameOverScene(Node):
-    def __init__(self, context: Context, final_score: int) -> None:
+    def __init__(
+        self, context: Context, final_score: int, state: TerminalState
+    ) -> None:
         super().__init__(context)
         panel = Panel(
             context,
@@ -176,10 +203,15 @@ class GameOverScene(Node):
             context.width / 2 - panel.size.x / 2, context.height / 7
         )
 
+        label_text = (
+            [("Game Over", Color("orange"))]
+            if state is TerminalState.LOST
+            else [("Wa Tbark Allah 3lik Ou Saf", Color("green"))]
+        )
         title = Label(
             context,
-            Vector2(300, 200),
-            [("Game Over", Color("orange"))],
+            Vector2(400, 200),
+            label_text,
             2,
         )
         title.local_position = (
