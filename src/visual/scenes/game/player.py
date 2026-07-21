@@ -39,13 +39,10 @@ class Player(Node):
                 self.next_direction = Direction.LEFT
             if event.key in {pygame.K_RIGHT, pygame.K_d, pygame.K_l}:
                 self.next_direction = Direction.RIGHT
+            if self.direction is None:
+                self.direction = self.next_direction
 
     def _on_update(self, delta: float) -> None:
-        if self.next_direction and self.maze.can_move_player(
-            self.next_direction
-        ):
-            self.direction = self.next_direction
-
         if not self.dead:
             self.animated_position = self.animated_position.move_towards(
                 self.target_position, delta * self.speed
@@ -56,11 +53,17 @@ class Player(Node):
             and self.direction is not None
         ):
             self.maze.tick_player(self.direction)
-            x, y = self.maze.player.get_grid_position()
-            self.target_position = Vector2(
-                x * self.step_size,
-                y * self.step_size,
-            )
+            player_pos = self.maze.player.get_grid_position()
+
+            if self.next_direction and self.maze.can_move_player(
+                self.next_direction
+            ):
+                self.direction = self.next_direction
+                self.target_position = (
+                    Vector2(player_pos) + Vector2(self.next_direction.value)
+                ) * self.step_size
+            else:
+                self.target_position = Vector2(player_pos) * self.step_size
 
     def respawn(self, x, y):
         self.target_position = Vector2(x, y) * self.step_size
