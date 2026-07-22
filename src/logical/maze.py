@@ -256,7 +256,7 @@ class LogicalMaze:
                 valid_moves.append(direction)
         return valid_moves
 
-    def _move_ghost(self, ghost: Ghost) -> None:
+    def _move_ghost(self, ghost: Ghost) -> Direction:
         """Advance a ghost by one step using its current chase behavior.
 
         Dead ghosts (respawn_timer > 0) are skipped — their respawn is
@@ -264,7 +264,7 @@ class LogicalMaze:
         """
         # Ghost is waiting to respawn — tick_timers handles it
         if ghost.state == GhostState.DEAD:
-            return
+            return Direction.NONE
 
         valid_moves = self._get_valid_moves(ghost.get_grid_position())
         if not valid_moves:
@@ -272,7 +272,7 @@ class LogicalMaze:
                 "Ghost at %s has no valid moves",
                 ghost.get_grid_position(),
             )
-            return
+            return Direction.NONE
 
         px, py = self.player.get_grid_position()
         reverse_direction = {
@@ -300,11 +300,7 @@ class LogicalMaze:
                 key=lambda d: abs((ghost.x + d.value[0]) - px)
                 + abs((ghost.y + d.value[1]) - py),
             )
-
-        ghost.x += best_dir.value[0]
-        ghost.y += best_dir.value[1]
-        ghost.last_direction = best_dir
-
+        return best_dir
 
     def respawn_player(self) -> None:
         """Reset the player and all ghosts after a death.
@@ -456,6 +452,23 @@ class LogicalMaze:
         self._pending_events.update(events)
         return
 
+    def get_ghost_next_move(self, ghost_id: int) -> Direction:
+        """Get the next move for a specific ghost without moving it.
+        Arguments:
+            ghost_id: The identity of the ghost to query (0–3).
+        Returns:
+            The Direction the ghost would move next, or Direction.NONE if it
+            cannot move.
+        """
+        ghost = next((g for g in self.ghosts if g.ghost_id == ghost_id), None)
+        if not ghost:
+            return Direction.NONE
+
+        if ghost.next_move:
+            return ghost.next_move
+
+        return Direction.NONE
+
     def tick_ghost(self, ghost_id: int) -> None:
         """Move a single ghost one step and check if it caught the player.
         Arguments:
@@ -474,7 +487,24 @@ class LogicalMaze:
             return
 
         # 1. Move the Ghost
-        self._move_ghost(ghost)
+        if ghost.next_move:
+            # If a next_move is queued, move in that direction
+            nx = ghost.x + ghost.next_move.value[0]
+            ny = ghost.y + ghost.next_move.value[1]
+            ghost.x, ghost.y = nx, ny
+            ghost.last_direction = ghost.next_move
+        else:
+            # Otherwise, determine the next move
+            best_dir = self._move_ghost(ghost)
+            if best_dir != Direction.NONE:
+                nx = ghost.x + best_dir.value[0]
+                ny = ghost.y + best_dir.value[1]
+                ghost.x, ghost.y = nx, ny
+                ghost.last_direction = best_dir
+
+        # Queue the next move for the ghost
+        ghost.next_move = self._move_ghost(ghost)
+
 
         # 2. Check Collision with Player ONLY
         events.update(self._resolve_ghost_collision(ghost))

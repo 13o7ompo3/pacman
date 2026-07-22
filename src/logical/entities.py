@@ -34,3 +34,4 @@ class Ghost(Entity):
         self.ghost_id: int = ghost_id
         self.state: GhostState = GhostState.CHASE
         self.last_direction: Optional[Direction] = None
+        self.next_move: Optional[Direction] = None
