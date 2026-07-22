@@ -50,14 +50,6 @@ def main():
         surface.fill(Color("black"))
         context.root_scene.render()
 
-        Draw.rounded_rect(
-            surface,
-            Color("red"),
-            (100, 100),
-            (50, 20),
-            True,
-            12,
-        )
         pygame.display.flip()
 
     pygame.quit()
