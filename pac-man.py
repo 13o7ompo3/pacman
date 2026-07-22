@@ -10,6 +10,7 @@ from src.db_manager.user import UserManager
 from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
+from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.text_box import TextBox
 
