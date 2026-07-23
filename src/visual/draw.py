@@ -9,38 +9,64 @@ class Draw:
     @staticmethod
     def rect(
         surface: Surface,
-        color: Color | tuple[int, int, int],
         position: Vector2 | tuple[int, int],
         size: Vector2 | tuple[int, int],
-        filled: bool,
+        fill_color: Color | tuple[int, int, int] | None = None,
+        border_color: Color | tuple[int, int, int] | None = None,
+        border_width: int = 0,
         border_radius: int = 0,
     ):
         if isinstance(position, Vector2):
             position = (int(position.x), int(position.y))
         if isinstance(size, Vector2):
             size = (int(size.x), int(size.y))
-        if isinstance(color, Color):
-            color = (color.r, color.g, color.b)
+        if isinstance(fill_color, Color):
+            fill_color = (fill_color.r, fill_color.g, fill_color.b)
+        if isinstance(border_color, Color):
+            border_color = (border_color.r, border_color.g, border_color.b)
 
-        cache_key = ("rect", size, color, filled, border_radius)
+        cache_key = (
+            "rect",
+            size,
+            fill_color,
+            border_color,
+            border_width,
+            border_radius,
+        )
 
         if cache_key not in Draw.cache:
-            rect = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(rect)
+            rect = Surface((size[0], size[1]), flags=pygame.SRCALPHA)
 
-            for x in range(size[0]):
-                for y in range(size[1]):
-                    if filled:
-                        array[x, y] = color
-                    elif (
-                        x == 0
-                        or x == size[0] - 1
-                        or y == 0
-                        or y == size[1] - 1
-                    ):
-                        array[x, y] = color
+            if fill_color:
+                if border_radius == 0:
+                    Draw._rect_filled(rect, (0, 0), size, fill_color)
+                elif border_radius > 0:
+                    Draw._rect_round(
+                        rect,
+                        (0, 0),
+                        size,
+                        border_width,
+                        border_radius,
+                        True,
+                        fill_color,
+                    )
 
-            array.close()
+            if border_color and border_width > 0:
+                if border_radius == 0:
+                    Draw._rect_outline(
+                        rect, (0, 0), size, border_color, border_width
+                    )
+                elif border_radius > 0:
+                    Draw._rect_round(
+                        rect,
+                        (0, 0),
+                        size,
+                        border_width,
+                        border_radius,
+                        False,
+                        border_color,
+                    )
+
             Draw.cache[cache_key] = rect
         else:
             rect = Draw.cache[cache_key]
@@ -48,10 +74,48 @@ class Draw:
         surface.blit(rect, position)
 
     @staticmethod
+    def _rect_filled(
+        surface: Surface,
+        position: tuple[int, int],
+        size: tuple[int, int],
+        color: tuple[int, int, int],
+    ) -> None:
+        array = PixelArray(surface)
+        for x in range(position[0], size[0] + position[0]):
+            for y in range(position[1], size[1] + position[1]):
+                array[x, y] = color
+        array.close()
+
+    @staticmethod
+    def _rect_outline(
+        surface: Surface,
+        position: tuple[int, int],
+        size: tuple[int, int],
+        color: tuple[int, int, int],
+        border_width: int,
+    ) -> None:
+        min_x_bound = position[0]
+        max_x_bound = size[0] + position[0] - 1
+        min_y_bound = position[1]
+        max_y_bound = size[1] + position[1] - 1
+        array = PixelArray(surface)
+        for x in range(position[0], size[0] + position[0]):
+            for y in range(position[1], size[1] + position[1]):
+                if (
+                    (min_x_bound <= x < min_x_bound + border_width)
+                    or (max_x_bound - border_width < x <= max_x_bound)
+                    or (min_y_bound <= y < min_y_bound + border_width)
+                    or (max_y_bound - border_width < y <= max_y_bound)
+                ):
+                    array[x, y] = color
+        array.close()
+
+    @staticmethod
     def sector(
         surface: Surface,
         color: Color | tuple[int, int, int],
         position: Vector2 | tuple[int, int],
+        border_width: int,
         radius: int,
         start_angle: float,
         end_angle: float,
@@ -67,6 +131,7 @@ class Draw:
             color,
             position,
             radius,
+            border_width,
             start_angle,
             end_angle,
             filled,
@@ -74,93 +139,139 @@ class Draw:
 
         if cache_key not in Draw.cache:
             size = (radius * 2 + 1, radius * 2 + 1)
-            rect = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(rect)
+            sector = Surface(size, flags=pygame.SRCALPHA)
+            array = PixelArray(sector)
 
             for x in range(-radius, radius + 1):
                 for y in range(-radius, radius + 1):
-                    length = round(math.sqrt((x) ** 2 + (y) ** 2))
+                    length = math.sqrt((x) ** 2 + (y) ** 2)
                     angle = math.atan2(y, -x)
                     in_sector = start_angle <= angle + math.pi <= end_angle
                     if filled and (length <= radius) and in_sector:
                         array[x + radius, y + radius] = color
-                    elif (length == radius) and in_sector:
+                    elif (
+                        radius - border_width < length <= radius
+                    ) and in_sector:
                         array[x + radius, y + radius] = color
 
             array.close()
-            Draw.cache[cache_key] = rect
+            Draw.cache[cache_key] = sector
         else:
-            rect = Draw.cache[cache_key]
+            sector = Draw.cache[cache_key]
 
-        surface.blit(rect, position)
+        surface.blit(sector, position)
 
     @staticmethod
-    def rounded_rect(
+    def circle(
         surface: Surface,
-        color: Color | tuple[int, int, int],
         position: Vector2 | tuple[int, int],
-        size: Vector2 | tuple[int, int],
-        filled: bool,
-        radius: int = 0,
+        radius: int,
+        fill_color: Color | tuple[int, int, int] | None = None,
+        border_color: Color | tuple[int, int, int] | None = None,
+        border_width: int = 0,
     ):
         if isinstance(position, Vector2):
-            position = (int(position.x), int(position.y))
-        if isinstance(size, Vector2):
-            size = (int(size.x), int(size.y))
-        if isinstance(color, Color):
-            color = (color.r, color.g, color.b)
+            position = (int(position.x) - radius, int(position.y) - radius)
+        if isinstance(fill_color, Color):
+            fill_color = (fill_color.r, fill_color.g, fill_color.b)
+        if isinstance(border_color, Color):
+            border_color = (border_color.r, border_color.g, border_color.b)
 
+        cache_key = (
+            "circle",
+            radius,
+            fill_color,
+            border_color,
+            border_width,
+        )
+
+        if cache_key not in Draw.cache:
+            size = (radius * 2 + 1, radius * 2 + 1)
+            circle = Surface(size, flags=pygame.SRCALPHA)
+            array = PixelArray(circle)
+
+            for x in range(-radius, radius + 1):
+                for y in range(-radius, radius + 1):
+                    length = math.sqrt((x) ** 2 + (y) ** 2)
+                    if fill_color and (length < radius):
+                        array[x + radius, y + radius] = fill_color
+                    if (
+                        border_color
+                        and border_width > 0
+                        and radius - border_width <= length < radius
+                    ):
+                        array[x + radius, y + radius] = border_color
+
+            array.close()
+            Draw.cache[cache_key] = circle
+        else:
+            circle = Draw.cache[cache_key]
+
+        surface.blit(circle, position)
+
+    @staticmethod
+    def _rect_round(
+        surface: Surface,
+        position: tuple[int, int],
+        size: tuple[int, int],
+        border_width: int,
+        radius: int,
+        filled: bool,
+        color: tuple[int, int, int],
+    ) -> None:
         radius = min(radius, size[0] // 2, size[1] // 2)
 
         if filled:
-            Draw.rect(
+            Draw._rect_filled(
                 surface,
-                color,
                 (position[0] + radius, position[1]),
-                (size[0] - 2 * radius, size[1] + 1),
-                filled,
-            )
-            Draw.rect(
-                surface,
+                (size[0] - 2 * radius, size[1]),
                 color,
+            )
+            Draw._rect_filled(
+                surface,
                 (position[0], position[1] + radius),
-                (size[0] + 1, size[1] - 2 * radius + 1),
-                filled,
+                (size[0], size[1] - 2 * radius),
+                color,
             )
         else:
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + radius, position[1]),
-                (size[0] - 2 * radius, 1),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + radius, position[1] + size[1]),
-                (size[0] - 2 * radius, 1),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0], position[1] + radius),
-                (1, size[1] - 2 * radius),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + size[0], position[1] + radius),
-                (1, size[1] - 2 * radius),
-                filled,
-            )
+            min_x_bound = position[0]
+            max_x_bound = size[0] + position[0] - 1
+            min_y_bound = position[1]
+            max_y_bound = size[1] + position[1] - 1
+
+            array = PixelArray(surface)
+            for x in range(position[0], size[0] + position[0]):
+                for y in range(position[1], size[1] + position[1]):
+                    in_left_border = (
+                        min_x_bound <= x < min_x_bound + border_width
+                    ) and radius <= y <= max_y_bound - radius
+                    in_right_border = (
+                        max_x_bound - border_width < x <= max_x_bound
+                    ) and radius <= y <= max_y_bound - radius
+                    in_top_border = (
+                        min_y_bound <= y < min_y_bound + border_width
+                    ) and radius <= x <= max_x_bound - radius
+                    in_bottom_border = (
+                        max_y_bound - border_width < y <= max_y_bound
+                    ) and radius <= x <= max_x_bound - radius
+
+                    if any(
+                        (
+                            in_left_border,
+                            in_right_border,
+                            in_top_border,
+                            in_bottom_border,
+                        )
+                    ):
+                        array[x, y] = color
+            array.close()
 
         Draw.sector(
             surface,
             color,
-            (position[0], position[1]),
+            position,
+            border_width,
             radius,
             0.5 * math.pi,
             1 * math.pi,
@@ -169,7 +280,8 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0] + size[0] - 2 * radius, position[1]),
+            (position[0] + size[0] - 2 * radius - 1, position[1]),
+            border_width,
             radius,
             0 * math.pi,
             0.5 * math.pi,
@@ -179,9 +291,10 @@ class Draw:
             surface,
             color,
             (
-                position[0] + size[0] - 2 * radius,
-                position[1] + size[1] - 2 * radius,
+                position[0] + size[0] - 2 * radius - 1,
+                position[1] + size[1] - 2 * radius - 1,
             ),
+            border_width,
             radius,
             1.5 * math.pi,
             2 * math.pi,
@@ -190,7 +303,8 @@ class Draw:
         Draw.sector(
             surface,
             color,
-            (position[0], position[1] + size[1] - 2 * radius),
+            (position[0], position[1] + size[1] - 2 * radius - 1),
+            border_width,
             radius,
             1 * math.pi,
             1.5 * math.pi,

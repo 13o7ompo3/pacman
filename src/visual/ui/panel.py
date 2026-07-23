@@ -1,4 +1,5 @@
 from src.visual import Node, Context
+from src.visual.draw import Draw
 from src.visual.ui.label import Label
 from pygame import (
     Color,
@@ -36,26 +37,22 @@ class Panel(Node):
         if border_color is None:
             border_color = color.lerp("darkblue", 0.3)
 
-        draw.rect(
+        Draw.rect(
             self.surface,
-            color,
-            self.rect,
-            0,
-            border_radius,
+            self.rect.topleft,
+            self.rect.size,
+            fill_color=color,
+            border_color=border_color,
+            border_width=border_width,
+            border_radius=border_radius,
         )
-        draw.rect(
+        Draw.rect(
             self.surface,
-            border_color,
-            self.rect,
-            border_width,
-            border_radius,
-        )
-        draw.rect(
-            self.surface,
-            outer_border_color,
-            self.rect,
-            1,
-            border_radius,
+            self.rect.topleft,
+            self.rect.size,
+            border_width=1,
+            border_color=outer_border_color,
+            border_radius=border_radius,
         )
         super().__init__(context)
 
