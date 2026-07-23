@@ -57,8 +57,8 @@ def main():
             (200, 150),
             fill_color=Color("crimson"),
             border_color=Color("white"),
-            border_width=5,
-            border_radius=17,
+            border_width=2,
+            border_radius=18,
         )
 
         pygame.display.flip()

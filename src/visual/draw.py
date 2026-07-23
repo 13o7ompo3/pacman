@@ -45,6 +45,7 @@ class Draw:
                         rect,
                         (0, 0),
                         size,
+                        border_width,
                         border_radius,
                         True,
                         fill_color,
@@ -60,6 +61,7 @@ class Draw:
                         rect,
                         (0, 0),
                         size,
+                        border_width,
                         border_radius,
                         False,
                         border_color,
@@ -113,6 +115,7 @@ class Draw:
         surface: Surface,
         color: Color | tuple[int, int, int],
         position: Vector2 | tuple[int, int],
+        border_width: int,
         radius: int,
         start_angle: float,
         end_angle: float,
@@ -145,7 +148,9 @@ class Draw:
                     in_sector = start_angle <= angle + math.pi <= end_angle
                     if filled and (length <= radius) and in_sector:
                         array[x + radius, y + radius] = color
-                    elif (radius - 1 <= length <= radius + 1) and in_sector:
+                    elif (
+                        radius - border_width <= length <= radius
+                    ) and in_sector:
                         array[x + radius, y + radius] = color
 
             array.close()
@@ -160,6 +165,7 @@ class Draw:
         surface: Surface,
         position: tuple[int, int],
         size: tuple[int, int],
+        border_width: int,
         radius: int,
         filled: bool,
         color: tuple[int, int, int],
@@ -189,21 +195,17 @@ class Draw:
             for x in range(position[0], size[0] + position[0]):
                 for y in range(position[1], size[1] + position[1]):
                     in_left_border = (
-                        x == min_x_bound
-                        and radius <= y <= max_y_bound - radius
-                    )
+                        min_x_bound <= x < min_x_bound + border_width
+                    ) and radius <= y <= max_y_bound - radius
                     in_right_border = (
-                        x == max_x_bound
-                        and radius <= y <= max_y_bound - radius
-                    )
+                        max_x_bound - border_width < x <= max_x_bound
+                    ) and radius <= y <= max_y_bound - radius
                     in_top_border = (
-                        y == min_y_bound
-                        and radius <= x <= max_x_bound - radius
-                    )
+                        min_y_bound <= y < min_y_bound + border_width
+                    ) and radius <= x <= max_x_bound - radius
                     in_bottom_border = (
-                        y == max_y_bound
-                        and radius <= x <= max_x_bound - radius
-                    )
+                        max_y_bound - border_width < y <= max_y_bound
+                    ) and radius <= x <= max_x_bound - radius
 
                     if any(
                         (
@@ -220,6 +222,7 @@ class Draw:
             surface,
             color,
             position,
+            border_width,
             radius,
             0.5 * math.pi,
             1 * math.pi,
@@ -229,6 +232,7 @@ class Draw:
             surface,
             color,
             (position[0] + size[0] - 2 * radius - 1, position[1]),
+            border_width,
             radius,
             0 * math.pi,
             0.5 * math.pi,
@@ -241,6 +245,7 @@ class Draw:
                 position[0] + size[0] - 2 * radius - 1,
                 position[1] + size[1] - 2 * radius - 1,
             ),
+            border_width,
             radius,
             1.5 * math.pi,
             2 * math.pi,
@@ -250,109 +255,7 @@ class Draw:
             surface,
             color,
             (position[0], position[1] + size[1] - 2 * radius - 1),
-            radius,
-            1 * math.pi,
-            1.5 * math.pi,
-            filled,
-        )
-
-    @staticmethod
-    def rounded_rect(
-        surface: Surface,
-        color: Color | tuple[int, int, int],
-        position: Vector2 | tuple[int, int],
-        size: Vector2 | tuple[int, int],
-        filled: bool,
-        radius: int = 0,
-    ):
-        if isinstance(position, Vector2):
-            position = (int(position.x), int(position.y))
-        if isinstance(size, Vector2):
-            size = (int(size.x), int(size.y))
-        if isinstance(color, Color):
-            color = (color.r, color.g, color.b)
-
-        radius = min(radius, size[0] // 2, size[1] // 2)
-
-        if filled:
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + radius, position[1]),
-                (size[0] - 2 * radius, size[1] + 1),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0], position[1] + radius),
-                (size[0] + 1, size[1] - 2 * radius + 1),
-                filled,
-            )
-        else:
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + radius, position[1]),
-                (size[0] - 2 * radius, 1),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + radius, position[1] + size[1]),
-                (size[0] - 2 * radius, 1),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0], position[1] + radius),
-                (1, size[1] - 2 * radius),
-                filled,
-            )
-            Draw.rect(
-                surface,
-                color,
-                (position[0] + size[0], position[1] + radius),
-                (1, size[1] - 2 * radius),
-                filled,
-            )
-
-        Draw.sector(
-            surface,
-            color,
-            (position[0], position[1]),
-            radius,
-            0.5 * math.pi,
-            1 * math.pi,
-            filled,
-        )
-        Draw.sector(
-            surface,
-            color,
-            (position[0] + size[0] - 2 * radius, position[1]),
-            radius,
-            0 * math.pi,
-            0.5 * math.pi,
-            filled,
-        )
-        Draw.sector(
-            surface,
-            color,
-            (
-                position[0] + size[0] - 2 * radius,
-                position[1] + size[1] - 2 * radius,
-            ),
-            radius,
-            1.5 * math.pi,
-            2 * math.pi,
-            filled,
-        )
-        Draw.sector(
-            surface,
-            color,
-            (position[0], position[1] + size[1] - 2 * radius),
+            border_width,
             radius,
             1 * math.pi,
             1.5 * math.pi,
