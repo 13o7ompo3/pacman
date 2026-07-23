@@ -1,4 +1,5 @@
 from src.visual import Context, Node
+from src.visual.draw import Draw
 from pygame import (
     BLEND_RGBA_MULT,
     KEYDOWN,
@@ -116,40 +117,41 @@ class Button(Node):
 
     def _on_draw(self) -> None:
         if self.is_pressed:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                self.fg_color,
-                self.pressed_rect,
+                self.pressed_rect.topleft,
+                self.pressed_rect.size,
+                fill_color=self.fg_color,
+                border_color=Color("white"),
                 border_radius=self.border_radius,
-            )
-            draw.rect(
-                self.context.screen,
-                Color("white"),
-                self.pressed_rect,
-                1,
-                self.border_radius,
+                border_width=1,
             )
             self.context.screen.blit(
                 self.content, self.pressed_content_position
             )
         else:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                self.bg_color,
-                self.bg_rect,
+                self.bg_rect.topleft,
+                self.bg_rect.size,
+                fill_color=self.bg_color,
                 border_radius=self.border_radius,
             )
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                self.fg_color,
-                self.fg_rect,
+                self.fg_rect.topleft,
+                self.fg_rect.size,
+                fill_color=self.fg_color,
                 border_radius=self.border_radius,
             )
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                Color("white") if self.is_hovered else self.border_color,
-                self.bg_rect,
-                1,
-                self.border_radius,
+                self.bg_rect.topleft,
+                self.bg_rect.size,
+                border_color=Color("white")
+                if self.is_hovered
+                else self.border_color,
+                border_width=1,
+                border_radius=self.border_radius,
             )
             self.context.screen.blit(self.content, self.content_position)

@@ -2,6 +2,7 @@ from enum import Enum
 
 from pygame import Color, Rect, Vector2, draw
 from src.visual import Node, Context
+from src.visual.draw import Draw
 
 
 class ProgressBarOrientation(Enum):
@@ -65,20 +66,23 @@ class ProgressBar(Node):
             )
             if progress.x < (self.border_radius * 2 + 2):
                 inflate.y = (self.border_radius * 2 + 2) - progress.x
-        draw.rect(
+        progress_rect = Rect(
+            self.world_position,
+            progress,
+        ).inflate(-inflate.x, -inflate.y)
+
+        Draw.rect(
             self.context.screen,
-            self.progress_color,
-            Rect(
-                self.world_position,
-                progress,
-            ).inflate(-inflate.x, -inflate.y),
-            0,
-            self.border_radius,
+            progress_rect.topleft,
+            progress_rect.size,
+            fill_color=self.progress_color,
+            border_radius=self.border_radius,
         )
-        draw.rect(
+        Draw.rect(
             self.context.screen,
-            self.border_color,
-            Rect(self.world_position, self.size),
-            self.border_width,
-            self.border_radius,
+            self.world_position,
+            self.size,
+            border_color=self.border_color,
+            border_width=self.border_width,
+            border_radius=self.border_radius,
         )

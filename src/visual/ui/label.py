@@ -1,6 +1,7 @@
 import pygame
 from src.visual import Context, Node
 from pygame import Color, Rect, Surface, Vector2, draw, transform
+from src.visual.draw import Draw
 
 
 class Label(Node):
@@ -10,9 +11,8 @@ class Label(Node):
         box_size: Vector2,
         texts: list[tuple[str, Color]],
         scale: int = 1,
-        background_color: Color = Color(0, 0, 0, 0),
-        border_color: Color = Color(0, 0, 0, 0),
-        border_width: int = 0,
+        background_color: Color | None = None,
+        border_color: Color | None = None,
         border_radius: int = 0,
     ) -> None:
         super().__init__(context)
@@ -41,21 +41,15 @@ class Label(Node):
         self.text = Surface(label_size, pygame.SRCALPHA)
 
         self.size = box_size
-        draw.rect(
+        Draw.rect(
             self.text,
+            (0, 0),
+            label_size,
             background_color,
-            Rect(Vector2(), label_size),
-            0,
+            border_color,
+            1,
             border_radius,
         )
-        if border_width > 0:
-            draw.rect(
-                self.text,
-                border_color,
-                Rect(Vector2(), label_size),
-                border_width,
-                border_radius,
-            )
         self.text.blit(text, label_size / 2 - text_size / 2)
 
     def _on_draw(self) -> None:
