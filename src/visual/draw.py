@@ -50,24 +50,20 @@ class Draw:
                         fill_color,
                     )
 
-            if border_color:
-                for i in range(border_width):
-                    border_pos = (i, i)
-                    border_size = (size[0] - i * 2, size[1] - i * 2)
-
-                    if border_radius == 0:
-                        Draw._rect_outline(
-                            rect, border_pos, border_size, border_color
-                        )
-                    elif border_radius > 0:
-                        Draw._rect_round(
-                            rect,
-                            border_pos,
-                            border_size,
-                            border_radius,
-                            False,
-                            border_color,
-                        )
+            if border_color and border_width > 0:
+                if border_radius == 0:
+                    Draw._rect_outline(
+                        rect, (0, 0), size, border_color, border_width
+                    )
+                elif border_radius > 0:
+                    Draw._rect_round(
+                        rect,
+                        (0, 0),
+                        size,
+                        border_radius,
+                        False,
+                        border_color,
+                    )
 
             Draw.cache[cache_key] = rect
         else:
@@ -94,6 +90,7 @@ class Draw:
         position: tuple[int, int],
         size: tuple[int, int],
         color: tuple[int, int, int],
+        border_width: int,
     ) -> None:
         min_x_bound = position[0]
         max_x_bound = size[0] + position[0] - 1
@@ -103,10 +100,10 @@ class Draw:
         for x in range(position[0], size[0] + position[0]):
             for y in range(position[1], size[1] + position[1]):
                 if (
-                    x == min_x_bound
-                    or x == max_x_bound
-                    or y == min_y_bound
-                    or y == max_y_bound
+                    (min_x_bound <= x < min_x_bound + border_width)
+                    or (max_x_bound - border_width < x <= max_x_bound)
+                    or (min_y_bound <= y < min_y_bound + border_width)
+                    or (max_y_bound - border_width < y <= max_y_bound)
                 ):
                     array[x, y] = color
         array.close()

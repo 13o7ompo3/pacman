@@ -57,7 +57,7 @@ def main():
             (200, 150),
             fill_color=Color("crimson"),
             border_color=Color("white"),
-            border_width=1,
+            border_width=5,
             border_radius=17,
         )
 
