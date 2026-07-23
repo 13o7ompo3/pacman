@@ -11,6 +11,7 @@ from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
+from src.visual.ui.panel import Panel
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.text_box import TextBox
 
@@ -50,24 +51,6 @@ def main():
         # render the scene tree
         surface.fill(Color("black"))
         context.root_scene.render()
-
-        Draw.rect(
-            surface,
-            (100, 100),
-            (200, 150),
-            fill_color=Color("crimson"),
-            border_color=Color("white"),
-            border_width=2,
-            border_radius=16,
-        )
-        Draw.circle(
-            surface,
-            (300, 300),
-            radius=25,
-            fill_color=Color("crimson"),
-            border_color=Color("white"),
-            border_width=1,
-        )
 
         pygame.display.flip()
 

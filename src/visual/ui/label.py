@@ -41,24 +41,15 @@ class Label(Node):
         self.text = Surface(label_size, pygame.SRCALPHA)
 
         self.size = box_size
-        if background_color:
-            Draw.rect(
-                self.text,
-                background_color,
-                (0, 0),
-                label_size,
-                True,
-                border_radius,
-            )
-        if border_color:
-            Draw.rect(
-                self.text,
-                border_color,
-                (0, 0),
-                label_size,
-                False,
-                border_radius,
-            )
+        Draw.rect(
+            self.text,
+            (0, 0),
+            label_size,
+            background_color,
+            border_color,
+            1,
+            border_radius,
+        )
         self.text.blit(text, label_size / 2 - text_size / 2)
 
     def _on_draw(self) -> None:
