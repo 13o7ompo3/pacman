@@ -1,4 +1,5 @@
 from src.logical.entities import Ghost
+from src.visual.draw import Draw
 from src.logical.game_event import AteGhostEvent
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
@@ -42,11 +43,11 @@ class VisualGhost(Node):
         )
 
     def _on_draw(self) -> None:
-        draw.circle(
+        Draw.circle(
             self.context.screen,
-            Color("blue"),
             self.world_position + self.animated_position,
             4,
+            Color("blue"),
         )
 
     def respawn(self, x, y):

@@ -1,4 +1,5 @@
 from src.visual import Context, Node
+from src.visual.draw import Draw
 from pygame import (
     K_RETURN,
     Color,
@@ -40,27 +41,23 @@ class Prompt(Node):
         )
         self.content = Surface(self.size, flags=pygame.SRCALPHA)
 
-        draw.rect(
+        Draw.rect(
             self.content,
-            Color("blue"),
-            Rect((0, 0), self.size),
+            (0, 0),
+            self.size,
+            fill_color=Color("blue"),
+            border_color=Color("white"),
             border_radius=7,
+            border_width=1,
         )
-        draw.rect(
+        Draw.rect(
             self.content,
-            Color("white"),
-            Rect((0, 0), self.size),
-            width=1,
-            border_radius=7,
-        )
-        draw.line(
-            self.content,
-            Color("white"),
-            (padding.x, self.title.get_size()[1] + padding.y * 2),
+            (int(padding.x), int(self.title.get_size()[1] + padding.y * 2)),
             (
-                self.size.x - padding.x,
-                self.title.get_size()[1] + padding.y * 2,
+                int(self.size.x - 2 * padding.x),
+                2,
             ),
+            fill_color=Color("white"),
         )
         self.content.blit(
             self.title,
