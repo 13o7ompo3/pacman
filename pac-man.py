@@ -51,6 +51,16 @@ def main():
         surface.fill(Color("black"))
         context.root_scene.render()
 
+        Draw.rect(
+            surface,
+            (100, 100),
+            (200, 150),
+            fill_color=Color("crimson"),
+            border_color=Color("white"),
+            border_width=1,
+            border_radius=17,
+        )
+
         pygame.display.flip()
 
     pygame.quit()
