@@ -58,7 +58,15 @@ def main():
             fill_color=Color("crimson"),
             border_color=Color("white"),
             border_width=2,
-            border_radius=18,
+            border_radius=16,
+        )
+        Draw.circle(
+            surface,
+            (300, 300),
+            radius=25,
+            fill_color=Color("crimson"),
+            border_color=Color("white"),
+            border_width=1,
         )
 
         pygame.display.flip()

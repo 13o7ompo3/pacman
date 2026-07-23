@@ -131,6 +131,7 @@ class Draw:
             color,
             position,
             radius,
+            border_width,
             start_angle,
             end_angle,
             filled,
@@ -138,8 +139,8 @@ class Draw:
 
         if cache_key not in Draw.cache:
             size = (radius * 2 + 1, radius * 2 + 1)
-            rect = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(rect)
+            sector = Surface(size, flags=pygame.SRCALPHA)
+            array = PixelArray(sector)
 
             for x in range(-radius, radius + 1):
                 for y in range(-radius, radius + 1):
@@ -149,16 +150,64 @@ class Draw:
                     if filled and (length <= radius) and in_sector:
                         array[x + radius, y + radius] = color
                     elif (
-                        radius - border_width <= length <= radius
+                        radius - border_width < length <= radius
                     ) and in_sector:
                         array[x + radius, y + radius] = color
 
             array.close()
-            Draw.cache[cache_key] = rect
+            Draw.cache[cache_key] = sector
         else:
-            rect = Draw.cache[cache_key]
+            sector = Draw.cache[cache_key]
 
-        surface.blit(rect, position)
+        surface.blit(sector, position)
+
+    @staticmethod
+    def circle(
+        surface: Surface,
+        position: Vector2 | tuple[int, int],
+        radius: int,
+        fill_color: Color | tuple[int, int, int] | None = None,
+        border_color: Color | tuple[int, int, int] | None = None,
+        border_width: int = 0,
+    ):
+        if isinstance(position, Vector2):
+            position = (int(position.x) - radius, int(position.y) - radius)
+        if isinstance(fill_color, Color):
+            fill_color = (fill_color.r, fill_color.g, fill_color.b)
+        if isinstance(border_color, Color):
+            border_color = (border_color.r, border_color.g, border_color.b)
+
+        cache_key = (
+            "circle",
+            radius,
+            fill_color,
+            border_color,
+            border_width,
+        )
+
+        if cache_key not in Draw.cache:
+            size = (radius * 2 + 1, radius * 2 + 1)
+            circle = Surface(size, flags=pygame.SRCALPHA)
+            array = PixelArray(circle)
+
+            for x in range(-radius, radius + 1):
+                for y in range(-radius, radius + 1):
+                    length = math.sqrt((x) ** 2 + (y) ** 2)
+                    if fill_color and (length < radius):
+                        array[x + radius, y + radius] = fill_color
+                    if (
+                        border_color
+                        and border_width > 0
+                        and radius - border_width <= length < radius
+                    ):
+                        array[x + radius, y + radius] = border_color
+
+            array.close()
+            Draw.cache[cache_key] = circle
+        else:
+            circle = Draw.cache[cache_key]
+
+        surface.blit(circle, position)
 
     @staticmethod
     def _rect_round(
