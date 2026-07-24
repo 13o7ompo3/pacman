@@ -3,7 +3,11 @@ import json
 import logging
 from typing import List
 
+<<<<<<< HEAD
 logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
+=======
+logger = logging.getLogger(__name__)
+>>>>>>> main
 
 
 class LevelConfig(BaseModel):
@@ -37,8 +41,13 @@ def parse_config(config_file: str) -> Config:
         with open(config_file, 'r') as f:
             raw_content = f.read()
     except OSError as e:
+<<<<<<< HEAD
         logging.error(f"File error '{config_file}': {e}."
                       " Proceeding with safe defaults.")
+=======
+        logger.error(f"File error '{config_file}': {e}."
+                     " Proceeding with safe defaults.")
+>>>>>>> main
         return Config()
 
     cleaned_content = _strip_comments(raw_content)
@@ -48,15 +57,25 @@ def parse_config(config_file: str) -> Config:
         if not isinstance(config_data, dict):
             raise ValueError("JSON root must be a dictionary.")
     except (json.JSONDecodeError, ValueError) as e:
+<<<<<<< HEAD
         logging.error(f"Parse error in '{config_file}': {e}."
                       " Proceeding with safe defaults.")
+=======
+        logger.error(f"Parse error in '{config_file}': {e}."
+                     " Proceeding with safe defaults.")
+>>>>>>> main
         return Config()
 
     try:
         return Config(**config_data)
     except ValidationError as e:
+<<<<<<< HEAD
         logging.warning("Invalid configuration values detected. "
                         "Clamping to defaults.")
+=======
+        logger.warning("Invalid configuration values detected. "
+                       "Clamping to defaults.")
+>>>>>>> main
         safe_data = config_data.copy()
         for error in e.errors():
             if len(error['loc']) > 0:
@@ -66,6 +85,11 @@ def parse_config(config_file: str) -> Config:
         try:
             return Config(**safe_data)
         except ValidationError:
+<<<<<<< HEAD
             logging.error("Critical validation failure. "
                           "Proceeding with safe defaults.")
+=======
+            logger.error("Critical validation failure. "
+                         "Proceeding with safe defaults.")
+>>>>>>> main
             return Config()

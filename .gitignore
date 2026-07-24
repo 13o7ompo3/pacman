@@ -1,1 +1,10 @@
+<<<<<<< HEAD
 __pycache__/
+=======
+__pycache__
+.mypy_cache
+dist
+Pac-man.spec
+build
+database/
+>>>>>>> main

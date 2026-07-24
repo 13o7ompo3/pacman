@@ -7,8 +7,21 @@ requires-python = ">=3.13"
 dependencies = [
     "pydantic>=2.13.4",
     "pygame>=2.6.1",
+<<<<<<< HEAD
+=======
+    "pyinstaller>=6.21.0",
+>>>>>>> main
 ]
 
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
+<<<<<<< HEAD
+=======
+
+[dependency-groups]
+dev = [
+    "flake8>=7.3.0",
+    "mypy>=2.1.0",
+]
+>>>>>>> main
