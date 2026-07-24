@@ -1,4 +1,5 @@
 from inspect import cleandoc
+from src.visual.draw import Draw
 from pydantic import BaseModel
 from pygame import KEYDOWN, Rect, Surface
 import pygame
@@ -46,67 +47,57 @@ class Cell(Node):
 
     def _on_draw(self) -> None:
         if self.left and self.right and self.top and self.bottom:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                Color("crimson"),
-                Rect(
-                    self.world_position,
-                    Vector2(
-                        self.size,
-                        self.size,
-                    ),
+                self.world_position,
+                Vector2(
+                    self.size,
+                    self.size,
                 ),
+                Color("crimson"),
             )
             return
         if self.left:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                Color("cyan"),
-                Rect(
-                    self.world_position,
-                    Vector2(
-                        self.wall_thickness,
-                        self.size,
-                    ),
+                self.world_position,
+                Vector2(
+                    self.wall_thickness,
+                    self.size,
                 ),
+                Color("cyan"),
             )
         if self.top:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                Color("cyan"),
-                Rect(
-                    self.world_position,
-                    Vector2(
-                        self.size,
-                        self.wall_thickness,
-                    ),
+                self.world_position,
+                Vector2(
+                    self.size,
+                    self.wall_thickness,
                 ),
+                Color("cyan"),
             )
         if self.right:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                Color("cyan"),
-                Rect(
-                    self.world_position
-                    + Vector2(self.size - self.wall_thickness, 0),
-                    Vector2(
-                        self.wall_thickness,
-                        self.size,
-                    ),
+                self.world_position
+                + Vector2(self.size - self.wall_thickness, 0),
+                Vector2(
+                    self.wall_thickness,
+                    self.size,
                 ),
+                Color("cyan"),
             )
         if self.bottom:
-            draw.rect(
+            Draw.rect(
                 self.context.screen,
-                Color("cyan"),
-                Rect(
-                    self.world_position
-                    + Vector2(0, self.size - self.wall_thickness),
-                    Vector2(
-                        self.size,
-                        self.wall_thickness,
-                    ),
+                self.world_position
+                + Vector2(0, self.size - self.wall_thickness),
+                Vector2(
+                    self.size,
+                    self.wall_thickness,
                 ),
+                Color("cyan"),
             )
 
 
@@ -205,20 +196,20 @@ class VisualMaze(Node):
 
     def _on_draw(self) -> None:
         for x, y in self.logical_maze.pacgums:
-            draw.circle(
+            Draw.circle(
                 self.context.screen,
-                Color("#444444"),
                 self.world_position
                 + Vector2(self.cell_size) / 2
                 + Vector2(x, y) * self.cell_size,
                 2,
+                Color("#444444"),
             )
         for x, y in self.logical_maze.super_pacgums:
-            draw.circle(
+            Draw.circle(
                 self.context.screen,
-                Color("gold"),
                 self.world_position
                 + Vector2(self.cell_size) / 2
                 + Vector2(x, y) * self.cell_size,
                 3,
+                Color("gold"),
             )

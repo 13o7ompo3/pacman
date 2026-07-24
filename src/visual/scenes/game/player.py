@@ -1,4 +1,5 @@
 import pygame
+from src.visual.draw import Draw
 from pygame.event import Event
 from pygame import draw, Color, Vector2, KEYDOWN
 from src.logical.core_types import PlayerState
@@ -70,10 +71,9 @@ class Player(Node):
         self.animated_position = self.target_position.copy()
 
     def _on_draw(self) -> None:
-        draw.circle(
+        Draw.circle(
             self.context.screen,
-            Color("yellow"),
             self.world_position + self.animated_position,
             5,
-            False,
+            Color("yellow"),
         )

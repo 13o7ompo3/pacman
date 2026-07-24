@@ -1,13 +1,17 @@
 import logging
 
 import pygame
+import math
 from pygame.time import Clock
-from pygame import Color, Vector2
+from pygame import Color, Vector2, Rect
+from src.visual.draw import Draw
 
 from src.db_manager.user import UserManager
 from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
 from src.visual.scenes.title import TitleScene
+from src.visual.ui.label import Label
+from src.visual.ui.panel import Panel
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.text_box import TextBox
 
