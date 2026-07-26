@@ -120,7 +120,7 @@ class LoginForms(Node):
             context, "Username: ", False, on_username_submit
         )
         password_form = InputForm(
-            context, "Password: ", False, on_password_submit
+            context, "Password: ", True, on_password_submit
         )
         password_form.hidden = True
 
