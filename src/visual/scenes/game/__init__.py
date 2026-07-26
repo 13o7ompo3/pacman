@@ -37,7 +37,10 @@ class GumTimer(Node):
             0,
             self.radius - 1,
             0,
-            2 * math.pi * 2000 / self.logical_maze.super_pacgum_duration,
+            2
+            * math.pi
+            * self.logical_maze.player.gum_timer
+            / self.logical_maze.super_pacgum_duration,
             True,
         )
         Draw.circle(
@@ -61,13 +64,31 @@ class TitleLabel(Node):
         accent_color: Color,
     ) -> None:
         super().__init__(context)
-        self.label = Label(
-            context,
-            Vector2(),
-            [(static_text, Color("white")), (dynamic_text, accent_color)],
-        )
+        self.static_text = static_text
+        self.dynamic_text = dynamic_text
         self.width = width
         self.line_thickness = 4
+        self.accent_color = accent_color
+        self.label = Label(
+            self.context,
+            Vector2(),
+            [
+                (self.static_text, Color("white")),
+                (self.dynamic_text, self.accent_color),
+            ],
+        )
+
+    def update_dynamic_text(self, val: str) -> None:
+        if self.dynamic_text != val:
+            self.label = Label(
+                self.context,
+                Vector2(),
+                [
+                    (self.static_text, Color("white")),
+                    (self.dynamic_text, self.accent_color),
+                ],
+            )
+            self.dynamic_text = val
 
     def _on_draw(self) -> None:
         Draw.rect(
@@ -103,58 +124,74 @@ class InfoBar(Node):
     def __init__(
         self,
         context: Context,
-        static_label: str,
-        dynamic_label: str,
+        static_text: str,
+        dynamic_text: str,
         icon: Surface,
         width: int,
         max_progress: int,
         reversed: bool,
+        progress_color: Color,
     ) -> None:
         super().__init__(context)
         self.width = width
         self.icon = icon
 
-        self.static_text = context.font.render(
-            static_label.center(8), False, Color("white")
+        self.dynamic_text = dynamic_text
+        self.static_text = static_text
+
+        self.static_label = context.font.render(
+            static_text.center(8), False, Color("white")
         )
-        self.dynamic_text = context.font.render(
-            dynamic_label.center(8), False, Color("white")
+        self.dynamic_label = context.font.render(
+            dynamic_text.center(8), False, Color("white")
         )
+        self.max_progress = max_progress
 
         self.last_world_pos = self.world_position
         self.progress = ProgressBar(
             self.context,
             Vector2(
                 width
-                - self.dynamic_text.get_size()[0] * 1.2
+                - self.dynamic_label.get_size()[0] * 1.2
                 - self.icon.get_size()[0] * 1.2,
                 16,
             ),
             ProgressBarOrientation.HORIZONTAL,
-            Color("blue"),
+            progress_color=progress_color,
             border_radius=0,
             total=max_progress,
-            reversed=reversed,
         )
+        self.reversed = reversed
 
         self._update_positions()
         self.add_child(self.progress)
 
+    def update_dynamic_text(self, val: int) -> None:
+        if reversed:
+            val = self.max_progress - val
+        if self.dynamic_text != str(val):
+            self.dynamic_text = str(val)
+            self.dynamic_label = self.context.font.render(
+                self.dynamic_text.center(8), False, Color("white")
+            )
+            self.progress.progress = val
+
     def _update_positions(self) -> None:
         self.icon_pos = self.world_position + Vector2(
             0,
-            self.static_text.get_size()[1] * 1.2
-            - self.dynamic_text.get_size()[1] / 2,
+            self.static_label.get_size()[1] * 1.2
+            - self.dynamic_label.get_size()[1] / 2,
         )
         self.static_text_pos = self.world_position + Vector2(
-            self.width / 2 - self.static_text.get_size()[0] / 2, 0
+            self.width / 2 - self.static_label.get_size()[0] / 2, 0
         )
         self.dynamic_text_pos = self.world_position + Vector2(
-            self.width - self.dynamic_text.get_size()[0],
-            self.static_text.get_size()[1] * 1.2,
+            self.width - self.dynamic_label.get_size()[0],
+            self.static_label.get_size()[1] * 1.2,
         )
         self.progress.local_position = Vector2(
-            self.icon.get_size()[0] * 1.6, self.static_text.get_size()[1] * 1.2
+            self.icon.get_size()[0] * 1.6,
+            self.static_label.get_size()[1] * 1.2,
         )
 
     def _on_update(self, delta: float) -> None:
@@ -164,7 +201,7 @@ class InfoBar(Node):
 
     def _on_draw(self) -> None:
         self.context.screen.blit(
-            self.static_text,
+            self.static_label,
             self.static_text_pos,
         )
         self.context.screen.blit(
@@ -172,7 +209,7 @@ class InfoBar(Node):
             self.icon_pos,
         )
         self.context.screen.blit(
-            self.dynamic_text,
+            self.dynamic_label,
             self.dynamic_text_pos,
         )
 
@@ -232,51 +269,73 @@ class GameScene(Node):
             -210, self.maze.size.y - 150
         )
 
-        score_title_label = TitleLabel(
-            context, "SCORE: ", "3435", int(self.maze.size.x), Color("red")
+        self.score_title_label = TitleLabel(
+            context,
+            "SCORE: ",
+            str(self.logical_maze.player.score),
+            int(self.maze.size.x),
+            Color("red"),
         )
-        score_title_label.local_position = self.maze.world_position - Vector2(
-            0, 50
-        )
-
-        level_title_label = TitleLabel(
-            context, "LEVEL: ", "3", int(self.maze.size.x), Color("yellow")
-        )
-        level_title_label.local_position = self.maze.world_position + Vector2(
-            0, self.maze.size.y + 40
+        self.score_title_label.local_position = (
+            self.maze.world_position - Vector2(0, 50)
         )
 
-        time_bar = InfoBar(
+        self.level_title_label = TitleLabel(
+            context,
+            "LEVEL: ",
+            str(self.logical_maze.current_level_idx + 1),
+            int(self.maze.size.x),
+            Color("yellow"),
+        )
+        self.level_title_label.local_position = (
+            self.maze.world_position + Vector2(0, self.maze.size.y + 40)
+        )
+
+        self.time_bar = InfoBar(
             context,
             "TIME LEFT",
-            "00:34",
+            "0",
             image.load("./assets/icons/clock.png"),
             int(context.width / 2 - self.maze.size.x / 2),
-            100,
-            True,
+            int(self.logical_maze.ticks_remaining / 60),
+            False,
+            Color("orange"),
         )
-        time_bar.local_position = self.maze.local_position + Vector2(
+        self.time_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 - 76
         )
 
-        gums_bar = InfoBar(
+        self.gums_bar = InfoBar(
             context,
             "GUMS EATEN",
-            "43",
+            "43/200",
             image.load("./assets/icons/gum.png"),
             int(context.width / 2 - self.maze.size.x / 2),
-            100,
-            False,
+            len(self.logical_maze.pacgums),
+            True,
+            Color("blue"),
         )
-        gums_bar.local_position = self.maze.local_position + Vector2(
+        self.gums_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 + 50
         )
 
         self.add_child(self.maze)
-        self.add_child(score_title_label)
-        self.add_child(level_title_label)
-        self.add_child(time_bar)
-        self.add_child(gums_bar)
+        self.add_child(self.score_title_label)
+        self.add_child(self.level_title_label)
+        self.add_child(self.time_bar)
+        self.add_child(self.gums_bar)
         self.add_child(gum_timer)
         self.add_child(lives_left)
         self.add_child(pause_button)
+
+    def _on_update(self, delta: float) -> None:
+        self.score_title_label.update_dynamic_text(
+            str(self.logical_maze.player.score)
+        )
+        self.level_title_label.update_dynamic_text(
+            str(self.logical_maze.current_level_idx + 1)
+        )
+        self.gums_bar.update_dynamic_text(len(self.logical_maze.pacgums))
+        self.time_bar.update_dynamic_text(
+            int(self.logical_maze.ticks_remaining / 60)
+        )
