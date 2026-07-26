@@ -11,8 +11,14 @@ class Draw:
         surface: Surface,
         position: Vector2 | tuple[int, int],
         size: Vector2 | tuple[int, int],
-        fill_color: Color | tuple[int, int, int] | None = None,
-        border_color: Color | tuple[int, int, int] | None = None,
+        fill_color: Color
+        | tuple[int, int, int]
+        | tuple[int, int, int, int]
+        | None = None,
+        border_color: Color
+        | tuple[int, int, int]
+        | tuple[int, int, int, int]
+        | None = None,
         border_width: int = 0,
         border_radius: int = 0,
     ):
@@ -21,9 +27,23 @@ class Draw:
         if isinstance(size, Vector2):
             size = (int(size.x), int(size.y))
         if isinstance(fill_color, Color):
-            fill_color = (fill_color.r, fill_color.g, fill_color.b)
+            fill_color = (
+                fill_color.r,
+                fill_color.g,
+                fill_color.b,
+                fill_color.a,
+            )
         if isinstance(border_color, Color):
-            border_color = (border_color.r, border_color.g, border_color.b)
+            border_color = (
+                border_color.r,
+                border_color.g,
+                border_color.b,
+                border_color.a,
+            )
+        if fill_color and len(fill_color) == 3:
+            fill_color = (*fill_color, 255)
+        if border_color and len(border_color) == 3:
+            border_color = (*border_color, 255)
 
         cache_key = (
             "rect",
@@ -78,7 +98,7 @@ class Draw:
         surface: Surface,
         position: tuple[int, int],
         size: tuple[int, int],
-        color: tuple[int, int, int],
+        color: tuple[int, int, int, int],
     ) -> None:
         array = PixelArray(surface)
         for x in range(position[0], size[0] + position[0]):
@@ -91,7 +111,7 @@ class Draw:
         surface: Surface,
         position: tuple[int, int],
         size: tuple[int, int],
-        color: tuple[int, int, int],
+        color: tuple[int, int, int, int],
         border_width: int,
     ) -> None:
         min_x_bound = position[0]
@@ -113,7 +133,7 @@ class Draw:
     @staticmethod
     def sector(
         surface: Surface,
-        color: Color | tuple[int, int, int],
+        color: Color | tuple[int, int, int, int],
         position: Vector2 | tuple[int, int],
         border_width: int,
         radius: int,
@@ -124,7 +144,9 @@ class Draw:
         if isinstance(position, Vector2):
             position = (int(position.x) - radius, int(position.y) - radius)
         if isinstance(color, Color):
-            color = (color.r, color.g, color.b)
+            color = (color.r, color.g, color.b, color.a)
+        if len(color) == 3:
+            color = (*color, 255)
 
         cache_key = (
             "sector",
@@ -166,16 +188,32 @@ class Draw:
         surface: Surface,
         position: Vector2 | tuple[int, int],
         radius: int,
-        fill_color: Color | tuple[int, int, int] | None = None,
-        border_color: Color | tuple[int, int, int] | None = None,
+        fill_color: Color
+        | tuple[int, int, int, int]
+        | tuple[int, int, int]
+        | None = None,
+        border_color: Color
+        | tuple[int, int, int, int]
+        | tuple[int, int, int]
+        | None = None,
         border_width: int = 0,
     ):
         if isinstance(position, Vector2):
             position = (int(position.x) - radius, int(position.y) - radius)
         if isinstance(fill_color, Color):
-            fill_color = (fill_color.r, fill_color.g, fill_color.b)
+            fill_color = (
+                fill_color.r,
+                fill_color.g,
+                fill_color.b,
+                fill_color.a,
+            )
         if isinstance(border_color, Color):
-            border_color = (border_color.r, border_color.g, border_color.b)
+            border_color = (
+                border_color.r,
+                border_color.g,
+                border_color.b,
+                border_color.a,
+            )
 
         cache_key = (
             "circle",
@@ -217,7 +255,7 @@ class Draw:
         border_width: int,
         radius: int,
         filled: bool,
-        color: tuple[int, int, int],
+        color: tuple[int, int, int, int],
     ) -> None:
         radius = min(radius, size[0] // 2, size[1] // 2)
 
