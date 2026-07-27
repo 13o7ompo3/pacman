@@ -397,6 +397,9 @@ class VisualMaze(Node):
             [0, 0, 1, 0, 1, 0, 0],
             [0, 0, 1, 0, 1, 1, 1],
         ]
+        if (len(ft_small)*2 > self.logical_maze.height
+            or len(ft_small[0])*2 > self.logical_maze.width):
+            return
         posy = int((self.logical_maze.height - len(ft_small)) / 2)
         posx = int((self.logical_maze.width - len(ft_small[0])) / 2)
         for y in range(len(ft_small)):
