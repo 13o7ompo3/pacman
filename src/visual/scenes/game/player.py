@@ -1,8 +1,9 @@
 import pygame
 from src.visual.draw import Draw
 from pygame.event import Event
-from pygame import draw, Color, Vector2, KEYDOWN, image
+from pygame import draw, Color, Vector2, KEYDOWN, image, Surface
 from src.visual.utils.sprite import Sprite
+from src.visual.utils.particle import ParticleSystem
 from src.logical.core_types import PlayerState
 from src.logical.game_event import PlayerDiedEvent, PlayerRespawnedEvent
 from src.visual import Context, Node
@@ -63,6 +64,18 @@ class Player(Node):
             ),
         }
         self.idle_img = image.load("assets/player/idle.png").convert_alpha()
+        particle_img = Surface((2, 2), flags=pygame.SRCALPHA)
+        particle_color = Color("#bf53c9")
+        particle_color.a = 100
+        particle_img.fill(particle_color)
+        self.particles = ParticleSystem(
+            context,
+            particle_img,
+            (Vector2(10, 10), Vector2(-10, -10)),
+            (Vector2(0, 0), Vector2(0, 0)),
+            0.4,
+            20,
+        )
 
     def _on_input(self, event: Event) -> None:
         if self.hidden:
@@ -80,9 +93,13 @@ class Player(Node):
                 self.direction = self.next_direction
 
     def _on_update(self, delta: float) -> None:
+        self.particles.update(delta)
         if not self.dead:
             self.animated_position = self.animated_position.move_towards(
                 self.target_position, delta * self.speed
+            )
+            self.particles.local_position = (
+                self.world_position + self.animated_position
             )
 
         if (
@@ -109,6 +126,7 @@ class Player(Node):
         self.animated_position = self.target_position.copy()
 
     def _on_draw(self) -> None:
+        self.particles.render()
         if self.direction is not None:
             sprite = self.sprites[self.direction]
             sprite.local_position = (
