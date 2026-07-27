@@ -48,7 +48,9 @@ class Corner(Node):
         self.context.screen.blit(
             self.surface[3],
             self.world_position
-            + Vector2(self.surface[0].get_width(), self.surface[0].get_height()),
+            + Vector2(
+                self.surface[0].get_width(), self.surface[0].get_height()
+            ),
         )
 
 
@@ -57,7 +59,7 @@ class VisualMaze(Node):
         self,
         context: Context,
         logical_maze: LogicalMaze,
-        cell_size: int = 32,
+        cell_size: int = 16,
     ) -> None:
         super().__init__(context)
         self.logical_maze = logical_maze
@@ -65,111 +67,211 @@ class VisualMaze(Node):
 
         self.surfaces = {
             (False, False, False, False): (
-                pygame.image.load("assets/tiles/empty_rect.png").convert_alpha(),
-                pygame.image.load("assets/tiles/empty_rect.png").convert_alpha(),
-                pygame.image.load("assets/tiles/empty_rect.png").convert_alpha(),
-                pygame.image.load("assets/tiles/empty_rect.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/empty_rect.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/empty_rect.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/empty_rect.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/empty_rect.png"
+                ).convert_alpha(),
             ),
             (True, True, True, True): (
-                pygame.image.load("assets/tiles/corner_bottom_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_bottom_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_left.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_left.png"
+                ).convert_alpha(),
             ),
             (True, False, False, False): (
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_top_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_top_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_top_left.png"
+                ).convert_alpha(),
             ),
             (False, True, False, False): (
-                pygame.image.load("assets/tiles/ball_bottom_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_top_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_bottom_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_top_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
             ),
             (False, False, True, False): (
-                pygame.image.load("assets/tiles/ball_bottom_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_bottom_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_bottom_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_bottom_left.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
             ),
             (False, False, False, True): (
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_bottom_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_bottom_left.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_top_left.png"
+                ).convert_alpha(),
             ),
             (True, True, False, False): (
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_bottom_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_top_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_left.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_top_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
             ),
             (False, True, True, False): (
-                pygame.image.load("assets/tiles/ball_bottom_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_bottom_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_left.png"
+                ).convert_alpha(),
             ),
             (False, False, True, True): (
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_bottom_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_bottom_left.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
             ),
             (True, False, False, True): (
-                pygame.image.load("assets/tiles/corner_bottom_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
-                pygame.image.load("assets/tiles/ball_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/ball_top_left.png"
+                ).convert_alpha(),
             ),
             (True, False, True, False): (
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
             ),
             (False, True, False, True): (
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
             ),
             (True, True, False, True): (
-                pygame.image.load("assets/tiles/corner_bottom_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_bottom_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_left.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
                 pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
             ),
             (True, False, True, True): (
-                pygame.image.load("assets/tiles/corner_bottom_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_right.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_right.png"
+                ).convert_alpha(),
                 pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
             ),
             (False, True, True, True): (
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_bottom.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_bottom.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_left.png"
+                ).convert_alpha(),
             ),
             (True, True, True, False): (
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_bottom_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_right.png").convert_alpha(),
-                pygame.image.load("assets/tiles/corner_top_left.png").convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_bottom_left.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/bar_right.png"
+                ).convert_alpha(),
+                pygame.image.load(
+                    "assets/tiles/corner_top_left.png"
+                ).convert_alpha(),
             ),
         }
         self.refresh()
 
-    def get_surface_for_corner(self, cells: list[int]) -> tuple[Surface, Surface, Surface, Surface]:
+    def get_surface_for_corner(
+        self, cells: list[int]
+    ) -> tuple[Surface, Surface, Surface, Surface]:
         top = cells[0] & 2 | cells[1] & 8
         right = cells[1] & 4 | cells[3] & 1
         bottom = cells[2] & 2 | cells[3] & 8
         left = cells[0] & 4 | cells[2] & 1
 
-        return self.surfaces[(bool(top), bool(right), bool(bottom), bool(left))]
+        return self.surfaces[
+            (bool(top), bool(right), bool(bottom), bool(left))
+        ]
 
     def refresh(self):
         self.clear_children()
@@ -205,8 +307,7 @@ class VisualMaze(Node):
                 ]
 
                 corner = Corner(
-                    self.context,
-                    self.get_surface_for_corner(cells)
+                    self.context, self.get_surface_for_corner(cells)
                 )
 
                 corner.local_position = Vector2(
@@ -289,12 +390,13 @@ class VisualMaze(Node):
                 Color("gold"),
             )
 
-        ft_small = [[1, 0, 0, 0, 1, 1, 1],
+        ft_small = [
+            [1, 0, 0, 0, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 1],
             [1, 1, 1, 0, 1, 1, 1],
             [0, 0, 1, 0, 1, 0, 0],
-            [0, 0, 1, 0, 1, 1, 1]
-            ]
+            [0, 0, 1, 0, 1, 1, 1],
+        ]
         posy = int((self.logical_maze.height - len(ft_small)) / 2)
         posx = int((self.logical_maze.width - len(ft_small[0])) / 2)
         for y in range(len(ft_small)):
@@ -305,5 +407,5 @@ class VisualMaze(Node):
                         self.world_position
                         + Vector2(posx + x, posy + y) * self.cell_size,
                         Vector2(self.cell_size, self.cell_size),
-                        Color("crimson"),
+                        Color("#bf53c9"),
                     )
