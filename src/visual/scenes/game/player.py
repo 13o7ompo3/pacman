@@ -1,7 +1,8 @@
 import pygame
 from src.visual.draw import Draw
 from pygame.event import Event
-from pygame import draw, Color, Vector2, KEYDOWN
+from pygame import draw, Color, Vector2, KEYDOWN, image
+from src.visual.utils.sprite import Sprite
 from src.logical.core_types import PlayerState
 from src.logical.game_event import PlayerDiedEvent, PlayerRespawnedEvent
 from src.visual import Context, Node
@@ -27,6 +28,41 @@ class Player(Node):
         self.maze = maze
         self.speed = speed
         self.dead = False
+        self.sprites = {
+            Direction.UP: Sprite(
+                context,
+                image.load("assets/player/up.png").convert_alpha(),
+                1,
+                4,
+                10,
+                True,
+            ),
+            Direction.DOWN: Sprite(
+                context,
+                image.load("assets/player/down.png").convert_alpha(),
+                1,
+                4,
+                10,
+                True,
+            ),
+            Direction.LEFT: Sprite(
+                context,
+                image.load("assets/player/left.png").convert_alpha(),
+                1,
+                4,
+                10,
+                True,
+            ),
+            Direction.RIGHT: Sprite(
+                context,
+                image.load("assets/player/right.png").convert_alpha(),
+                1,
+                4,
+                10,
+                True,
+            ),
+        }
+        self.idle_img = image.load("assets/player/idle.png").convert_alpha()
 
     def _on_input(self, event: Event) -> None:
         if self.hidden:
@@ -65,15 +101,24 @@ class Player(Node):
                 ) * self.step_size
             else:
                 self.target_position = Vector2(player_pos) * self.step_size
+        elif self.direction is not None:
+            self.sprites[self.direction].update(delta)
 
     def respawn(self, x, y):
         self.target_position = Vector2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
 
     def _on_draw(self) -> None:
-        Draw.circle(
-            self.context.screen,
-            self.world_position + self.animated_position,
-            5,
-            Color("yellow"),
-        )
+        if self.direction is not None:
+            sprite = self.sprites[self.direction]
+            sprite.local_position = (
+                self.world_position + self.animated_position
+            )
+            sprite.render()
+        else:
+            self.context.screen.blit(
+                self.idle_img,
+                self.world_position
+                + self.animated_position
+                - Vector2(self.idle_img.get_size()) / 2,
+            )

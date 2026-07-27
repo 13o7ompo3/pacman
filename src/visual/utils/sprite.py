@@ -32,24 +32,32 @@ class Sprite(Node):
         parent_width, parent_height = surface.get_size()
         if x < 0 or y < 0 or width <= 0 or height <= 0:
             raise ValueError(
-                "Subsurface rectangle dimensions must be positive.")
+                "Subsurface rectangle dimensions must be positive."
+            )
         if x + width > parent_width or y + height > parent_height:
             raise ValueError(
-                "Subsurface rectangle outside parent surface area.")
-        child_surface = pygame.Surface((width, height),
-                                       flags=surface.get_flags(),
-                                       depth=surface.get_bitsize()).convert()
+                "Subsurface rectangle outside parent surface area."
+            )
+        child_surface = pygame.Surface(
+            (width, height),
+            flags=surface.get_flags(),
+            depth=surface.get_bitsize(),
+        )
         with pygame.PixelArray(surface) as parent_array:
             with pygame.PixelArray(child_surface) as child_array:
-                child_array[:] = parent_array[x:x + width, y:y + height]  # type: ignore[index]
+                child_array[:] = parent_array[x : x + width, y : y + height]  # type: ignore[index]
         return child_surface
 
-    def __flip_surface(self, surface: Surface, flip_x: bool, flip_y: bool) -> Surface:
+    def __flip_surface(
+        self, surface: Surface, flip_x: bool, flip_y: bool
+    ) -> Surface:
         width = surface.get_width()
         height = surface.get_height()
-        flipped_surface = pygame.Surface((width, height),
-                                          flags=surface.get_flags(),
-                                          depth=surface.get_bitsize()).convert()
+        flipped_surface = pygame.Surface(
+            (width, height),
+            flags=surface.get_flags(),
+            depth=surface.get_bitsize(),
+        )
         with pygame.PixelArray(surface) as original_array:
             with pygame.PixelArray(flipped_surface) as flipped_array:
                 x_slice = slice(None, None, -1) if flip_x else slice(None)
@@ -58,7 +66,6 @@ class Sprite(Node):
                 flipped_array[:] = original_array[x_slice, y_slice]  # type: ignore[index]
         return flipped_surface
 
-
     def __split_surface(self, surface: Surface) -> list[Surface]:
         width, height = surface.get_size()
         frame_width = width // self.cols
@@ -66,18 +73,27 @@ class Sprite(Node):
         frames = []
         for row in range(self.rows):
             for col in range(self.cols):
-                frame_rect = (col * frame_width, row * frame_height, frame_width, frame_height)
+                frame_rect = (
+                    col * frame_width,
+                    row * frame_height,
+                    frame_width,
+                    frame_height,
+                )
                 frame_surface = self.__subsurface(surface, *frame_rect)
                 frames.append(frame_surface)
         return frames
 
-    def __compute_flipped_frames(self) -> Dict[Tuple[bool, bool], list[Surface]]:
+    def __compute_flipped_frames(
+        self,
+    ) -> Dict[Tuple[bool, bool], list[Surface]]:
         flipped_frames: Dict[Tuple[bool, bool], list[Surface]] = {}
         for flip_x in [False, True]:
             for flip_y in [False, True]:
                 flipped_frames[(flip_x, flip_y)] = []
                 for frame in self.frames:
-                    flipped_frames[(flip_x, flip_y)].append(self.__flip_surface(frame, flip_x, flip_y))
+                    flipped_frames[(flip_x, flip_y)].append(
+                        self.__flip_surface(frame, flip_x, flip_y)
+                    )
         return flipped_frames
 
     def _on_update(self, delta: float) -> None:
@@ -98,8 +114,11 @@ class Sprite(Node):
         current_frame = self.frames[self.current_frame_index]
         self.context.screen.blit(
             current_frame,
-            (self.world_position.x - current_frame.get_width() / 2,
-             self.world_position.y - current_frame.get_height() / 2))
+            (
+                self.world_position.x - current_frame.get_width() / 2,
+                self.world_position.y - current_frame.get_height() / 2,
+            ),
+        )
 
     def flip(self, flip_x: bool, flip_y: bool) -> None:
         self.flip_x = flip_x
