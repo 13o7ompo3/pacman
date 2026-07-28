@@ -241,7 +241,7 @@ class GameScene(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
         levels = [
-            LevelConfig(width=20, height=20, seed=1337),
+            LevelConfig(width=15, height=15, seed=1337),
             # LevelConfig(width=10, height=13, seed=42),
         ]
         max_ticks = 4000

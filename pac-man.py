@@ -25,7 +25,7 @@ def main():
     pygame.font.init()
     font = pygame.font.Font("assets/perfect_dos_vga_437.ttf", 16)
 
-    WIDTH, HEIGHT = 960, 600
+    WIDTH, HEIGHT = 640, 480
     surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
 
     user_manager = UserManager()
