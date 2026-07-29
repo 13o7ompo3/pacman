@@ -40,7 +40,11 @@ class PauseScene(Node):
         )
 
         resume_button = Button(
-            context, "Resume", Vector2(150, 30), Color("green"), resume_game
+            context,
+            [context.assets.image("play_icon"), "Resume"],
+            Vector2(150, 30),
+            Color("green"),
+            resume_game,
         )
 
         def go_to_title(_):
@@ -49,7 +53,7 @@ class PauseScene(Node):
 
         title_button = Button(
             context,
-            "Quit To Tittle",
+            [context.assets.image("return_icon"), "Quit To Tittle"],
             Vector2(150, 30),
             Color("red"),
             go_to_title,

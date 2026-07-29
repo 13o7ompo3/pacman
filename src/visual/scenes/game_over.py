@@ -49,7 +49,7 @@ class InputForm(Node):
 
         title_button = Button(
             context,
-            "Quit To Tittle",
+            [context.assets.image("return_icon"), "Quit To Tittle"],
             Vector2(150, 30),
             Color("red"),
             go_to_title,
@@ -163,7 +163,7 @@ class LogoutForm(Node):
 
         update_button = Button(
             context,
-            "Update",
+            [context.assets.image("update_icon"), "Update"],
             Vector2(80, 30),
             Color("blue"),
             on_update,
@@ -174,7 +174,7 @@ class LogoutForm(Node):
         )
         logout_button = Button(
             context,
-            "Logout",
+            [context.assets.image("exit_icon"), "Logout"],
             Vector2(80, 30),
             Color("red"),
             on_logout,

@@ -25,7 +25,7 @@ class TitleScene(Node):
 
         start_button = Button(
             context,
-            "Start",
+            [context.assets.image("play_icon"), "Start"],
             button_size,
             Color("cyan"),
             start_game,
@@ -37,7 +37,7 @@ class TitleScene(Node):
 
         leaderboard_button = Button(
             context,
-            "LeaderBoard",
+            [context.assets.image("cup_icon"), "LeaderBoard"],
             button_size,
             Color("gold"),
             open_leader_board,
@@ -47,7 +47,11 @@ class TitleScene(Node):
             context.game_running = False
 
         exit_button = Button(
-            context, "Quit", button_size, Color("red"), quit_game
+            context,
+            [context.assets.image("exit_icon"), "Quit"],
+            button_size,
+            Color("red"),
+            quit_game,
         )
 
         width, height = context.width, context.height

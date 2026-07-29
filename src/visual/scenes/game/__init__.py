@@ -140,10 +140,10 @@ class InfoBar(Node):
         self.static_text = static_text
 
         self.static_label = self.context.assets.font("ui").render(
-            static_text.center(8), False, Color("white")
+            static_text, False, Color("white")
         )
         self.dynamic_label = self.context.assets.font("ui").render(
-            dynamic_text.center(8), False, Color("white")
+            dynamic_text.center(5), False, Color("white")
         )
         self.max_progress = max_progress
 
@@ -152,7 +152,7 @@ class InfoBar(Node):
             self.context,
             Vector2(
                 width
-                - self.dynamic_label.get_size()[0] * 1.2
+                - self.dynamic_label.get_size()[0] * 1.1
                 - self.icon.get_size()[0] * 1.2,
                 16,
             ),
@@ -172,15 +172,13 @@ class InfoBar(Node):
         if self.dynamic_text != str(val):
             self.dynamic_text = str(val)
             self.dynamic_label = self.context.assets.font("ui").render(
-                self.dynamic_text.center(8), False, Color("white")
+                self.dynamic_text.center(5), False, Color("white")
             )
             self.progress.progress = val
 
     def _update_positions(self) -> None:
         self.icon_pos = self.world_position + Vector2(
-            0,
-            self.static_label.get_size()[1] * 1.2
-            - self.dynamic_label.get_size()[1] / 2,
+            0, self.static_label.get_size()[1] * 1.2
         )
         self.static_text_pos = self.world_position + Vector2(
             self.width / 2 - self.static_label.get_size()[0] / 2, 0
@@ -220,10 +218,9 @@ class LivesLeft(Node):
 
         self.logical_maze = logical_maze
         self.last_level = self.logical_maze.current_level_idx
-        self.life_img = image.load("./assets/icons/life.png")
 
         self.lives_text = self.context.assets.font("ui").render(
-            "Lives remaining: ", False, Color("white")
+            "LIVES REMAINING: ", False, Color("white")
         )
 
     def _on_draw(self) -> None:
@@ -233,7 +230,8 @@ class LivesLeft(Node):
         )
         for i in range(self.logical_maze.player.lives):
             self.context.screen.blit(
-                self.life_img, self.world_position + (32 * i + 20, 30)
+                self.context.assets.image("life_icon"),
+                self.world_position + (32 * i + 25, 30),
             )
 
 
@@ -254,19 +252,19 @@ class GameScene(Node):
 
         pause_button = Button(
             context,
-            "=",
+            context.assets.image("pause_icon"),
             Vector2(30, 30),
             Color("white"),
             lambda _: context.root_scene.add_child(
                 PauseScene(context, self.maze)
             ),
         )
-        gum_timer = GumTimer(context, self.logical_maze, 32)
-        gum_timer.local_position = self.maze.local_position + Vector2(-200, 50)
+        gum_timer = GumTimer(context, self.logical_maze, 24)
+        gum_timer.local_position = self.maze.local_position + Vector2(-160, 30)
 
         lives_left = LivesLeft(context, self.logical_maze)
         lives_left.local_position = self.maze.local_position + Vector2(
-            -210, self.maze.size.y - 150
+            -170, self.maze.size.y - 80
         )
 
         self.score_title_label = TitleLabel(
@@ -294,8 +292,8 @@ class GameScene(Node):
         self.time_bar = InfoBar(
             context,
             "TIME LEFT",
-            "0",
-            image.load("./assets/icons/clock.png"),
+            "  0",
+            context.assets.image("clock_icon"),
             int(context.width / 2 - self.maze.size.x / 2),
             int(self.logical_maze.ticks_remaining / 60),
             False,
@@ -309,7 +307,7 @@ class GameScene(Node):
             context,
             "GUMS EATEN",
             "43/200",
-            image.load("./assets/icons/gum.png"),
+            context.assets.image("gum_icon"),
             int(context.width / 2 - self.maze.size.x / 2),
             len(self.logical_maze.pacgums),
             True,

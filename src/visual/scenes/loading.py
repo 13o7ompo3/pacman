@@ -137,3 +137,29 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "tile_full_rect", "assets/tiles/full_rect.png"
         )
+        self.context.assets.register_image(
+            "clock_icon", "assets/icons/clock.png"
+        )
+        self.context.assets.register_image("gum_icon", "assets/icons/gum.png")
+        self.context.assets.register_image(
+            "life_icon", "assets/icons/life.png"
+        )
+        self.context.assets.register_image(
+            "play_icon", "assets/icons/play.png"
+        )
+        self.context.assets.register_image("cup_icon", "assets/icons/cup.png")
+        self.context.assets.register_image(
+            "exit_icon", "assets/icons/exit.png"
+        )
+        self.context.assets.register_image(
+            "pause_icon", "assets/icons/pause.png"
+        )
+        self.context.assets.register_image(
+            "return_icon", "assets/icons/return.png"
+        )
+        self.context.assets.register_image(
+            "login_icon", "assets/icons/login.png"
+        )
+        self.context.assets.register_image(
+            "update_icon", "assets/icons/update.png"
+        )
