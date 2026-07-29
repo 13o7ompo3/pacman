@@ -9,11 +9,13 @@ from src.visual.draw import Draw
 from src.db_manager.user import UserManager
 from src.visual import Context, GameComponent, Node
 from src.visual.scenes.game import VisualMaze
+from src.visual.scenes.loading import LoadingScene
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.text_box import TextBox
+from src.visual.utils.asset_manager import AssetManager
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -23,15 +25,17 @@ logging.basicConfig(
 def main():
     pygame.init()
     pygame.font.init()
-    font = pygame.font.Font("assets/perfect_dos_vga_437.ttf", 16)
 
     WIDTH, HEIGHT = 640, 480
     surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
 
     user_manager = UserManager()
-    context = Context(surface, WIDTH, HEIGHT, font, user_manager)
-    title_scene = TitleScene(context)
-    context.root_scene.add_child(title_scene)
+
+    assets = AssetManager()
+
+    context = Context(surface, WIDTH, HEIGHT, assets, user_manager)
+    loading_scene = LoadingScene(context)
+    context.root_scene.add_child(loading_scene)
 
     clock = Clock()
     while context.game_running:

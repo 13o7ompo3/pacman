@@ -79,20 +79,28 @@ class Button(Node):
         content: str | Surface | list[Surface | str],
     ):
         if isinstance(content, str):
-            content = self.context.font.render(
-                content,
-                False,
-                self.bg_color,
-            ).convert_alpha()
+            content = (
+                self.context.assets.font("ui")
+                .render(
+                    content,
+                    False,
+                    self.bg_color,
+                )
+                .convert_alpha()
+            )
         elif isinstance(content, list):
             size = Vector2()
             for i in range(len(content)):
                 if isinstance(content[i], str):
-                    content[i] = self.context.font.render(
-                        content[i],
-                        False,
-                        self.bg_color,
-                    ).convert_alpha()
+                    content[i] = (
+                        self.context.assets.font("ui")
+                        .render(
+                            content[i],
+                            False,
+                            self.bg_color,
+                        )
+                        .convert_alpha()
+                    )
                 elif isinstance(content[i], Surface):
                     content[i] = content[i].convert_alpha()
                     content[i].fill(

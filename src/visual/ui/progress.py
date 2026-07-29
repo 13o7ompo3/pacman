@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Callable
 
 from pygame import Color, Rect, Vector2, draw
 from src.visual import Node, Context
@@ -22,6 +23,7 @@ class ProgressBar(Node):
         border_color: Color = Color("white"),
         border_width: int = 2,
         border_radius: int = 7,
+        on_finish: Callable = lambda _: None,
     ) -> None:
         super().__init__(context)
 
@@ -33,6 +35,7 @@ class ProgressBar(Node):
         self.border_color = border_color
         self.border_width = border_width
         self.border_radius = border_radius
+        self.on_finish = on_finish
         self._progress = 0
         self._animated_progress = 0
 
@@ -52,17 +55,22 @@ class ProgressBar(Node):
         if self._progress < 0:
             self._progress = 0
 
+        if self._progress == self.total:
+            self.on_finish(self)
+
     def _on_draw(self) -> None:
         inflate = Vector2()
         if self.orientation is ProgressBarOrientation.VERTICAL:
             progress = Vector2(
-                self.size.x, self.size.y * self._progress / self.total
+                self.size.x,
+                self.size.y * self._progress / self.total if self.total else 0,
             )
             if progress.y < (self.border_radius * 2 + 2):
                 inflate.x = (self.border_radius * 2 + 2) - progress.y
         else:
             progress = Vector2(
-                self.size.x * self._progress / self.total, self.size.y
+                self.size.x * self._progress / self.total if self.total else 0,
+                self.size.y,
             )
             if progress.x < (self.border_radius * 2 + 2):
                 inflate.y = (self.border_radius * 2 + 2) - progress.x

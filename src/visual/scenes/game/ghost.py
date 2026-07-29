@@ -34,7 +34,7 @@ class VisualGhost(Node):
 
         self.sprite_neutral = Sprite(
             context,
-            image.load("assets/ghost/ghost_neutral.png").convert_alpha(),
+            context.assets.image("ghost_neutral"),
             1,
             2,
             5,
@@ -42,7 +42,7 @@ class VisualGhost(Node):
         )
         self.sprite_running = Sprite(
             context,
-            image.load("assets/ghost/ghost_running.png").convert_alpha(),
+            context.assets.image("ghost_running"),
             1,
             4,
             17,

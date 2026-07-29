@@ -20,7 +20,8 @@ class TextBox(Node):
         self.length = length
         self.on_submit = on_submit
         box_size = Vector2(
-            context.font.size(" ")[0] * length, context.font.size(" ")[1]
+            self.context.assets.font("ui").size(" ")[0] * length,
+            self.context.assets.font("ui").size(" ")[1],
         )
         self.size = Vector2(
             box_size.y * 0.4 + box_size.x,
@@ -42,7 +43,9 @@ class TextBox(Node):
             content = "*" * len(self.content)
         else:
             content = self.content
-        self.text = self.context.font.render(content, False, Color("red"))
+        self.text = self.context.assets.font("ui").render(
+            content, False, Color("red")
+        )
 
     def _on_input(self, event: Event) -> Event | None:
         if self.hidden:

@@ -139,10 +139,10 @@ class InfoBar(Node):
         self.dynamic_text = dynamic_text
         self.static_text = static_text
 
-        self.static_label = context.font.render(
+        self.static_label = self.context.assets.font("ui").render(
             static_text.center(8), False, Color("white")
         )
-        self.dynamic_label = context.font.render(
+        self.dynamic_label = self.context.assets.font("ui").render(
             dynamic_text.center(8), False, Color("white")
         )
         self.max_progress = max_progress
@@ -171,7 +171,7 @@ class InfoBar(Node):
             val = self.max_progress - val
         if self.dynamic_text != str(val):
             self.dynamic_text = str(val)
-            self.dynamic_label = self.context.font.render(
+            self.dynamic_label = self.context.assets.font("ui").render(
                 self.dynamic_text.center(8), False, Color("white")
             )
             self.progress.progress = val
@@ -222,7 +222,7 @@ class LivesLeft(Node):
         self.last_level = self.logical_maze.current_level_idx
         self.life_img = image.load("./assets/icons/life.png")
 
-        self.lives_text = self.context.font.render(
+        self.lives_text = self.context.assets.font("ui").render(
             "Lives remaining: ", False, Color("white")
         )
 
