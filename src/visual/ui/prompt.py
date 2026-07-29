@@ -25,10 +25,10 @@ class Prompt(Node):
     ) -> None:
         super().__init__(context)
         self.title = self.context.assets.font("ui").render(
-            title, False, Color("white")
+            title, False, context.colors.lightest
         )
         self.message = self.context.assets.font("ui").render(
-            message, False, Color("white")
+            message, False, context.colors.lightest
         )
 
         padding = Vector2(10, 10)
@@ -49,8 +49,8 @@ class Prompt(Node):
             self.content,
             (0, 0),
             self.size,
-            fill_color=Color("blue"),
-            border_color=Color("white"),
+            fill_color=context.colors.darker,
+            border_color=context.colors.lightest,
             border_radius=7,
             border_width=1,
         )
@@ -61,7 +61,7 @@ class Prompt(Node):
                 int(self.size.x - 2 * padding.x),
                 2,
             ),
-            fill_color=Color("white"),
+            fill_color=context.colors.lightest,
         )
         self.content.blit(
             self.title,
@@ -84,9 +84,10 @@ class Prompt(Node):
                 context,
                 "Ok",
                 button_size,
-                Color("green"),
+                context.colors.light,
                 on_accept_fn,
                 {K_RETURN},
+                shadow_color=context.colors.dark,
             ),
         ]
 

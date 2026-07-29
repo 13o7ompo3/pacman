@@ -30,7 +30,7 @@ class InputForm(Node):
             context,
             Vector2(300, 200),
             [
-                (label_text, Color("white")),
+                (label_text, context.colors.lightest),
             ],
         )
         label.local_position = (
@@ -49,10 +49,11 @@ class InputForm(Node):
 
         title_button = Button(
             context,
-            "Quit To Tittle",
+            [context.assets.image("return_icon"), "Quit To Tittle"],
             Vector2(150, 30),
-            Color("red"),
+            context.colors.dark,
             go_to_title,
+            shadow_color=context.colors.darker,
         )
         title_button.local_position = (
             Vector2(context.width / 2, context.height * 6 / 8)
@@ -137,8 +138,8 @@ class LogoutForm(Node):
             context,
             Vector2(300, 200),
             [
-                ("Logged in as: ", Color("white")),
-                (username, Color("green")),
+                ("Logged in as: ", context.colors.lightest),
+                (username, context.colors.light),
             ],
         )
         score.local_position = (
@@ -163,10 +164,11 @@ class LogoutForm(Node):
 
         update_button = Button(
             context,
-            "Update",
+            [context.assets.image("update_icon"), "Update"],
             Vector2(80, 30),
-            Color("blue"),
+            context.colors.light,
             on_update,
+            shadow_color=context.colors.dark,
         )
         update_button.local_position = (
             Vector2(context.width / 2 - 50, context.height * 5 / 8)
@@ -174,10 +176,11 @@ class LogoutForm(Node):
         )
         logout_button = Button(
             context,
-            "Logout",
+            [context.assets.image("exit_icon"), "Logout"],
             Vector2(80, 30),
-            Color("red"),
+            context.colors.dark,
             on_logout,
+            shadow_color=context.colors.darker,
         )
         logout_button.local_position = (
             Vector2(context.width / 2 + 50, context.height * 5 / 8)
@@ -195,18 +198,19 @@ class GameOverScene(Node):
         super().__init__(context)
         panel = Panel(
             context,
-            Vector2(300, 450),
-            Color("darkgray"),
-            on_outside_press=lambda x: None,
+            Vector2(300, 350),
+            context.colors.darker,
+            border_color=context.colors.darkest,
+            on_outside_press=lambda _: None,
         )
         panel.local_position = Vector2(
             context.width / 2 - panel.size.x / 2, context.height / 7
         )
 
         label_text = (
-            [("Game Over", Color("orange"))]
+            [("Game Over", context.colors.dark)]
             if state is TerminalState.LOST
-            else [("Wa Tbark Allah 3lik Ou Saf", Color("green"))]
+            else [("Wa Tbark Allah 3lik Ou Saf", context.colors.light)]
         )
         title = Label(
             context,
@@ -222,8 +226,8 @@ class GameOverScene(Node):
             context,
             Vector2(300, 200),
             [
-                ("Final Score: ", Color("white")),
-                (str(final_score), Color("gold")),
+                ("Final Score: ", context.colors.light),
+                (str(final_score), context.colors.lighter),
             ],
         )
         score.local_position = (

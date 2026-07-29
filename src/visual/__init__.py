@@ -6,6 +6,7 @@ from typing import final
 
 from pygame.font import Font
 from src.db_manager.user import UserManager
+from src.visual.palette import COLOR_PALETTE
 from src.visual.utils.asset_manager import AssetManager
 
 
@@ -121,4 +122,5 @@ class Context:
         self.height = height
         self.assets = assets
         self.user_manager = user_manager
+        self.colors = COLOR_PALETTE
         self.game_running = True

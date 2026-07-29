@@ -1,5 +1,5 @@
 from pydantic_core.core_schema import TimeSchema
-from pygame import Color, Vector2
+from pygame import Vector2
 from src.visual import Node, Context
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
@@ -25,7 +25,10 @@ class LoadingScene(Node):
         self._register_assets()
 
         label = Label(
-            context, Vector2(256, 32), [("Loading..", Color("white"))], 2
+            context,
+            Vector2(256, 32),
+            [("Loading..", context.colors.lightest)],
+            2,
         )
         label.local_position = (
             Vector2(context.width, context.height) / 2
@@ -37,7 +40,7 @@ class LoadingScene(Node):
             context,
             Vector2(256, 32),
             ProgressBarOrientation.HORIZONTAL,
-            Color("orange"),
+            context.colors.light,
             context.assets.total_assets,
             border_radius=15,
             on_finish=on_finish,
@@ -50,7 +53,7 @@ class LoadingScene(Node):
 
         self.loading_iter = self.context.assets.load_progress()
         self.time = 0
-        self.load_time_per_item = 0.1
+        self.load_time_per_item = 0
 
         self.add_child(label)
         self.add_child(self.progress_bar)
@@ -62,11 +65,12 @@ class LoadingScene(Node):
                 if isinstance(ret, Exception):
 
                     def on_accept(_) -> None:
-                        exit()
+                        self.context.game_running = False
 
                     prompt = Prompt(self.context, "Error", str(ret), on_accept)
                     self.add_child(prompt)
-                self.progress_bar.progress += 1
+                else:
+                    self.progress_bar.progress += 1
             except StopIteration:
                 pass
 
@@ -135,4 +139,30 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "tile_full_rect", "assets/tiles/full_rect.png"
+        )
+        self.context.assets.register_image(
+            "clock_icon", "assets/icons/clock.png"
+        )
+        self.context.assets.register_image("gum_icon", "assets/icons/gum.png")
+        self.context.assets.register_image(
+            "life_icon", "assets/icons/life.png"
+        )
+        self.context.assets.register_image(
+            "play_icon", "assets/icons/play.png"
+        )
+        self.context.assets.register_image("cup_icon", "assets/icons/cup.png")
+        self.context.assets.register_image(
+            "exit_icon", "assets/icons/exit.png"
+        )
+        self.context.assets.register_image(
+            "pause_icon", "assets/icons/pause.png"
+        )
+        self.context.assets.register_image(
+            "return_icon", "assets/icons/return.png"
+        )
+        self.context.assets.register_image(
+            "login_icon", "assets/icons/login.png"
+        )
+        self.context.assets.register_image(
+            "update_icon", "assets/icons/update.png"
         )

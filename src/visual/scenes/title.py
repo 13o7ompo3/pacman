@@ -11,11 +11,11 @@ from pygame import Color, Vector2
 class TitleScene(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
-        button_size = Vector2(120, 48)
+        button_size = Vector2(130, 38)
         title_text = Label(
             context,
             Vector2(300, 200),
-            [("Pac", Color("red")), ("Man", Color("blue"))],
+            [("Pac", context.colors.dark), ("Man", context.colors.light)],
             4,
         )
 
@@ -25,11 +25,12 @@ class TitleScene(Node):
 
         start_button = Button(
             context,
-            "Start",
+            [context.assets.image("play_icon"), "Start".center(12)],
             button_size,
-            Color("cyan"),
+            context.colors.light,
             start_game,
             shortcuts={pygame.K_SPACE},
+            shadow_color=context.colors.dark,
         )
 
         def open_leader_board(_):
@@ -37,17 +38,23 @@ class TitleScene(Node):
 
         leaderboard_button = Button(
             context,
-            "LeaderBoard",
+            [context.assets.image("cup_icon"), "LeaderBoard".center(12)],
             button_size,
-            Color("gold"),
+            context.colors.light,
             open_leader_board,
+            shadow_color=context.colors.dark,
         )
 
         def quit_game(_):
             context.game_running = False
 
         exit_button = Button(
-            context, "Quit", button_size, Color("red"), quit_game
+            context,
+            [context.assets.image("exit_icon"), "Quit".center(12)],
+            button_size,
+            context.colors.dark,
+            quit_game,
+            shadow_color=context.colors.darker,
         )
 
         width, height = context.width, context.height

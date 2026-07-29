@@ -259,6 +259,8 @@ class VisualMaze(Node):
                 self.ghosts[event.ghost_id].respawn(event.x, event.y)
                 self.ghosts[event.ghost_id].hidden = False
             if isinstance(event, GameOverEvent):
+                if self.parent:
+                    self.parent.paused = True
                 self.context.root_scene.add_child(
                     GameOverScene(
                         self.context, event.final_score, TerminalState.LOST
@@ -267,6 +269,8 @@ class VisualMaze(Node):
             if isinstance(event, LevelCompleteEvent):
                 self.refresh()
             if isinstance(event, WinEvent):
+                if self.parent:
+                    self.parent.paused = True
                 self.context.root_scene.add_child(
                     GameOverScene(
                         self.context, event.final_score, TerminalState.WON
@@ -282,7 +286,7 @@ class VisualMaze(Node):
                 + Vector2(self.cell_size) / 2
                 + Vector2(x, y) * self.cell_size,
                 2,
-                Color("#444444"),
+                self.context.colors.darker,
             )
         for x, y in self.logical_maze.super_pacgums:
             Draw.circle(
@@ -291,7 +295,7 @@ class VisualMaze(Node):
                 + Vector2(self.cell_size) / 2
                 + Vector2(x, y) * self.cell_size,
                 3,
-                Color("gold"),
+                self.context.colors.lightest,
             )
 
         ft_small = [
@@ -311,5 +315,5 @@ class VisualMaze(Node):
                         self.world_position
                         + Vector2(posx + x, posy + y) * self.cell_size,
                         Vector2(self.cell_size, self.cell_size),
-                        Color("#bf53c9"),
+                        self.context.colors.light,
                     )

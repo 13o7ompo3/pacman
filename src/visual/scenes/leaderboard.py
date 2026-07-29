@@ -11,8 +11,9 @@ class LeaderBoardScene(Node):
         width, height = context.width, context.height
         panel = Panel(
             context,
-            Vector2(300, 450),
-            Color("darkgray"),
+            Vector2(300, 350),
+            context.colors.darker,
+            border_color=context.colors.darkest,
             on_outside_press=lambda x: self.free_from_scene(),
         )
         panel.local_position = Vector2(
@@ -23,7 +24,7 @@ class LeaderBoardScene(Node):
         title_text = Label(
             context,
             Vector2(300, 200),
-            [("LeaderBoard", Color("white"))],
+            [("LeaderBoard", context.colors.lightest)],
             2,
         )
         title_text.local_position = (
@@ -37,8 +38,8 @@ class LeaderBoardScene(Node):
                 context,
                 Vector2(panel.size.x, panel.size.y / 12),
                 [
-                    (f"{user.username}:    ", Color("white")),
-                    (str(user.highscore), Color("gold")),
+                    (f"{user.username}:    ", context.colors.light),
+                    (str(user.highscore), context.colors.lighter),
                 ],
             )
             entry.local_position = Vector2(0, (panel.size.y * (i + 2)) / 13)
