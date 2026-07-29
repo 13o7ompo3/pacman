@@ -60,12 +60,12 @@ class Image:
     def blit(
         dest_surface: Surface,
         source_surface: Surface,
-        position: Tuple[int, int] | pygame.Vector2,
+        position: Tuple[int, int] | Tuple[float, float] | pygame.Vector2,
     ) -> None:
         if isinstance(position, pygame.Vector2):
-            position = (int(position.x), int(position.y))
+            position = position.x, position.y
 
-        x, y = position
+        x, y = (int(position[0]), int(position[1]))
         src_w, src_h = source_surface.get_width(), source_surface.get_height()
         dst_w, dst_h = dest_surface.get_width(), dest_surface.get_height()
 
@@ -83,23 +83,30 @@ class Image:
         y2_src = y1_src + (y2_dst - y1_dst)
 
 
+        has_dst_alpha = dest_surface.get_flags() & pygame.SRCALPHA
 
         src_pixels = pygame.surfarray.pixels3d(source_surface)
         src_alpha = pygame.surfarray.array_alpha(source_surface)
-        
         dst_pixels = pygame.surfarray.pixels3d(dest_surface)
-        dst_alpha = pygame.surfarray.array_alpha(dest_surface)
 
         src_slice_rgb = src_pixels[x1_src:x2_src, y1_src:y2_src]
         src_slice_a = src_alpha[x1_src:x2_src, y1_src:y2_src]
-
         dst_slice_rgb = dst_pixels[x1_dst:x2_dst, y1_dst:y2_dst]
-        dst_slice_a = dst_alpha[x1_dst:x2_dst, y1_dst:y2_dst]
 
         alpha_normalized = src_slice_a[..., np.newaxis] / 255.0
 
-        blended_rgb = (src_slice_rgb * alpha_normalized + dst_slice_rgb * (1.0 - alpha_normalized))
-        blended_a = np.maximum(src_slice_a, dst_slice_a)
+        if has_dst_alpha:
+            dst_alpha = pygame.surfarray.pixels_alpha(dest_surface)
+            dst_slice_a = dst_alpha[x1_dst:x2_dst, y1_dst:y2_dst]
 
-        dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
-        dst_slice_a[:] = blended_a.astype(np.uint8)
+            blended_rgb = (
+                src_slice_rgb * alpha_normalized
+                + dst_slice_rgb * (1.0 - alpha_normalized)
+            )
+
+            dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
+            dst_slice_a[:] = np.maximum(src_slice_a, dst_slice_a).astype(np.uint8)
+        else:
+            blended_rgb = src_slice_rgb * alpha_normalized + dst_slice_rgb * (1.0 - alpha_normalized)
+            dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
+
