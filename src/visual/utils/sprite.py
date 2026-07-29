@@ -2,6 +2,7 @@ from pygame import Surface
 import pygame
 from src.visual import Node, Context
 from src.visual.draw import Draw
+from src.visual.utils.image import Image
 from typing import Dict, Tuple
 
 
@@ -21,67 +22,12 @@ class Sprite(Node):
         self.rows = rows
         self.cols = cols
         self.repeat = repeat
-        self.frames = self.__split_surface(surface)
+        self.frames = Image.split_surface(surface, self.rows, self.cols)
         self.flipped_frames = self.__compute_flipped_frames()
         self.current_frame_index = 0
         self.playing = True
         self.flip_x = False
         self.flip_y = False
-
-    def __subsurface(self, surface: Surface, x, y, width, height) -> Surface:
-        parent_width, parent_height = surface.get_size()
-        if x < 0 or y < 0 or width <= 0 or height <= 0:
-            raise ValueError(
-                "Subsurface rectangle dimensions must be positive."
-            )
-        if x + width > parent_width or y + height > parent_height:
-            raise ValueError(
-                "Subsurface rectangle outside parent surface area."
-            )
-        child_surface = pygame.Surface(
-            (width, height),
-            flags=surface.get_flags(),
-            depth=surface.get_bitsize(),
-        )
-        with pygame.PixelArray(surface) as parent_array:
-            with pygame.PixelArray(child_surface) as child_array:
-                child_array[:] = parent_array[x : x + width, y : y + height]  # type: ignore[index]
-        return child_surface
-
-    def __flip_surface(
-        self, surface: Surface, flip_x: bool, flip_y: bool
-    ) -> Surface:
-        width = surface.get_width()
-        height = surface.get_height()
-        flipped_surface = pygame.Surface(
-            (width, height),
-            flags=surface.get_flags(),
-            depth=surface.get_bitsize(),
-        )
-        with pygame.PixelArray(surface) as original_array:
-            with pygame.PixelArray(flipped_surface) as flipped_array:
-                x_slice = slice(None, None, -1) if flip_x else slice(None)
-                y_slice = slice(None, None, -1) if flip_y else slice(None)
-
-                flipped_array[:] = original_array[x_slice, y_slice]  # type: ignore[index]
-        return flipped_surface
-
-    def __split_surface(self, surface: Surface) -> list[Surface]:
-        width, height = surface.get_size()
-        frame_width = width // self.cols
-        frame_height = height // self.rows
-        frames = []
-        for row in range(self.rows):
-            for col in range(self.cols):
-                frame_rect = (
-                    col * frame_width,
-                    row * frame_height,
-                    frame_width,
-                    frame_height,
-                )
-                frame_surface = self.__subsurface(surface, *frame_rect)
-                frames.append(frame_surface)
-        return frames
 
     def __compute_flipped_frames(
         self,
@@ -92,7 +38,7 @@ class Sprite(Node):
                 flipped_frames[(flip_x, flip_y)] = []
                 for frame in self.frames:
                     flipped_frames[(flip_x, flip_y)].append(
-                        self.__flip_surface(frame, flip_x, flip_y)
+                        Image.flip_surface(frame, flip_x, flip_y)
                     )
         return flipped_frames
 
