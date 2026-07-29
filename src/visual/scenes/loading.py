@@ -62,11 +62,12 @@ class LoadingScene(Node):
                 if isinstance(ret, Exception):
 
                     def on_accept(_) -> None:
-                        exit()
+                        self.context.game_running = False
 
                     prompt = Prompt(self.context, "Error", str(ret), on_accept)
                     self.add_child(prompt)
-                self.progress_bar.progress += 1
+                else:
+                    self.progress_bar.progress += 1
             except StopIteration:
                 pass
 
