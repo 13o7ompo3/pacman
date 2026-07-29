@@ -23,14 +23,14 @@ class GumTimer(Node):
         self.label = Label(
             context,
             Vector2(100, 20),
-            [("SUPER PACGUM", Color("cyan"))],
+            [("SUPER PACGUM", context.colors.lightest)],
         )
         self.add_child(self.label)
 
     def _on_draw(self) -> None:
         Draw.sector(
             self.context.screen,
-            Color("blue"),
+            self.context.colors.dark,
             self.world_position
             + self.label.size / 2
             + Vector2(0, self.radius * 1.5),
@@ -49,7 +49,7 @@ class GumTimer(Node):
             + self.label.size / 2
             + Vector2(0, self.radius * 1.5),
             self.radius,
-            border_color=Color("white"),
+            border_color=self.context.colors.lightest,
             border_width=2,
         )
 
@@ -73,7 +73,7 @@ class TitleLabel(Node):
             self.context,
             Vector2(),
             [
-                (self.static_text, Color("white")),
+                (self.static_text, context.colors.lightest),
                 (self.dynamic_text, self.accent_color),
             ],
         )
@@ -84,7 +84,7 @@ class TitleLabel(Node):
                 self.context,
                 Vector2(),
                 [
-                    (self.static_text, Color("white")),
+                    (self.static_text, self.context.colors.lightest),
                     (self.dynamic_text, self.accent_color),
                 ],
             )
@@ -99,7 +99,7 @@ class TitleLabel(Node):
                 self.width / 2 - self.label.size.x * 1.2 / 2,
                 self.line_thickness,
             ),
-            fill_color=Color("cyan"),
+            fill_color=self.context.colors.light,
         )
         Draw.rect(
             self.context.screen,
@@ -112,7 +112,7 @@ class TitleLabel(Node):
                 self.width / 2 - self.label.size.x * 1.2 / 2,
                 self.line_thickness,
             ),
-            fill_color=Color("cyan"),
+            fill_color=self.context.colors.light,
         )
         self.label.local_position = self.world_position + Vector2(
             self.width / 2 - self.label.size.x / 2, 0
@@ -140,10 +140,10 @@ class InfoBar(Node):
         self.static_text = static_text
 
         self.static_label = self.context.assets.font("ui").render(
-            static_text, False, Color("white")
+            static_text, False, context.colors.lighter
         )
         self.dynamic_label = self.context.assets.font("ui").render(
-            dynamic_text.center(5), False, Color("white")
+            dynamic_text.center(5), False, context.colors.lighter
         )
         self.max_progress = max_progress
 
@@ -172,7 +172,7 @@ class InfoBar(Node):
         if self.dynamic_text != str(val):
             self.dynamic_text = str(val)
             self.dynamic_label = self.context.assets.font("ui").render(
-                self.dynamic_text.center(5), False, Color("white")
+                self.dynamic_text.center(5), False, self.context.colors.lighter
             )
             self.progress.progress = val
 
@@ -220,7 +220,7 @@ class LivesLeft(Node):
         self.last_level = self.logical_maze.current_level_idx
 
         self.lives_text = self.context.assets.font("ui").render(
-            "LIVES REMAINING: ", False, Color("white")
+            "LIVES REMAINING: ", False, context.colors.lightest
         )
 
     def _on_draw(self) -> None:
@@ -254,11 +254,13 @@ class GameScene(Node):
             context,
             context.assets.image("pause_icon"),
             Vector2(30, 30),
-            Color("white"),
+            context.colors.lightest,
             lambda _: context.root_scene.add_child(
                 PauseScene(context, self.maze)
             ),
+            shadow_color=context.colors.light,
         )
+        pause_button.local_position = Vector2(10, 10)
         gum_timer = GumTimer(context, self.logical_maze, 24)
         gum_timer.local_position = self.maze.local_position + Vector2(-160, 30)
 
@@ -272,7 +274,7 @@ class GameScene(Node):
             "SCORE: ",
             str(self.logical_maze.player.score),
             int(self.maze.size.x),
-            Color("red"),
+            context.colors.dark,
         )
         self.score_title_label.local_position = (
             self.maze.world_position - Vector2(0, 50)
@@ -283,7 +285,7 @@ class GameScene(Node):
             "LEVEL: ",
             str(self.logical_maze.current_level_idx + 1),
             int(self.maze.size.x),
-            Color("yellow"),
+            context.colors.darker,
         )
         self.level_title_label.local_position = (
             self.maze.world_position + Vector2(0, self.maze.size.y + 40)
@@ -297,7 +299,7 @@ class GameScene(Node):
             int(context.width / 2 - self.maze.size.x / 2),
             int(self.logical_maze.ticks_remaining / 60),
             False,
-            Color("orange"),
+            context.colors.light,
         )
         self.time_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 - 76
@@ -311,7 +313,7 @@ class GameScene(Node):
             int(context.width / 2 - self.maze.size.x / 2),
             len(self.logical_maze.pacgums),
             True,
-            Color("blue"),
+            context.colors.darker,
         )
         self.gums_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 + 50

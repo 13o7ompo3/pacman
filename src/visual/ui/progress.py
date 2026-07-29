@@ -20,7 +20,7 @@ class ProgressBar(Node):
         progress_color: Color,
         total: float = 1.0,
         reversed: bool = False,
-        border_color: Color = Color("white"),
+        border_color: Color | None = None,
         border_width: int = 2,
         border_radius: int = 7,
         on_finish: Callable = lambda _: None,
@@ -32,7 +32,9 @@ class ProgressBar(Node):
         self.progress_color = progress_color
         self.total = total
         self.reversed = reversed
-        self.border_color = border_color
+        self.border_color = (
+            border_color if border_color else context.colors.lightest
+        )
         self.border_width = border_width
         self.border_radius = border_radius
         self.on_finish = on_finish

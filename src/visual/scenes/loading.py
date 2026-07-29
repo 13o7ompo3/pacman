@@ -1,5 +1,5 @@
 from pydantic_core.core_schema import TimeSchema
-from pygame import Color, Vector2
+from pygame import Vector2
 from src.visual import Node, Context
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
@@ -25,7 +25,10 @@ class LoadingScene(Node):
         self._register_assets()
 
         label = Label(
-            context, Vector2(256, 32), [("Loading..", Color("white"))], 2
+            context,
+            Vector2(256, 32),
+            [("Loading..", context.colors.lightest)],
+            2,
         )
         label.local_position = (
             Vector2(context.width, context.height) / 2
@@ -37,7 +40,7 @@ class LoadingScene(Node):
             context,
             Vector2(256, 32),
             ProgressBarOrientation.HORIZONTAL,
-            Color("orange"),
+            context.colors.light,
             context.assets.total_assets,
             border_radius=15,
             on_finish=on_finish,
@@ -50,7 +53,7 @@ class LoadingScene(Node):
 
         self.loading_iter = self.context.assets.load_progress()
         self.time = 0
-        self.load_time_per_item = 0.1
+        self.load_time_per_item = 0
 
         self.add_child(label)
         self.add_child(self.progress_bar)

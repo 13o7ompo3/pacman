@@ -12,6 +12,7 @@ from pygame import (
 )
 from pygame.event import Event
 from typing import Any, Callable
+import pygame
 
 
 class Panel(Node):
@@ -24,7 +25,7 @@ class Panel(Node):
         on_outside_press: Callable = lambda _: None,
         border_color: Color | None = None,
         border_width: int = 5,
-        outer_border_color: Color = Color("white"),
+        outer_border_color: Color | None = None,
         border_radius: int = 8,
     ) -> None:
         self.size = size
@@ -33,7 +34,13 @@ class Panel(Node):
         self.on_outside_press = on_outside_press
         self.is_pressed = False
 
-        self.surface = Surface(self.size)
+        outer_border_color = (
+            outer_border_color
+            if outer_border_color
+            else context.colors.lightest
+        )
+
+        self.surface = Surface(self.size, flags=pygame.SRCALPHA)
         if border_color is None:
             border_color = color.lerp("darkblue", 0.3)
 

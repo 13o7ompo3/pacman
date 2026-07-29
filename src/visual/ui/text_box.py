@@ -44,7 +44,7 @@ class TextBox(Node):
         else:
             content = self.content
         self.text = self.context.assets.font("ui").render(
-            content, False, Color("red")
+            content, False, self.context.colors.dark
         )
 
     def _on_input(self, event: Event) -> Event | None:
@@ -64,8 +64,8 @@ class TextBox(Node):
             self.context.screen,
             self.world_position,
             self.size,
-            fill_color=Color("white"),
-            border_color=Color("gray"),
+            fill_color=self.context.colors.lightest,
+            border_color=self.context.colors.lighter,
             border_radius=2,
             border_width=2,
         )
