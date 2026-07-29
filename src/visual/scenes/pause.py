@@ -41,7 +41,7 @@ class PauseScene(Node):
 
         resume_button = Button(
             context,
-            [context.assets.image("play_icon"), "Resume"],
+            [context.assets.image("play_icon"), "Resume".center(14)],
             Vector2(150, 30),
             Color("green"),
             resume_game,
@@ -53,7 +53,7 @@ class PauseScene(Node):
 
         title_button = Button(
             context,
-            [context.assets.image("return_icon"), "Quit To Tittle"],
+            [context.assets.image("return_icon"), "Quit To Tittle".center(14)],
             Vector2(150, 30),
             Color("red"),
             go_to_title,
