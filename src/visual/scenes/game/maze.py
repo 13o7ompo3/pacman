@@ -67,196 +67,100 @@ class VisualMaze(Node):
 
         self.surfaces = {
             (False, False, False, False): (
-                pygame.image.load(
-                    "assets/tiles/empty_rect.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/empty_rect.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/empty_rect.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/empty_rect.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_empty_rect"),
+                self.context.assets.image("tile_empty_rect"),
+                self.context.assets.image("tile_empty_rect"),
+                self.context.assets.image("tile_empty_rect"),
             ),
             (True, True, True, True): (
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_corner_bottom_right"),
+                self.context.assets.image("tile_corner_bottom_left"),
+                self.context.assets.image("tile_corner_top_right"),
+                self.context.assets.image("tile_corner_top_left"),
             ),
             (True, False, False, False): (
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_bar_left"),
+                self.context.assets.image("tile_ball_top_right"),
+                self.context.assets.image("tile_ball_top_left"),
             ),
             (False, True, False, False): (
-                pygame.image.load(
-                    "assets/tiles/ball_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
+                self.context.assets.image("tile_ball_bottom_right"),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_ball_top_right"),
+                self.context.assets.image("tile_bar_top"),
             ),
             (False, False, True, False): (
-                pygame.image.load(
-                    "assets/tiles/ball_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
+                self.context.assets.image("tile_ball_bottom_right"),
+                self.context.assets.image("tile_ball_bottom_left"),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_bar_left"),
             ),
             (False, False, False, True): (
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_ball_bottom_left"),
+                self.context.assets.image("tile_bar_top"),
+                self.context.assets.image("tile_ball_top_left"),
             ),
             (True, True, False, False): (
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_corner_bottom_left"),
+                self.context.assets.image("tile_ball_top_right"),
+                self.context.assets.image("tile_bar_top"),
             ),
             (False, True, True, False): (
-                pygame.image.load(
-                    "assets/tiles/ball_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_ball_bottom_right"),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_corner_top_left"),
             ),
             (False, False, True, True): (
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_ball_bottom_left"),
+                self.context.assets.image("tile_corner_top_right"),
+                self.context.assets.image("tile_bar_left"),
             ),
             (True, False, False, True): (
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/ball_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_corner_bottom_right"),
+                self.context.assets.image("tile_bar_left"),
+                self.context.assets.image("tile_bar_top"),
+                self.context.assets.image("tile_ball_top_left"),
             ),
             (True, False, True, False): (
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_bar_left"),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_bar_left"),
             ),
             (False, True, False, True): (
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_bar_top"),
+                self.context.assets.image("tile_bar_top"),
             ),
             (True, True, False, True): (
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
-                pygame.image.load("assets/tiles/bar_top.png").convert_alpha(),
+                self.context.assets.image("tile_corner_bottom_right"),
+                self.context.assets.image("tile_corner_bottom_left"),
+                self.context.assets.image("tile_bar_top"),
+                self.context.assets.image("tile_bar_top"),
             ),
             (True, False, True, True): (
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load("assets/tiles/bar_left.png").convert_alpha(),
+                self.context.assets.image("tile_corner_bottom_right"),
+                self.context.assets.image("tile_bar_left"),
+                self.context.assets.image("tile_corner_top_right"),
+                self.context.assets.image("tile_bar_left"),
             ),
             (False, True, True, True): (
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_bottom.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_bar_bottom"),
+                self.context.assets.image("tile_corner_top_right"),
+                self.context.assets.image("tile_corner_top_left"),
             ),
             (True, True, True, False): (
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_bottom_left.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/bar_right.png"
-                ).convert_alpha(),
-                pygame.image.load(
-                    "assets/tiles/corner_top_left.png"
-                ).convert_alpha(),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_corner_bottom_left"),
+                self.context.assets.image("tile_bar_right"),
+                self.context.assets.image("tile_corner_top_left"),
             ),
         }
         self.refresh()

@@ -20,7 +20,11 @@ class Label(Node):
         text_surfaces = []
         min_size = Vector2()
         for text, color in texts:
-            surface = context.font.render(text, False, color).convert_alpha()
+            surface = (
+                self.context.assets.font("ui")
+                .render(text, False, color)
+                .convert_alpha()
+            )
             text_surfaces.append(surface)
             min_size.y = max(min_size.y, surface.get_size()[1])
             min_size.x += surface.get_size()[0]

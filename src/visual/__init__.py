@@ -6,6 +6,7 @@ from typing import final
 
 from pygame.font import Font
 from src.db_manager.user import UserManager
+from src.visual.utils.asset_manager import AssetManager
 
 
 class GameComponent(ABC):
@@ -111,13 +112,13 @@ class Context:
         screen: Surface,
         width: int,
         height: int,
-        font: Font,
+        assets: AssetManager,
         user_manager: UserManager,
     ) -> None:
         self.root_scene = Node(self)
         self.screen = screen
         self.width = width
         self.height = height
-        self.font = font
+        self.assets = assets
         self.user_manager = user_manager
         self.game_running = True

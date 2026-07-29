@@ -32,7 +32,7 @@ class Player(Node):
         self.sprites = {
             Direction.UP: Sprite(
                 context,
-                image.load("assets/player/up.png").convert_alpha(),
+                self.context.assets.image("player_up"),
                 1,
                 4,
                 10,
@@ -40,7 +40,7 @@ class Player(Node):
             ),
             Direction.DOWN: Sprite(
                 context,
-                image.load("assets/player/down.png").convert_alpha(),
+                self.context.assets.image("player_down"),
                 1,
                 4,
                 10,
@@ -48,7 +48,7 @@ class Player(Node):
             ),
             Direction.LEFT: Sprite(
                 context,
-                image.load("assets/player/left.png").convert_alpha(),
+                self.context.assets.image("player_left"),
                 1,
                 4,
                 10,
@@ -56,14 +56,14 @@ class Player(Node):
             ),
             Direction.RIGHT: Sprite(
                 context,
-                image.load("assets/player/right.png").convert_alpha(),
+                self.context.assets.image("player_right"),
                 1,
                 4,
                 10,
                 True,
             ),
         }
-        self.idle_img = image.load("assets/player/idle.png").convert_alpha()
+        self.idle_img = self.context.assets.image("player_idle")
         particle_img = Surface((2, 2), flags=pygame.SRCALPHA)
         particle_color = Color("#bf53c9")
         particle_color.a = 100

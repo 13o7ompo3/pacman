@@ -20,7 +20,7 @@ class Button(Node):
     def __init__(
         self,
         context: Context,
-        content: Surface | str,
+        content: str | Surface | list[Surface | str],
         size: Vector2,
         color: Color,
         callback: Callable,
@@ -29,8 +29,9 @@ class Button(Node):
         border_radius: int = 8,
         shadow_color: Color | None = None,
         highlight_color: Color | None = None,
+        padding: int = 3,
     ) -> None:
-        self.size = size
+        self.context = context
         self.fg_color = color
         self.bg_color = (
             shadow_color
@@ -43,15 +44,13 @@ class Button(Node):
             else color.lerp(Color("lightyellow"), 0.4)
         )
 
-        if isinstance(content, str):
-            self.content = context.font.render(
-                content,
-                False,
-                self.bg_color,
-            ).convert_alpha()
-        else:
-            self.content = content.convert_alpha()
-            self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
+        self.padding = padding
+        self._prepare_content(content)
+        size = Vector2(
+            max(size.x, self.content.get_size()[0]),
+            max(size.y, self.content.get_size()[1]),
+        )
+        self.size = size
 
         self.thickness = thickness
         self.border_radius = border_radius
@@ -74,6 +73,59 @@ class Button(Node):
         self.shortcuts = shortcuts
 
         super().__init__(context)
+
+    def _prepare_content(
+        self,
+        content: str | Surface | list[Surface | str],
+    ):
+        if isinstance(content, str):
+            content = (
+                self.context.assets.font("ui")
+                .render(
+                    content,
+                    False,
+                    self.bg_color,
+                )
+                .convert_alpha()
+            )
+        elif isinstance(content, list):
+            size = Vector2()
+            for i in range(len(content)):
+                if isinstance(content[i], str):
+                    content[i] = (
+                        self.context.assets.font("ui")
+                        .render(
+                            content[i],
+                            False,
+                            self.bg_color,
+                        )
+                        .convert_alpha()
+                    )
+                elif isinstance(content[i], Surface):
+                    content[i] = content[i].convert_alpha()
+                    content[i].fill(
+                        self.bg_color, special_flags=BLEND_RGBA_MULT
+                    )
+                w, h = content[i].get_size()
+                size.x += w
+                if h > size.y:
+                    size.y = h
+
+            size += Vector2(
+                self.padding * (len(content) + 1), self.padding * 2
+            )
+            surface = Surface(size, flags=pygame.SRCALPHA)
+            x = self.padding
+            for i in range(len(content)):
+                w, h = content[i].get_size()
+                surface.blit(content[i], (x, size.y / 2 - h / 2))
+                x += w + self.padding
+            content = surface
+        elif isinstance(content, Surface):
+            content = content.convert_alpha()
+            content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
+
+        self.content = content
 
     def __setattr__(self, name: str, value: Any, /) -> None:
         ret = super().__setattr__(name, value)

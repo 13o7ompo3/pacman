@@ -24,8 +24,12 @@ class Prompt(Node):
         on_accept: Callable,
     ) -> None:
         super().__init__(context)
-        self.title = context.font.render(title, False, Color("white"))
-        self.message = context.font.render(message, False, Color("white"))
+        self.title = self.context.assets.font("ui").render(
+            title, False, Color("white")
+        )
+        self.message = self.context.assets.font("ui").render(
+            message, False, Color("white")
+        )
 
         padding = Vector2(10, 10)
         button_size = Vector2(50, 30)
