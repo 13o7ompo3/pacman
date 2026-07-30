@@ -110,3 +110,7 @@ class Image:
             blended_rgb = src_slice_rgb * alpha_normalized + dst_slice_rgb * (1.0 - alpha_normalized)
             dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
 
+    @staticmethod
+    def fill(surface: Surface, color: Tuple[int, int, int]) -> None:
+        pixel_array = pygame.surfarray.pixels3d(surface)
+        pixel_array[:, :] = color
