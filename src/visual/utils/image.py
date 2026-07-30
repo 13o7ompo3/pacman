@@ -130,5 +130,5 @@ class Image:
         }
 
         for original_color, new_color in color_mapping.items():
-            mask = np.all(pixel_array == original_color)
-            pixel_array[mask] = new_color[:3]  # Update only RGB values, ignore alpha
+            mask = np.all(pixel_array == original_color, axis=-1)
+            pixel_array[mask] = new_color
