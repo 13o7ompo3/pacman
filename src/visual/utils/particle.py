@@ -2,6 +2,7 @@ from src.visual import Node, Context
 from pygame import Surface, Vector2
 import random
 from typing import Dict, Tuple
+from src.visual.utils.image import Image
 
 class Particle(Node):
     def __init__(
