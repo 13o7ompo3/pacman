@@ -51,6 +51,7 @@ class RootScene(Node):
             self._copy_color(self.context.colors.light, theme.light)
             self._copy_color(self.context.colors.lighter, theme.lighter)
             self._copy_color(self.context.colors.lightest, theme.lightest)
+            self.redraw()
 
     def _copy_color(self, color1, color2) -> None:
         color1.r = color2.r

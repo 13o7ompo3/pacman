@@ -119,6 +119,9 @@ class TitleLabel(Node):
         )
         self.label.render()
 
+    def _on_redraw(self) -> None:
+        self.label._on_redraw()
+
 
 class InfoBar(Node):
     def __init__(
@@ -211,6 +214,14 @@ class InfoBar(Node):
             self.dynamic_text_pos,
         )
 
+    def _on_redraw(self) -> None:
+        self.static_label = self.context.assets.font("ui").render(
+            self.static_text, False, self.context.colors.lighter
+        )
+        self.dynamic_label = self.context.assets.font("ui").render(
+            self.dynamic_text.center(5), False, self.context.colors.lighter
+        )
+
 
 class LivesLeft(Node):
     def __init__(self, context: "Context", logical_maze: LogicalMaze) -> None:
@@ -233,6 +244,11 @@ class LivesLeft(Node):
                 self.context.assets.image("life_icon"),
                 self.world_position + (32 * i + 25, 30),
             )
+
+    def _on_redraw(self) -> None:
+        self.lives_text = self.context.assets.font("ui").render(
+            "LIVES REMAINING: ", False, self.context.colors.lightest
+        )
 
 
 class GameScene(Node):

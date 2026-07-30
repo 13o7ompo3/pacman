@@ -45,7 +45,9 @@ class Button(Node):
         )
 
         self.padding = padding
-        self._prepare_content(content)
+        self.content = self._prepare_content(content)
+        self.original_content = self.content.copy()
+        self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
         size = Vector2(
             max(size.x, self.content.get_size()[0]),
             max(size.y, self.content.get_size()[1]),
@@ -77,14 +79,14 @@ class Button(Node):
     def _prepare_content(
         self,
         content: str | Surface | list[Surface | str],
-    ):
+    ) -> Surface:
         if isinstance(content, str):
             content = (
                 self.context.assets.font("ui")
                 .render(
                     content,
                     False,
-                    self.bg_color,
+                    Color("white"),
                 )
                 .convert_alpha()
             )
@@ -97,15 +99,12 @@ class Button(Node):
                         .render(
                             content[i],
                             False,
-                            self.bg_color,
+                            Color("white"),
                         )
                         .convert_alpha()
                     )
                 elif isinstance(content[i], Surface):
                     content[i] = content[i].convert_alpha()
-                    content[i].fill(
-                        self.bg_color, special_flags=BLEND_RGBA_MULT
-                    )
                 w, h = content[i].get_size()
                 size.x += w
                 if h > size.y:
@@ -123,9 +122,8 @@ class Button(Node):
             content = surface
         elif isinstance(content, Surface):
             content = content.convert_alpha()
-            content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
 
-        self.content = content
+        return content
 
     def __setattr__(self, name: str, value: Any, /) -> None:
         ret = super().__setattr__(name, value)
@@ -207,3 +205,7 @@ class Button(Node):
                 border_radius=self.border_radius,
             )
             self.context.screen.blit(self.content, self.content_position)
+
+    def _on_redraw(self) -> None:
+        self.content = self.original_content.copy()
+        self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)

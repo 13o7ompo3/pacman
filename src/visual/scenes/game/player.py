@@ -77,7 +77,7 @@ class Player(Node):
             20,
         )
 
-    def _on_input(self, event: Event) -> None:
+    def _on_input(self, event: Event) -> Event | None:
         if self.hidden:
             return
         if event.type == KEYDOWN:
@@ -91,6 +91,7 @@ class Player(Node):
                 self.next_direction = Direction.RIGHT
             if self.direction is None:
                 self.direction = self.next_direction
+        return event
 
     def _on_update(self, delta: float) -> None:
         self.particles.update(delta)

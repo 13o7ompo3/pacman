@@ -106,6 +106,20 @@ class Node(GameComponent):
         """Override to draw component."""
         ...
 
+    @final
+    def redraw(self) -> None:
+        """Handle redrawing the visuals of a component and it's children."""
+
+        self._on_redraw()
+
+        for child in self.children:
+            if isinstance(child, Node):
+                child.redraw()
+
+    def _on_redraw(self) -> None:
+        """Override to draw component."""
+        ...
+
 
 class Context:
     def __init__(

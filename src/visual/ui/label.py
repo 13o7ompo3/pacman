@@ -16,10 +16,25 @@ class Label(Node):
         border_radius: int = 0,
     ) -> None:
         super().__init__(context)
+        self.box_size = box_size
+        self.texts = texts
+        self.scale = scale
+        self.background_color = background_color
+        self.border_color = border_color
+        self.border_radius = border_radius
 
+        self._on_redraw()
+
+    def _on_draw(self) -> None:
+        self.context.screen.blit(self.text, self.world_position)
+
+    def get_as_surface(self) -> Surface:
+        return self.text
+
+    def _on_redraw(self) -> None:
         text_surfaces = []
         min_size = Vector2()
-        for text, color in texts:
+        for text, color in self.texts:
             surface = (
                 self.context.assets.font("ui")
                 .render(text, False, color)
@@ -35,12 +50,12 @@ class Label(Node):
             text.blit(surface, offset)
             offset.x += surface.get_size()[0]
 
-        text = transform.scale_by(text, scale)
+        text = transform.scale_by(text, self.scale)
         text_size = Vector2(text.get_size())
 
         label_size = Vector2(
-            max(box_size.x, text_size.x),
-            max(box_size.y, text_size.y),
+            max(self.box_size.x, text_size.x),
+            max(self.box_size.y, text_size.y),
         )
         self.text = Surface(label_size, pygame.SRCALPHA)
 
@@ -49,15 +64,9 @@ class Label(Node):
             self.text,
             (0, 0),
             label_size,
-            background_color,
-            border_color,
+            self.background_color,
+            self.border_color,
             1,
-            border_radius,
+            self.border_radius,
         )
         self.text.blit(text, label_size / 2 - text_size / 2)
-
-    def _on_draw(self) -> None:
-        self.context.screen.blit(self.text, self.world_position)
-
-    def get_as_surface(self) -> Surface:
-        return self.text
