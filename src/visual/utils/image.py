@@ -2,6 +2,7 @@ import pygame
 from pygame import Surface
 from typing import Dict, Tuple
 import numpy as np
+from src.visual.palette import ColorPalette
 
 class Image:
     @staticmethod
@@ -114,3 +115,20 @@ class Image:
     def fill(surface: Surface, color: Tuple[int, int, int]) -> None:
         pixel_array = pygame.surfarray.pixels3d(surface)
         pixel_array[:, :] = color
+
+    @staticmethod
+    def switch_palette(surface: Surface, old_palette: ColorPalette, new_palette: ColorPalette) -> None:
+        pixel_array = pygame.surfarray.pixels3d(surface)
+
+        color_mapping = {
+            old_palette.darkest: new_palette.darkest,
+            old_palette.darker: new_palette.darker,
+            old_palette.dark: new_palette.dark,
+            old_palette.light: new_palette.light,
+            old_palette.lighter: new_palette.lighter,
+            old_palette.lightest: new_palette.lightest,
+        }
+
+        for original_color, new_color in color_mapping.items():
+            mask = np.all(pixel_array == original_color)
+            pixel_array[mask] = new_color[:3]  # Update only RGB values, ignore alpha
