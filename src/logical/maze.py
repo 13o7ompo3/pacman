@@ -405,9 +405,14 @@ class LogicalMaze:
                     self._death_countdown = self.respawn_delay
                     events.add(PlayerDiedEvent(self.player.lives))
 
+                for g in self.ghosts:
+                    g.next_move = None
+                    g.last_direction = None
+
             elif ghost.state == GhostState.FRIGHTENED:
                 ghost.state = GhostState.DEAD
                 ghost.last_direction = None
+                ghost.next_move = None
                 ghost.respawn_timer = self.ghost_respawn_delay
                 self.player.score += self.points_ghost
 
