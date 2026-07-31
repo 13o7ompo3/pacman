@@ -1,6 +1,7 @@
-from pygame import K_t, KEYUP
+from pygame import K_t, KEYUP, Surface
 from pygame.event import Event
 from src.visual import Node, Context
+from src.visual.utils.image import Image
 from src.visual.palette import ColorPalette
 from src.visual.utils.asset_manager import AssetManager
 
@@ -52,6 +53,12 @@ class RootScene(Node):
             self._copy_color(self.context.colors.lighter, theme.lighter)
             self._copy_color(self.context.colors.lightest, theme.lightest)
             self.redraw()
+
+            surface = Surface((100, 100))
+            # Image.switch_palette(surface, theme, theme)
+            for image in self.context.assets.images:
+                # change to the new theme
+                pass
 
     def _copy_color(self, color1, color2) -> None:
         color1.r = color2.r

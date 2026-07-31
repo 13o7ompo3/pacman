@@ -33,6 +33,14 @@ class AssetManager:
             + len(self._registered_audios)
         )
 
+    @property
+    def images(self) -> list[str]:
+        return list(self._loaded_images.keys())
+
+    @property
+    def fonts(self) -> list[str]:
+        return list(self._loaded_fonts.keys())
+
     def load(self) -> None:
         for _ in self.load_progress():
             pass
