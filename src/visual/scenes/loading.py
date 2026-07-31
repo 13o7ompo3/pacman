@@ -169,3 +169,9 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "instructions_icon", "assets/icons/instructions.png"
         )
+        self.context.assets.register_image(
+            "next_icon", "assets/icons/next.png"
+        )
+        self.context.assets.register_image(
+            "previous_icon", "assets/icons/previous.png"
+        )

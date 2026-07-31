@@ -3,6 +3,7 @@ from src.visual import Node, Context
 from src.visual.scenes.game import GameScene
 from src.visual.scenes.game_over import GameOverScene, TerminalState
 from src.visual.scenes.leaderboard import LeaderBoardScene
+from src.visual.scenes.instructions import InstructionsScene
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from pygame import Color, Vector2
@@ -46,7 +47,8 @@ class TitleScene(Node):
         )
 
         def open_instructions(_):
-            pass
+            instruction_scene = InstructionsScene(context)
+            context.root_scene.add_child(instruction_scene)
 
         instructions_button = Button(
             context,
