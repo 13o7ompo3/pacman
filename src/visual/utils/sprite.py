@@ -22,8 +22,8 @@ class Sprite(Node):
         self.rows = rows
         self.cols = cols
         self.repeat = repeat
-        self.frames = Image.split_surface(surface, self.rows, self.cols)
-        self.flipped_frames = self.__compute_flipped_frames()
+        self.surface = surface
+        self._on_redraw()
         self.current_frame_index = 0
         self.playing = True
         self.flip_x = False
@@ -75,3 +75,7 @@ class Sprite(Node):
 
     def stop(self):
         self.playing = False
+
+    def _on_redraw(self) -> None:
+        self.frames = Image.split_surface(self.surface, self.rows, self.cols)
+        self.flipped_frames = self.__compute_flipped_frames()

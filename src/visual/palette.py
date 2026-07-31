@@ -31,10 +31,18 @@ class ColorPalette:
 
 
 DEFAULT_PALETTE = ColorPalette(
-    Color("#272744"),
-    Color("#494d7e"),
-    Color("#8b6d9c"),
-    Color("#c69fa5"),
-    Color("#f2d3ab"),
-    Color("#fbf5ef"),
+    Color("#18215d"),
+    Color("#503197"),
+    Color("#bf53c9"),
+    Color("#e17cb7"),
+    Color("#efaaa5"),
+    Color("#f6e0c8"),
 )
+# DEFAULT_PALETTE = ColorPalette(
+#     Color("#272744"),
+#     Color("#494d7e"),
+#     Color("#8b6d9c"),
+#     Color("#c69fa5"),
+#     Color("#f2d3ab"),
+#     Color("#fbf5ef"),
+# )

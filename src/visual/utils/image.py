@@ -4,14 +4,21 @@ from typing import Dict, Tuple
 import numpy as np
 from src.visual.palette import ColorPalette
 
+
 class Image:
     @staticmethod
-    def subsurface(surface: Surface, x: int, y: int, width: int, height: int) -> Surface:
+    def subsurface(
+        surface: Surface, x: int, y: int, width: int, height: int
+    ) -> Surface:
         parent_width, parent_height = surface.get_size()
         if x < 0 or y < 0 or width <= 0 or height <= 0:
-            raise ValueError("Subsurface rectangle dimensions must be positive.")
+            raise ValueError(
+                "Subsurface rectangle dimensions must be positive."
+            )
         if x + width > parent_width or y + height > parent_height:
-            raise ValueError("Subsurface rectangle outside parent surface area.")
+            raise ValueError(
+                "Subsurface rectangle outside parent surface area."
+            )
         child_surface = pygame.Surface(
             (width, height),
             flags=surface.get_flags(),
@@ -83,7 +90,6 @@ class Image:
         x2_src = x1_src + (x2_dst - x1_dst)
         y2_src = y1_src + (y2_dst - y1_dst)
 
-
         has_dst_alpha = dest_surface.get_flags() & pygame.SRCALPHA
 
         src_pixels = pygame.surfarray.pixels3d(source_surface)
@@ -100,15 +106,18 @@ class Image:
             dst_alpha = pygame.surfarray.pixels_alpha(dest_surface)
             dst_slice_a = dst_alpha[x1_dst:x2_dst, y1_dst:y2_dst]
 
-            blended_rgb = (
-                src_slice_rgb * alpha_normalized
-                + dst_slice_rgb * (1.0 - alpha_normalized)
+            blended_rgb = src_slice_rgb * alpha_normalized + dst_slice_rgb * (
+                1.0 - alpha_normalized
             )
 
             dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
-            dst_slice_a[:] = np.maximum(src_slice_a, dst_slice_a).astype(np.uint8)
+            dst_slice_a[:] = np.maximum(src_slice_a, dst_slice_a).astype(
+                np.uint8
+            )
         else:
-            blended_rgb = src_slice_rgb * alpha_normalized + dst_slice_rgb * (1.0 - alpha_normalized)
+            blended_rgb = src_slice_rgb * alpha_normalized + dst_slice_rgb * (
+                1.0 - alpha_normalized
+            )
             dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
 
     @staticmethod
@@ -117,7 +126,9 @@ class Image:
         pixel_array[:, :] = color
 
     @staticmethod
-    def switch_palette(surface: Surface, old_palette: ColorPalette, new_palette: ColorPalette) -> None:
+    def switch_palette(
+        surface: Surface, old_palette: ColorPalette, new_palette: ColorPalette
+    ) -> None:
         pixel_array = pygame.surfarray.pixels3d(surface)
 
         color_mapping = {

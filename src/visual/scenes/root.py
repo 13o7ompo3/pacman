@@ -4,6 +4,7 @@ from src.visual import Node, Context
 from src.visual.utils.image import Image
 from src.visual.palette import ColorPalette
 from src.visual.utils.asset_manager import AssetManager
+from copy import deepcopy
 
 
 class RootScene(Node):
@@ -42,23 +43,23 @@ class RootScene(Node):
 
     def _on_input(self, event: Event) -> Event | None:
         if event.type == KEYUP and event.key == K_t and self.themes:
+            old_theme = deepcopy(self.context.colors)
             self.current_theme_index = (self.current_theme_index + 1) % len(
                 self.themes
             )
-            theme = self.themes[self.current_theme_index]
-            self._copy_color(self.context.colors.darkest, theme.darkest)
-            self._copy_color(self.context.colors.darker, theme.darker)
-            self._copy_color(self.context.colors.dark, theme.dark)
-            self._copy_color(self.context.colors.light, theme.light)
-            self._copy_color(self.context.colors.lighter, theme.lighter)
-            self._copy_color(self.context.colors.lightest, theme.lightest)
-            self.redraw()
+            new_theme = self.themes[self.current_theme_index]
+            self._copy_color(self.context.colors.darkest, new_theme.darkest)
+            self._copy_color(self.context.colors.darker, new_theme.darker)
+            self._copy_color(self.context.colors.dark, new_theme.dark)
+            self._copy_color(self.context.colors.light, new_theme.light)
+            self._copy_color(self.context.colors.lighter, new_theme.lighter)
+            self._copy_color(self.context.colors.lightest, new_theme.lightest)
 
-            surface = Surface((100, 100))
-            # Image.switch_palette(surface, theme, theme)
             for image in self.context.assets.images:
-                # change to the new theme
-                pass
+                surface = self.context.assets.image(image)
+                Image.switch_palette(surface, old_theme, new_theme)
+
+            self.redraw()
 
     def _copy_color(self, color1, color2) -> None:
         color1.r = color2.r
