@@ -166,3 +166,6 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "update_icon", "assets/icons/update.png"
         )
+        self.context.assets.register_image(
+            "instructions_icon", "assets/icons/instructions.png"
+        )

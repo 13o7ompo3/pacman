@@ -45,6 +45,21 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
+        def open_instructions(_):
+            pass
+
+        instructions_button = Button(
+            context,
+            [
+                context.assets.image("instructions_icon"),
+                "Instructions".center(12),
+            ],
+            button_size,
+            context.colors.light,
+            open_instructions,
+            shadow_color=context.colors.dark,
+        )
+
         def quit_game(_):
             context.game_running = False
 
@@ -59,19 +74,23 @@ class TitleScene(Node):
 
         width, height = context.width, context.height
         title_text.local_position = (
-            Vector2(width / 2, height / 5) - title_text.size / 2
+            Vector2(width / 2, height / 6) - title_text.size / 2
         )
         start_button.local_position = (
-            Vector2(width / 2, height * 2 / 5) - start_button.size / 2
+            Vector2(width / 2, height * 2 / 6) - start_button.size / 2
         )
         leaderboard_button.local_position = (
-            Vector2(width / 2, height * 3 / 5) - leaderboard_button.size / 2
+            Vector2(width / 2, height * 3 / 6) - leaderboard_button.size / 2
+        )
+        instructions_button.local_position = (
+            Vector2(width / 2, height * 4 / 6) - exit_button.size / 2
         )
         exit_button.local_position = (
-            Vector2(width / 2, height * 4 / 5) - exit_button.size / 2
+            Vector2(width / 2, height * 5 / 6) - exit_button.size / 2
         )
 
         self.add_child(title_text)
         self.add_child(start_button)
         self.add_child(leaderboard_button)
+        self.add_child(instructions_button)
         self.add_child(exit_button)
