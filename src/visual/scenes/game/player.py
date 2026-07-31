@@ -64,20 +64,22 @@ class Player(Node):
             ),
         }
         self.idle_img = self.context.assets.image("player_idle")
-        particle_img = Surface((2, 2), flags=pygame.SRCALPHA)
-        particle_color = Color("#bf53c9")
+        self.particle_img = Surface(
+            (2, 2), flags=pygame.SRCALPHA
+        ).convert_alpha()
+        particle_color = Color(self.context.colors.lightest)
         particle_color.a = 100
-        particle_img.fill(particle_color)
+        self.particle_img.fill(particle_color)
         self.particles = ParticleSystem(
             context,
-            particle_img,
+            self.particle_img,
             (Vector2(10, 10), Vector2(-10, -10)),
             (Vector2(0, 0), Vector2(0, 0)),
             0.4,
             20,
         )
 
-    def _on_input(self, event: Event) -> None:
+    def _on_input(self, event: Event) -> Event | None:
         if self.hidden:
             return
         if event.type == KEYDOWN:
@@ -91,6 +93,7 @@ class Player(Node):
                 self.next_direction = Direction.RIGHT
             if self.direction is None:
                 self.direction = self.next_direction
+        return event
 
     def _on_update(self, delta: float) -> None:
         self.particles.update(delta)
@@ -140,3 +143,10 @@ class Player(Node):
                 + self.animated_position
                 - Vector2(self.idle_img.get_size()) / 2,
             )
+
+    def _on_redraw(self) -> None:
+        particle_color = Color(self.context.colors.lightest)
+        particle_color.a = 100
+        self.particle_img.fill(particle_color)
+        for sprite in self.sprites.values():
+            sprite.redraw()

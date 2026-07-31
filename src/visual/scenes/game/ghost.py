@@ -104,3 +104,7 @@ class VisualGhost(Node):
         self.target_position = Vector2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
         self.dead = False
+
+    def _on_redraw(self) -> None:
+        self.sprite_neutral.redraw()
+        self.sprite_running.redraw()

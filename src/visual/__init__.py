@@ -6,7 +6,7 @@ from typing import final
 
 from pygame.font import Font
 from src.db_manager.user import UserManager
-from src.visual.palette import COLOR_PALETTE
+from src.visual.palette import DEFAULT_PALETTE
 from src.visual.utils.asset_manager import AssetManager
 
 
@@ -106,6 +106,20 @@ class Node(GameComponent):
         """Override to draw component."""
         ...
 
+    @final
+    def redraw(self) -> None:
+        """Handle redrawing the visuals of a component and it's children."""
+
+        self._on_redraw()
+
+        for child in self.children:
+            if isinstance(child, Node):
+                child.redraw()
+
+    def _on_redraw(self) -> None:
+        """Override to draw component."""
+        ...
+
 
 class Context:
     def __init__(
@@ -116,11 +130,13 @@ class Context:
         assets: AssetManager,
         user_manager: UserManager,
     ) -> None:
-        self.root_scene = Node(self)
+        from src.visual.scenes.root import RootScene
+
         self.screen = screen
         self.width = width
         self.height = height
         self.assets = assets
         self.user_manager = user_manager
-        self.colors = COLOR_PALETTE
+        self.colors = DEFAULT_PALETTE
         self.game_running = True
+        self.root_scene = RootScene(self)

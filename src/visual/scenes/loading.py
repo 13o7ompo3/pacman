@@ -16,6 +16,7 @@ class LoadingScene(Node):
             context.root_scene.clear_children
             title_scene = TitleScene(context)
             context.root_scene.add_child(title_scene)
+            self.context.root_scene.load_themes()
 
         # only load the font for the loading screen
         context.assets.register_font(
@@ -174,4 +175,32 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "previous_icon", "assets/icons/previous.png"
+        )
+        self.context.assets.register_image(
+            "oil-6_palette", "assets/palettes/oil-6-1x.png"
+        )
+        self.context.assets.register_image(
+            "cryptic-ocean_palette", "assets/palettes/cryptic-ocean-1x.png"
+        )
+        self.context.assets.register_image(
+            "robots-are-cool_palette", "assets/palettes/robots-are-cool-1x.png"
+        )
+        self.context.assets.register_image(
+            "molten_palette", "assets/palettes/molten-1x.png"
+        )
+        self.context.assets.register_image(
+            "enbydiade6_palette", "assets/palettes/enbydiade6-1x.png"
+        )
+        self.context.assets.register_image(
+            "vintage-voltage_palette", "assets/palettes/vintage-voltage-1x.png"
+        )
+        self.context.assets.register_image(
+            "bluberry-6_palette", "assets/palettes/bluberry-6-1x.png"
+        )
+        self.context.assets.register_image(
+            "grape-soda-arcade_palette",
+            "assets/palettes/grape-soda-arcade-1x.png",
+        )
+        self.context.assets.register_image(
+            "fistat6_palette", "assets/palettes/fistat6-1x.png"
         )
