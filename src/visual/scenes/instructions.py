@@ -2,6 +2,8 @@ from pygame import Color, Vector2
 from pygame.event import Event
 from src.visual import Node, Context
 from src.visual.ui.button import Button
+from src.visual.ui.label import Label
+from src.visual.utils.sprite import Sprite
 
 
 class InstructionsScene(Node):
@@ -51,12 +53,53 @@ class InstructionsScene(Node):
         )
         return_button.local_position = Vector2(10, 10)
 
+        sp = Sprite(
+            context,
+            context.assets.image("movements_instruction"),
+            1,
+            8,
+            2,
+            True,
+        )
+        sp.local_position = Vector2(context.width, context.height) / 2
+        breaking = Label(
+            context,
+            Vector2(100, 0),
+            [(" BREAKING ", context.colors.light)],
+            background_color=context.colors.dark,
+            scale=2,
+        )
+        breaking.local_position.y = (
+            context.height - breaking.size.y - next_button.size.y - 20
+        )
+        self.text = Label(
+            context,
+            Vector2(1400, breaking.size.y),
+            [
+                (
+                    "To move around you can use arrow keys. vim motions are also supported alongside WASD.",
+                    context.colors.lightest,
+                )
+            ],
+            background_color=context.colors.darkest,
+        )
+        self.text.local_position = breaking.local_position + Vector2(
+            breaking.size.x, 0
+        )
         self.add_child(next_button)
         self.add_child(previous_button)
         self.add_child(return_button)
+        self.add_child(sp)
+        self.add_child(self.text)
+        self.add_child(breaking)
+
+    def _on_update(self, delta: float) -> None:
+        self.text.local_position.x -= 100 * delta
+        if -self.text.local_position.x > self.text.size.x / 2:
+            self.text.local_position.x = 0
 
     def _on_input(self, event: Event) -> Event | None:
         return
 
     def _on_draw(self) -> None:
-        self.context.screen.fill(self.context.colors.darkest)
+        self.context.screen.fill(self.context.colors.darker)
