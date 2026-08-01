@@ -5,6 +5,7 @@ from src.visual.draw import Draw
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.utils.sprite import Sprite
+from typing import Any
 
 
 class InstructionPage(Node):
@@ -13,6 +14,7 @@ class InstructionPage(Node):
     ) -> None:
         super().__init__(context)
 
+        self.sprite = sprite
         title_text = Label(
             context,
             Vector2(0, 0),
@@ -54,6 +56,13 @@ class InstructionPage(Node):
         self.add_child(sprite)
         self.add_child(self.text)
         self.add_child(self.breaking_text)
+
+    def __setattr__(self, name: str, value: Any, /) -> None:
+        ret = super().__setattr__(name, value)
+        if name == "hidden" and hasattr(self, "sprite"):
+            if not self.hidden:
+                self.sprite.current_frame_index = 0
+        return ret
 
     def _on_update(self, delta: float) -> None:
         self.text.local_position.x -= 100 * delta
@@ -102,6 +111,19 @@ class InstructionsScene(Node):
                 ),
                 "Losing",
                 "In order to lose you must be an absolute loser.",
+            ),
+            InstructionPage(
+                context,
+                Sprite(
+                    context,
+                    context.assets.image("super_pacgum_instruction"),
+                    1,
+                    8,
+                    2,
+                    True,
+                ),
+                "Super Pacgum",
+                "When you eat a super pacgum, the ghosts become edible for a short time and they run away from you on sight.",
             ),
         ]
 
