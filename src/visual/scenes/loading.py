@@ -216,3 +216,6 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "movements_instruction", "assets/instructions/movements.png"
         )
+        self.context.assets.register_image(
+            "losing_instruction", "assets/instructions/losing.png"
+        )

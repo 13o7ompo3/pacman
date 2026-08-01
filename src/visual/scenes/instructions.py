@@ -1,17 +1,122 @@
 from pygame import Color, Vector2
 from pygame.event import Event
 from src.visual import Node, Context
+from src.visual.draw import Draw
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.utils.sprite import Sprite
+
+
+class InstructionPage(Node):
+    def __init__(
+        self, context: Context, sprite: Sprite, heading: str, description: str
+    ) -> None:
+        super().__init__(context)
+
+        title_text = Label(
+            context,
+            Vector2(0, 0),
+            [(f" {heading} ", context.colors.light)],
+            background_color=context.colors.dark,
+            scale=2,
+            border_color=context.colors.lightest,
+            border_radius=8,
+        )
+        title_text.local_position = Vector2(
+            context.width / 2 - title_text.size.x / 2, 50
+        )
+        sprite.local_position = Vector2(context.width, context.height) / 2
+        self.breaking_text = Label(
+            context,
+            Vector2(100, 0),
+            [(" BREAKING ", context.colors.light)],
+            background_color=context.colors.dark,
+            scale=2,
+        )
+        self.breaking_text.local_position.y = (
+            context.height - self.breaking_text.size.y - 45
+        )
+        self.text = Label(
+            context,
+            Vector2(0, self.breaking_text.size.y),
+            [
+                (
+                    description,
+                    context.colors.lightest,
+                )
+            ],
+        )
+        self.text.local_position = self.breaking_text.local_position + Vector2(
+            self.breaking_text.size.x, 0
+        )
+
+        self.add_child(title_text)
+        self.add_child(sprite)
+        self.add_child(self.text)
+        self.add_child(self.breaking_text)
+
+    def _on_update(self, delta: float) -> None:
+        self.text.local_position.x -= 100 * delta
+        if (
+            -self.text.local_position.x + self.breaking_text.size.x
+            > self.text.size.x
+        ):
+            self.text.local_position.x = self.context.width
+
+    def _on_draw(self) -> None:
+        Draw.rect(
+            self.context.screen,
+            self.breaking_text.local_position,
+            (self.context.width, int(self.breaking_text.size.y)),
+            fill_color=self.context.colors.darkest,
+        )
 
 
 class InstructionsScene(Node):
     def __init__(self, context: Context) -> None:
         super().__init__(context)
 
+        self.pages = [
+            InstructionPage(
+                context,
+                Sprite(
+                    context,
+                    context.assets.image("movements_instruction"),
+                    1,
+                    8,
+                    2,
+                    True,
+                ),
+                "Movements",
+                "To move around you can use arrow keys. vim motions are also supported alongside WASD.",
+            ),
+            InstructionPage(
+                context,
+                Sprite(
+                    context,
+                    context.assets.image("losing_instruction"),
+                    1,
+                    2,
+                    2,
+                    True,
+                ),
+                "Losing",
+                "In order to lose you must be an absolute loser.",
+            ),
+        ]
+
+        for page in self.pages:
+            self.add_child(page)
+            page.hidden = True
+
+        self.current_page_idx = 0
+        self.pages[self.current_page_idx].hidden = False
+
         def go_next(_):
-            pass
+            self.pages[self.current_page_idx].hidden = True
+            if self.current_page_idx < len(self.pages) - 1:
+                self.current_page_idx += 1
+            self.pages[self.current_page_idx].hidden = False
 
         next_button = Button(
             context,
@@ -26,7 +131,10 @@ class InstructionsScene(Node):
         )
 
         def go_prev(_):
-            pass
+            self.pages[self.current_page_idx].hidden = True
+            if self.current_page_idx > 0:
+                self.current_page_idx -= 1
+            self.pages[self.current_page_idx].hidden = False
 
         previous_button = Button(
             context,
@@ -53,50 +161,9 @@ class InstructionsScene(Node):
         )
         return_button.local_position = Vector2(10, 10)
 
-        sp = Sprite(
-            context,
-            context.assets.image("movements_instruction"),
-            1,
-            8,
-            2,
-            True,
-        )
-        sp.local_position = Vector2(context.width, context.height) / 2
-        breaking = Label(
-            context,
-            Vector2(100, 0),
-            [(" BREAKING ", context.colors.light)],
-            background_color=context.colors.dark,
-            scale=2,
-        )
-        breaking.local_position.y = (
-            context.height - breaking.size.y - next_button.size.y - 20
-        )
-        self.text = Label(
-            context,
-            Vector2(1400, breaking.size.y),
-            [
-                (
-                    "To move around you can use arrow keys. vim motions are also supported alongside WASD.",
-                    context.colors.lightest,
-                )
-            ],
-            background_color=context.colors.darkest,
-        )
-        self.text.local_position = breaking.local_position + Vector2(
-            breaking.size.x, 0
-        )
         self.add_child(next_button)
         self.add_child(previous_button)
         self.add_child(return_button)
-        self.add_child(sp)
-        self.add_child(self.text)
-        self.add_child(breaking)
-
-    def _on_update(self, delta: float) -> None:
-        self.text.local_position.x -= 100 * delta
-        if -self.text.local_position.x > self.text.size.x / 2:
-            self.text.local_position.x = 0
 
     def _on_input(self, event: Event) -> Event | None:
         return
