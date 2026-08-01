@@ -387,6 +387,7 @@ class GameScene(Node):
                     self.logical_maze.player.state = PlayerState.POWERED_UP
                     self.logical_maze.player.gum_timer = self.logical_maze.super_pacgum_duration
                     for ghost in self.logical_maze.ghosts:
-                        ghost.state = GhostState.FRIGHTENED
-                        ghost.last_direction = None
+                        if ghost.state != GhostState.DEAD:
+                            ghost.state = GhostState.FRIGHTENED
+                            ghost.last_direction = None
         return event
