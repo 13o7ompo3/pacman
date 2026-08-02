@@ -46,11 +46,10 @@ class LogicalMaze:
 
         Args:
             levels: List of level configurations.
-            points_pacgum: Score awarded per normal pellet eaten.
-            points_super_pacgum: Score awarded per power pellet eaten.
+            points_pacgum: Score awarded per normal pacgum eaten.
+            points_super_pacgum: Score awarded per super pacgum eaten.
             points_ghost: Score awarded per ghost eaten while frightened.
-            max_ticks: Ticks before TIME_UP fires. Pauses while player is
-                in the death countdown so the player is not penalised.
+            max_ticks: Ticks before TIME_UP fires.
             super_pacgum_duration: Ticks the FRIGHTENED state lasts.
             respawn_delay: Ticks between PLAYER_DIED and auto-respawn.
                 The view uses this window to play a death animation.
@@ -62,6 +61,9 @@ class LogicalMaze:
                 reappearing at its corner spawn. The view uses
                 ghost.respawn_timer > 0 to know which ghosts are waiting.
                 GHOST_RESPAWNED is emitted for each ghost that reappears.
+
+        Returns:
+            None
         """
         self.levels: List[LevelConfig] = levels
         self.current_level_index: int = 0
@@ -86,7 +88,14 @@ class LogicalMaze:
         self.load_level(0)
 
     def load_level(self, level_idx: int) -> None:
-        """Loads a specific level, regenerating the maze and resetting positions."""
+        """Loads a specific level
+
+        Args:
+            level_idx: Index of the level to load (0-based).
+
+        Returns:
+            None
+        """
         if level_idx < 0 or level_idx >= len(self.levels):
             logger.error(f"Level index {level_idx} out of bounds.")
             return
@@ -120,21 +129,38 @@ class LogicalMaze:
         self.pacgums = self._place_pacgums()
 
     def next_level(self) -> bool:
-        """Advances to the next level. Returns False if game is won."""
+        """Advances to the next level. Returns False if game is won.
+
+        Arguments:
+            None
+        Returns:
+            bool: True if the next level was loaded, False if there are no
+        """
         if self.current_level_idx + 1 < len(self.levels):
             self.load_level(self.current_level_idx + 1)
             return True
         return False
 
     def restart_game(self) -> None:
-        """Hard reset for a brand new game session."""
+        """Hard reset for a brand new game session.
+
+        Arguments:
+            None
+        Returns:
+            None
+        """
         self.player.lives = 3
         self.player.score = 0
         self.load_level(0)
 
     def _initialize_ghosts(self) -> list[Ghost]:
-        """Place ghosts in their four corner spawn points."""
-        # 4 corners per PDF specification
+        """Place ghosts in their four corner spawn points.
+
+        Arguments:
+            None
+        Returns:
+            list[Ghost]: List of four ghosts.
+        """
         positions = [
             (1, 1),
             (self.width - 2, 1),
@@ -147,7 +173,13 @@ class LogicalMaze:
         ]
 
     def _place_super_pacgums(self) -> set[Tuple[int, int]]:
-        """Place power pellets at the designated corner positions."""
+        """Place super pacgums at the designated corner positions.
+
+        Arguments:
+            None
+        Returns:
+            set[Tuple[int, int]]: Set of positions for super pacgums.
+        """
         positions: set[Tuple[int, int]] = set()
         corners = [
             (1, 1),
@@ -161,20 +193,30 @@ class LogicalMaze:
         return positions
 
     def _place_pacgums(self) -> set[Tuple[int, int]]:
-        """Place normal pellets on every non-wall cell except the spawn
-        tile."""
+        """Place normal pacgums on every non-wall cell except the spawn
+        tile.
+
+        Arguments:
+            None
+        Returns:
+            set[Tuple[int, int]]: Set of positions for normal pacgums.
+        """
         positions: set[Tuple[int, int]] = set()
         for y in range(self.height):
             for x in range(self.width):
                 if self.grid[y][x] != 15 and (x, y) not in self.super_pacgums:
                     positions.add((x, y))
-        # Do not spawn pacgum on player start
+
         positions.discard(self.player.get_grid_position())
         return positions
 
     @property
     def is_level_complete(self) -> bool:
-        """Return whether all pellets and power pellets have been eaten."""
+        """Return whether all pacgums and super pacgums have been eaten.
+
+        Returns:
+            bool: True if the level is complete, False otherwise.
+        """
         return not self.pacgums and not self.super_pacgums
 
     @property
@@ -204,8 +246,11 @@ class LogicalMaze:
     def can_move(self, p1: Tuple[int, int], p2: Tuple[int, int]) -> bool:
         """Check whether an entity can move from p1 to p2.
 
-        p2 must be orthogonally adjacent to p1 and in-bounds; returns False
-        otherwise. Intended for single-step moves, not pathfinding.
+        Arguments:
+            p1: Current position (x, y).
+            p2: Target position (x, y).
+        Returns:
+            bool: True if the move is legal, False otherwise.
         """
         x1, y1 = p1
         x2, y2 = p2
@@ -229,7 +274,14 @@ class LogicalMaze:
     def can_move_direction(
         self, pos: Tuple[int, int], direction: Direction
     ) -> bool:
-        """Check whether an entity can move from pos in the given direction."""
+        """Check whether an entity can move from pos in the given direction.
+
+        Arguments:
+            pos: Current position (x, y).
+            direction: Direction to check.
+        Returns:
+            bool: True if the move is legal, False otherwise.
+        """
         if direction == Direction.NONE:
             return False
         dx, dy = direction.value
@@ -237,7 +289,13 @@ class LogicalMaze:
         return self.can_move(pos, new_pos)
 
     def can_move_player(self, direction: Direction) -> bool:
-        """Check whether the player can move in the given direction."""
+        """Check whether the player can move in the given direction.
+
+        Arguments:
+            direction: Direction to check.
+        Returns:
+            bool: True if the move is legal, False otherwise.
+        """
         return self.can_move_direction(
             self.player.get_grid_position(), direction
         )
@@ -245,22 +303,27 @@ class LogicalMaze:
     def _get_valid_moves(
         self, current_pos: Tuple[int, int]
     ) -> List[Direction]:
-        """Return the legal orthogonal moves from the current position."""
+        """Return the legal orthogonal moves from the current position.
+
+        Arguments:
+            current_pos: The current (x, y) position of the entity.
+        Returns:
+            List[Direction]: A list of valid directions the entity can move.
+        """
         valid_moves: List[Direction] = []
         for direction in Direction:
-            if direction == Direction.NONE:
-                continue
-            nx = current_pos[0] + direction.value[0]
-            ny = current_pos[1] + direction.value[1]
-            if self.can_move(current_pos, (nx, ny)):
+            if self.can_move_direction(current_pos, direction):
                 valid_moves.append(direction)
         return valid_moves
 
     def _move_ghost(self, ghost: Ghost) -> Direction:
-        """Advance a ghost by one step using its current chase behavior.
+        """Determine the next move for a ghost
+           based on its state and the player's position.
 
-        Dead ghosts (respawn_timer > 0) are skipped — their respawn is
-        handled by tick_timers(), not by movement.
+        Arguments:
+            ghost: The ghost to determine the next move for.
+        Returns:
+            Direction: The direction the ghost should move next.
         """
         # Ghost is waiting to respawn — tick_timers handles it
         if ghost.state == GhostState.DEAD:
@@ -305,12 +368,10 @@ class LogicalMaze:
     def respawn_player(self) -> None:
         """Reset the player and all ghosts after a death.
 
-        Pellets and score are preserved — only positions and states reset.
-        Grants invulnerability_duration ticks of post-respawn protection so
-        the player cannot die again the instant they appear.
-
-        Called automatically by tick_timers() when the death countdown
-        expires. The view may also call this directly (e.g. from a cheat).
+        Arguments:
+            None
+        Returns:
+            None
         """
         self.player.x, self.player.y = self._spawn_x, self._spawn_y
         self.player.state = PlayerState.NORMAL
@@ -349,7 +410,13 @@ class LogicalMaze:
         )
 
     def _resolve_item_collisions(self) -> Set[GameEvent]:
-        """Check if the player landed on a pellet or power-up."""
+        """Check if the player landed on a pacgum.
+
+        Arguments:
+            None
+        Returns:
+            A set of GameEvents that occurred due to the collision.
+        """
         events: Set[GameEvent] = set()
         p_pos = self.player.get_grid_position()
         px, py = p_pos
@@ -510,7 +577,6 @@ class LogicalMaze:
         # Queue the next move for the ghost
         ghost.next_move = self._move_ghost(ghost)
 
-
         # 2. Check Collision with Player ONLY
         events.update(self._resolve_ghost_collision(ghost))
 
@@ -560,7 +626,7 @@ class LogicalMaze:
 
         # 3. Ghost respawn countdowns
         for ghost in self.ghosts:
-            if ghost.state == GhostState.DEAD and ghost.respawn_timer > 0:
+            if ghost.state == GhostState.DEAD:
                 ghost.respawn_timer -= 1
                 if ghost.respawn_timer == 0:
                     gx, gy = ghost.spawn_point
@@ -597,7 +663,14 @@ class LogicalMaze:
         return
 
     def flush_events(self) -> set[GameEvent]:
-        """Returns all queued events and clears the internal queue."""
+        """Returns all queued events and clears the internal queue.
+
+        Arguments:
+            None
+        Returns:
+            set[GameEvent]: A set of all events that have occurred since the
+            last flush.
+        """
         events_to_return = self._pending_events.copy()
         self._pending_events.clear()
         return events_to_return
