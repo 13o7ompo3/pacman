@@ -163,7 +163,7 @@ class Button(Node):
         return content
 
     def __setattr__(self, name: str, value: Any, /) -> None:
-        """Set an attribute and update the button's rectangle position if needed.
+        """Set an attribute and update the button rectangle position if needed.
 
         Args:
             name (str): The name of the attribute.

@@ -1,11 +1,11 @@
 import logging
-from typing import Tuple, List, Optional, Set
+from typing import Tuple, List, Set
 from mazegenerator import MazeGenerator  # type: ignore[import-not-found]
 from src.logical.core_types import (
     Direction,
     GhostState,
     PlayerState,
-    RenderState
+    RenderState,
 )
 from src.logical.game_event import (
     GameEvent,
@@ -64,6 +64,7 @@ class LogicalMaze:
 
         Returns:
             None
+
         """
         self.levels: List[LevelConfig] = levels
         self.current_level_index: int = 0
@@ -95,6 +96,7 @@ class LogicalMaze:
 
         Returns:
             None
+
         """
         if level_idx < 0 or level_idx >= len(self.levels):
             logger.error(f"Level index {level_idx} out of bounds.")
@@ -107,7 +109,9 @@ class LogicalMaze:
         self.base_seed = self.current_level.seed
 
         seed = self.base_seed
-        self.maze_generator = MazeGenerator((self.width, self.height), seed=seed)
+        self.maze_generator = MazeGenerator(
+            (self.width, self.height), seed=seed
+        )
         self.grid = self.maze_generator.maze
 
         self.elapsed_ticks = 0
@@ -135,6 +139,7 @@ class LogicalMaze:
             None
         Returns:
             bool: True if the next level was loaded, False if there are no
+
         """
         if self.current_level_idx + 1 < len(self.levels):
             self.load_level(self.current_level_idx + 1)
@@ -148,6 +153,7 @@ class LogicalMaze:
             None
         Returns:
             None
+
         """
         self.player.lives = 3
         self.player.score = 0
@@ -160,6 +166,7 @@ class LogicalMaze:
             None
         Returns:
             list[Ghost]: List of four ghosts.
+
         """
         positions = [
             (1, 1),
@@ -179,6 +186,7 @@ class LogicalMaze:
             None
         Returns:
             set[Tuple[int, int]]: Set of positions for super pacgums.
+
         """
         positions: set[Tuple[int, int]] = set()
         corners = [
@@ -200,6 +208,7 @@ class LogicalMaze:
             None
         Returns:
             set[Tuple[int, int]]: Set of positions for normal pacgums.
+
         """
         positions: set[Tuple[int, int]] = set()
         for y in range(self.height):
@@ -216,6 +225,7 @@ class LogicalMaze:
 
         Returns:
             bool: True if the level is complete, False otherwise.
+
         """
         return not self.pacgums and not self.super_pacgums
 
@@ -249,8 +259,10 @@ class LogicalMaze:
         Arguments:
             p1: Current position (x, y).
             p2: Target position (x, y).
+
         Returns:
             bool: True if the move is legal, False otherwise.
+
         """
         x1, y1 = p1
         x2, y2 = p2
@@ -279,8 +291,10 @@ class LogicalMaze:
         Arguments:
             pos: Current position (x, y).
             direction: Direction to check.
+
         Returns:
             bool: True if the move is legal, False otherwise.
+
         """
         if direction == Direction.NONE:
             return False
@@ -293,8 +307,10 @@ class LogicalMaze:
 
         Arguments:
             direction: Direction to check.
+
         Returns:
             bool: True if the move is legal, False otherwise.
+
         """
         return self.can_move_direction(
             self.player.get_grid_position(), direction
@@ -307,8 +323,10 @@ class LogicalMaze:
 
         Arguments:
             current_pos: The current (x, y) position of the entity.
+
         Returns:
             List[Direction]: A list of valid directions the entity can move.
+
         """
         valid_moves: List[Direction] = []
         for direction in Direction:
@@ -322,8 +340,10 @@ class LogicalMaze:
 
         Arguments:
             ghost: The ghost to determine the next move for.
+
         Returns:
             Direction: The direction the ghost should move next.
+
         """
         # Ghost is waiting to respawn — tick_timers handles it
         if ghost.state == GhostState.DEAD:
@@ -354,14 +374,18 @@ class LogicalMaze:
         if ghost.state == GhostState.CHASE:
             best_dir = min(
                 candidates,
-                key=lambda d: abs((ghost.x + d.value[0]) - px)
-                + abs((ghost.y + d.value[1]) - py),
+                key=lambda d: (
+                    abs((ghost.x + d.value[0]) - px)
+                    + abs((ghost.y + d.value[1]) - py)
+                ),
             )
         else:
             best_dir = max(
                 candidates,
-                key=lambda d: abs((ghost.x + d.value[0]) - px)
-                + abs((ghost.y + d.value[1]) - py),
+                key=lambda d: (
+                    abs((ghost.x + d.value[0]) - px)
+                    + abs((ghost.y + d.value[1]) - py)
+                ),
             )
         return best_dir
 
@@ -372,6 +396,7 @@ class LogicalMaze:
             None
         Returns:
             None
+
         """
         self.player.x, self.player.y = self._spawn_x, self._spawn_y
         self.player.state = PlayerState.NORMAL
@@ -396,8 +421,13 @@ class LogicalMaze:
             player_score=self.player.score,
             player_invulnerable=self.is_player_invulnerable,
             ghosts=tuple(
-                (ghost.x, ghost.y, ghost.state, ghost.ghost_id,
-                 ghost.respawn_timer)
+                (
+                    ghost.x,
+                    ghost.y,
+                    ghost.state,
+                    ghost.ghost_id,
+                    ghost.respawn_timer,
+                )
                 for ghost in self.ghosts
             ),
             pacgums=frozenset(self.pacgums),
@@ -416,6 +446,7 @@ class LogicalMaze:
             None
         Returns:
             A set of GameEvents that occurred due to the collision.
+
         """
         events: Set[GameEvent] = set()
         p_pos = self.player.get_grid_position()
@@ -424,16 +455,20 @@ class LogicalMaze:
         if p_pos in self.pacgums:
             self.pacgums.remove(p_pos)
             self.player.score += self.points_pacgum
-            events.add(AtePacgumEvent(x=px, y=py,
-                                      score_gained=self.points_pacgum))
+            events.add(
+                AtePacgumEvent(x=px, y=py, score_gained=self.points_pacgum)
+            )
 
         elif p_pos in self.super_pacgums:
             self.super_pacgums.remove(p_pos)
             self.player.score += self.points_super_pacgum
             self.player.gum_timer = self.super_pacgum_duration
             self.player.state = PlayerState.POWERED_UP
-            events.add(AteSuperPacgumEvent(
-                x=px, y=py, score_gained=self.points_super_pacgum))
+            events.add(
+                AteSuperPacgumEvent(
+                    x=px, y=py, score_gained=self.points_super_pacgum
+                )
+            )
 
             for ghost in self.ghosts:
                 if ghost.state != GhostState.DEAD:
@@ -450,19 +485,22 @@ class LogicalMaze:
 
     def _resolve_ghost_collision(self, ghost: Ghost) -> Set[GameEvent]:
         """Check if a specific ghost is occupying the same tile as the player.
+
         Arguments:
             ghost: The ghost to check for collision with the player.
+
         Returns:
             A set of GameEvents that occurred due to the collision.
+
         """
         events: Set[GameEvent] = set()
 
         if ghost.get_grid_position() == self.player.get_grid_position():
-
-            if (ghost.state == GhostState.CHASE
+            if (
+                ghost.state == GhostState.CHASE
                 and not self.cheat_invincible
-                    and not self.is_player_invulnerable):
-
+                and not self.is_player_invulnerable
+            ):
                 self.player.lives -= 1
                 self.player.state = PlayerState.DEAD
 
@@ -483,21 +521,26 @@ class LogicalMaze:
                 ghost.respawn_timer = self.ghost_respawn_delay
                 self.player.score += self.points_ghost
 
-                events.add(AteGhostEvent(
-                    ghost_id=ghost.ghost_id,
-                    x=ghost.x,
-                    y=ghost.y,
-                    score_gained=self.points_ghost,
-                ))
+                events.add(
+                    AteGhostEvent(
+                        ghost_id=ghost.ghost_id,
+                        x=ghost.x,
+                        y=ghost.y,
+                        score_gained=self.points_ghost,
+                    )
+                )
 
         return events
 
     def tick_player(self, player_dir: Direction) -> None:
         """Move the player one step and resolve all collisions.
+
         Arguments:
             player_dir: The direction the player is attempting to move.
+
         Returns:
             None
+
         """
         events: Set[GameEvent] = set()
 
@@ -526,11 +569,14 @@ class LogicalMaze:
 
     def get_ghost_next_move(self, ghost_id: int) -> Direction:
         """Get the next move for a specific ghost without moving it.
+
         Arguments:
             ghost_id: The identity of the ghost to query (0–3).
+
         Returns:
             The Direction the ghost would move next, or Direction.NONE if it
             cannot move.
+
         """
         ghost = next((g for g in self.ghosts if g.ghost_id == ghost_id), None)
         if not ghost:
@@ -543,10 +589,13 @@ class LogicalMaze:
 
     def tick_ghost(self, ghost_id: int) -> None:
         """Move a single ghost one step and check if it caught the player.
+
         Arguments:
             ghost_id: The identity of the ghost to move (0–3).
+
         Returns:
             None
+
         """
         events: Set[GameEvent] = set()
 
@@ -605,6 +654,7 @@ class LogicalMaze:
 
         Returns:
             None
+
         """
         events: Set[GameEvent] = set()
 
@@ -613,10 +663,12 @@ class LogicalMaze:
             self._death_countdown -= 1
             if self._death_countdown == 0:
                 self.respawn_player()
-                events.add(PlayerRespawnedEvent(
-                    x=self._spawn_x,
-                    y=self._spawn_y,
-                ))
+                events.add(
+                    PlayerRespawnedEvent(
+                        x=self._spawn_x,
+                        y=self._spawn_y,
+                    )
+                )
             self._pending_events.update(events)
             return  # level timer pauses during death countdown
 
@@ -638,11 +690,13 @@ class LogicalMaze:
                         else GhostState.CHASE
                     )
                     ghost.last_direction = None
-                    events.add(GhostRespawnedEvent(
-                        ghost_id=ghost.ghost_id,
-                        x=gx,
-                        y=gy,
-                    ))
+                    events.add(
+                        GhostRespawnedEvent(
+                            ghost_id=ghost.ghost_id,
+                            x=gx,
+                            y=gy,
+                        )
+                    )
 
         # 4. Power-up countdown
         if self.player.gum_timer > 0:
@@ -670,6 +724,7 @@ class LogicalMaze:
         Returns:
             set[GameEvent]: A set of all events that have occurred since the
             last flush.
+
         """
         events_to_return = self._pending_events.copy()
         self._pending_events.clear()

@@ -2,13 +2,13 @@
 
 from parser import LevelConfig
 from src.visual import Node, Context
-from src.logical.maze import Direction, LogicalMaze
+from src.logical.maze import LogicalMaze
 from src.visual.scenes.game.maze import VisualMaze
 from src.visual.draw import Draw
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.label import Label
-from pygame import Color, Vector2, draw
-from pygame import image, Surface
+from pygame import Color, Vector2
+from pygame import Surface
 import math
 
 from src.visual.ui.button import Button

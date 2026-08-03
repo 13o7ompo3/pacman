@@ -1,6 +1,7 @@
 """
 This module provides utility functions for image manipulation using Pygame.
 """
+
 import pygame
 from pygame import Surface, Color
 from typing import Tuple
@@ -12,6 +13,7 @@ class Image:
     """
     A utility class for image manipulation using Pygame.
     """
+
     @staticmethod
     def subsurface(
         surface: Surface, x: int, y: int, width: int, height: int

@@ -2,7 +2,7 @@
 
 import pygame
 from src.visual import Context, Node
-from pygame import Color, Rect, Surface, Vector2, draw, transform
+from pygame import Color, Surface, Vector2, transform
 from src.visual.draw import Draw
 
 

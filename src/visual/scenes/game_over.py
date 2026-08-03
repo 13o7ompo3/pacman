@@ -1,7 +1,7 @@
 """A module representing the game over scene and related UI components."""
 
 from enum import Enum
-from pygame import Color, Vector2
+from pygame import Vector2
 from src.visual import Node, Context
 from src.visual.ui.label import Label
 from src.visual.ui.button import Button

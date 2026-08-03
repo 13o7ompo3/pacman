@@ -3,7 +3,7 @@
 from src.visual import GameComponent, Node, Context
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
-from pygame import Color, Rect, Vector2, MOUSEBUTTONDOWN, draw
+from pygame import Vector2
 from src.visual.ui.panel import Panel
 
 

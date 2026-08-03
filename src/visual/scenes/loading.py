@@ -1,6 +1,5 @@
 """The loading scene is responsible for loading all the assets."""
 
-from pydantic_core.core_schema import TimeSchema
 from pygame import Vector2
 from src.visual import Node, Context
 from src.visual.scenes.title import TitleScene
@@ -16,7 +15,7 @@ class LoadingScene(Node):
         progress_bar (ProgressBar): The progress bar of the loading scene.
         loading_iter (iter): An iterator for loading assets.
         time (float): The time elapsed since the last asset was loaded.
-        load_time_per_item (float): The time to wait before loading the next asset.
+        load_time_per_item (float): The time to wait before loading the next.
 
     """
 

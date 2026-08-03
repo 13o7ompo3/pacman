@@ -4,12 +4,10 @@ from src.logical.core_types import GhostState
 from src.visual.utils.particle import ParticleSystem
 import pygame
 from src.logical.entities import Ghost
-from src.visual.draw import Draw
-from src.logical.game_event import AteGhostEvent
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
-from pygame import Surface, draw, Color, Vector2, image, sprite
+from pygame import Surface, Color, Vector2
 
 
 class VisualGhost(Node):

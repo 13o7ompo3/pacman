@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Callable
 
-from pygame import Color, Rect, Vector2, draw
+from pygame import Color, Rect, Vector2
 from src.visual import Node, Context
 from src.visual.draw import Draw
 
@@ -14,6 +14,7 @@ class ProgressBarOrientation(Enum):
     Attributes:
         VERTICAL (str): Represents a vertical progress bar.
         HORIZONTAL (str): Represents a horizontal progress bar.
+
     """
 
     VERTICAL = "vertical"
