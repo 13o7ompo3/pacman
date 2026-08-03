@@ -91,8 +91,19 @@ class Player(Node):
                 self.next_direction = Direction.LEFT
             if event.key in {pygame.K_RIGHT, pygame.K_d, pygame.K_l}:
                 self.next_direction = Direction.RIGHT
-            if self.direction is None:
+            if self.direction is None and self.next_direction is not None:
                 self.direction = self.next_direction
+                player_pos = self.maze.player.get_grid_position()
+                if self.maze.can_move(
+                    player_pos,
+                    (
+                        player_pos[0] + self.direction.value[0],
+                        player_pos[1] + self.direction.value[1],
+                    ),
+                ):
+                    self.target_position = (
+                        Vector2(player_pos) + self.direction.value
+                    ) * self.step_size
         return event
 
     def _on_update(self, delta: float) -> None:
@@ -105,24 +116,29 @@ class Player(Node):
                 self.world_position + self.animated_position
             )
 
-        if (
-            self.animated_position == self.target_position
-            and self.direction is not None
-        ):
+        if self.animated_position == self.target_position:
+            self._step_target_position()
+        elif self.direction is not None:
+            self.sprites[self.direction].update(delta)
+
+    def _step_target_position(self):
+        if self.direction is not None:
             self.maze.tick_player(self.direction)
             player_pos = self.maze.player.get_grid_position()
-
             if self.next_direction and self.maze.can_move_player(
                 self.next_direction
             ):
                 self.direction = self.next_direction
+            if self.maze.can_move(
+                player_pos,
+                (
+                    player_pos[0] + self.direction.value[0],
+                    player_pos[1] + self.direction.value[1],
+                ),
+            ):
                 self.target_position = (
-                    Vector2(player_pos) + Vector2(self.next_direction.value)
+                    Vector2(player_pos) + self.direction.value
                 ) * self.step_size
-            else:
-                self.target_position = Vector2(player_pos) * self.step_size
-        elif self.direction is not None:
-            self.sprites[self.direction].update(delta)
 
     def respawn(self, x, y):
         self.target_position = Vector2(x, y) * self.step_size
