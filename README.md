@@ -72,7 +72,22 @@ These are the documentations that were used during the making of this project:
 
 | Field | Description | Type | Default |
 |-------|-------------|------|---------|
-|       |             |      |         |
+|LEVELS|             |      |         |
+|POINTS_PER_PACGUM|
+|POINTS_PER_SUPER_PACGUM|
+|POINTS_PER_GHOST|
+|SUPERGUM_DURATION|
+
+Fields of the levels:
+width height
+seed of the maze
+time limit
+speed of player
+speed of ghosts
+number of pacgums < than width * height
+
+
+
 ===TODO===: OSSAMA 3MER HAD SECTION!!!
 
 • A Highscore section explaining how the highscore system works and why you
