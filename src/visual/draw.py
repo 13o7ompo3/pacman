@@ -1,9 +1,18 @@
+"""A module that provides basic drawing functions."""
+
 from pygame import Surface, PixelArray, Vector2, Color
 import math
 import pygame
 
 
 class Draw:
+    """A class that provides basic drawing functions.
+
+    Attributes:
+        cache (dict): A cache for storing drawn shapes to optimize performance.
+
+    """
+
     cache: dict = {}
 
     @staticmethod
@@ -21,7 +30,21 @@ class Draw:
         | None = None,
         border_width: int = 0,
         border_radius: int = 0,
-    ):
+    ) -> None:
+        """Draws a rectangle on the given surface.
+
+        Args:
+            surface (Surface): The surface to draw on.
+            position (Vector2 | tuple[int, int]): The position.
+            size (Vector2 | tuple[int, int]): The size of the rectangle.
+            fill_color (Color | tuple[int, int, int] \
+                | tuple[int, int, int, int] | None): The fill color.
+            border_color (Color | tuple[int, int, int] \
+                | tuple[int, int, int, int] | None): The border color.
+            border_width (int): The width of the border.
+            border_radius (int): The radius of the border corners.
+
+        """
         if isinstance(position, Vector2):
             position = (int(position.x), int(position.y))
         if isinstance(size, Vector2):
@@ -100,6 +123,15 @@ class Draw:
         size: tuple[int, int],
         color: tuple[int, int, int, int],
     ) -> None:
+        """Draws a filled rectangle on the given surface.
+
+        Args:
+            surface (Surface): The surface to draw on.
+            position (tuple[int, int]): The position.
+            size (tuple[int, int]): The size of the rectangle.
+            color (tuple[int, int, int, int]): The color of the rectangle.
+
+        """
         array = PixelArray(surface)
         for x in range(position[0], size[0] + position[0]):
             for y in range(position[1], size[1] + position[1]):
@@ -114,6 +146,16 @@ class Draw:
         color: tuple[int, int, int, int],
         border_width: int,
     ) -> None:
+        """Draws a rectangle outline on the given surface.
+
+        Args:
+            surface (Surface): The surface to draw on.
+            position (tuple[int, int]): The position.
+            size (tuple[int, int]): The size of the rectangle.
+            color (tuple[int, int, int, int]): The color of the rectangle.
+            border_width (int): The width of the border.
+
+        """
         min_x_bound = position[0]
         max_x_bound = size[0] + position[0] - 1
         min_y_bound = position[1]
@@ -141,6 +183,19 @@ class Draw:
         end_angle: float,
         filled: bool,
     ):
+        """Draws a sector on the given surface.
+
+        Args:
+            surface (Surface): The surface to draw on.
+            color (Color | tuple[int, int, int, int]): The color of the sector.
+            position (Vector2 | tuple[int, int]): The position of the sector.
+            border_width (int): The width of the border.
+            radius (int): The radius of the sector.
+            start_angle (float): The start angle of the sector in radians.
+            end_angle (float): The end angle of the sector in radians.
+            filled (bool): Whether the sector is filled or not.
+
+        """
         if isinstance(position, Vector2):
             position = (int(position.x) - radius, int(position.y) - radius)
         if isinstance(color, Color):
@@ -198,6 +253,19 @@ class Draw:
         | None = None,
         border_width: int = 0,
     ):
+        """Draws a circle on the given surface.
+
+        Args:
+            surface (Surface): The surface to draw on.
+            position (Vector2 | tuple[int, int]): The position of the circle.
+            radius (int): The radius of the circle.
+            fill_color (Color | tuple[int, int, int, int] \
+            | tuple[int, int, int] | None): The fill color of the circle.
+            border_color (Color | tuple[int, int, int, int] \
+            | tuple[int, int, int] | None): The border color of the circle.
+            border_width (int): The width of the border.
+
+        """
         if isinstance(position, Vector2):
             position = (int(position.x) - radius, int(position.y) - radius)
         if isinstance(fill_color, Color):
@@ -257,6 +325,18 @@ class Draw:
         filled: bool,
         color: tuple[int, int, int, int],
     ) -> None:
+        """Draws a rounded rectangle on the given surface.
+
+        Args:
+            surface (Surface): The surface to draw on.
+            position (tuple[int, int]): The position of the rectangle.
+            size (tuple[int, int]): The size of the rectangle.
+            border_width (int): The width of the border.
+            radius (int): The radius of the corners.
+            filled (bool): Whether the rectangle is filled or not.
+            color (tuple[int, int, int, int]): The color of the rectangle.
+
+        """
         radius = min(radius, size[0] // 2, size[1] // 2)
 
         if filled:

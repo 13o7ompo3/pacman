@@ -99,7 +99,15 @@ class Player(Node):
         )
 
     def _on_input(self, event: Event) -> Event | None:
-        """Handle input events for the player."""
+        """Handle input events for the player.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+
+        """
         if self.hidden:
             return
         if event.type == KEYDOWN:
@@ -127,7 +135,12 @@ class Player(Node):
         return event
 
     def _on_update(self, delta: float) -> None:
-        """Update the player's state."""
+        """Update the player's state.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         self.particles.update(delta)
         if not self.dead:
             self.animated_position = self.animated_position.move_towards(
@@ -163,7 +176,13 @@ class Player(Node):
                 ) * self.step_size
 
     def respawn(self, x, y):
-        """Respawn the player at the given grid coordinates (x, y)."""
+        """Respawn the player at the given grid coordinates (x, y).
+
+        Args:
+            x (int): The x-coordinate to respawn the player.
+            y (int): The y-coordinate to respawn the player.
+
+        """
         self.target_position = Vector2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
 

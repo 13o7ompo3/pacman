@@ -1,21 +1,31 @@
-from src.visual import Context, Node
-from src.visual.draw import Draw
+"""A module that defines a Prompt."""
+
+from typing import Callable
+
+import pygame
 from pygame import (
     K_RETURN,
-    Color,
-    Rect,
     Surface,
     Vector2,
 )
-import pygame
-from pygame.font import Font
 from pygame.event import Event
-from pygame import draw, Surface
-from typing import Any, Callable
+
+from src.visual import Context, Node
+from src.visual.draw import Draw
 from src.visual.ui.button import Button
 
 
 class Prompt(Node):
+    """A class that represents a prompt.
+
+    Attributes:
+        title (Surface): The title of the prompt.
+        message (Surface): The message of the prompt.
+        size (Vector2): The size of the prompt.
+        content (Surface): The content of the prompt.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -23,6 +33,7 @@ class Prompt(Node):
         message: str,
         on_accept: Callable,
     ) -> None:
+        """Initialize a Prompt instance."""
         super().__init__(context)
         self.title = self.context.assets.font("ui").render(
             title, False, context.colors.lightest
@@ -103,7 +114,17 @@ class Prompt(Node):
             self.add_child(button)
 
     def _on_draw(self) -> None:
+        """Draw the prompt on the screen."""
         self.context.screen.blit(self.content, self.world_position)
 
     def _on_input(self, event: Event) -> Event | None:
+        """Stop input events from propagating to other nodes.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+
+        """
         return

@@ -24,7 +24,7 @@ class Corner(Node):
     """A class representing a corner in the maze.
 
     Attributes:
-        surface (tuple[Surface, Surface, Surface, Surface]): A tuple containing the surfaces.
+        surface (tuple): A tuple containing the surfaces.
 
     """
 
@@ -66,7 +66,7 @@ class VisualMaze(Node):
     Attributes:
         logical_maze (LogicalMaze): The logical representation of the maze.
         cell_size (int): The size of each cell in the maze.
-        surfaces (dict): A dictionary mapping corner configurations to surfaces.
+        surfaces (dict): A dictionary maps corner configurations to surfaces.
         ghosts (list[VisualGhost]): A list of visual representations of ghosts.
         player (Player): The visual representation of the player.
 
@@ -190,6 +190,9 @@ class VisualMaze(Node):
 
         Args:
             cells (list[int]): A list of integers of the surrounding cells.
+
+        Returns:
+            tuple: A tuple containing the surfaces for the corner
 
         """
         top = cells[0] & 2 | cells[1] & 8

@@ -1,3 +1,5 @@
+"""The loading scene is responsible for loading all the assets."""
+
 from pydantic_core.core_schema import TimeSchema
 from pygame import Vector2
 from src.visual import Node, Context
@@ -8,12 +10,23 @@ from src.visual.ui.prompt import Prompt
 
 
 class LoadingScene(Node):
+    """A class that represents the loading scene.
+
+    Attributes:
+        progress_bar (ProgressBar): The progress bar of the loading scene.
+        loading_iter (iter): An iterator for loading assets.
+        time (float): The time elapsed since the last asset was loaded.
+        load_time_per_item (float): The time to wait before loading the next asset.
+
+    """
+
     def __init__(self, context: Context) -> None:
+        """Initialize a LoadingScene instance."""
         super().__init__(context)
 
         def on_finish(_: ProgressBar) -> None:
+            """Handle the completion of asset loading."""
             self.free_from_scene()
-            context.root_scene.clear_children
             title_scene = TitleScene(context)
             context.root_scene.add_child(title_scene)
             self.context.root_scene.load_themes()
@@ -60,12 +73,19 @@ class LoadingScene(Node):
         self.add_child(self.progress_bar)
 
     def _on_update(self, delta: float) -> None:
+        """Update the loading scene.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         if self.time >= self.load_time_per_item:
             try:
                 ret = next(self.loading_iter)
                 if isinstance(ret, Exception):
 
                     def on_accept(_) -> None:
+                        """Handle the acceptance of the error prompt."""
                         self.context.game_running = False
 
                     prompt = Prompt(self.context, "Error", str(ret), on_accept)
@@ -80,6 +100,7 @@ class LoadingScene(Node):
         self.time += delta
 
     def _register_assets(self) -> None:
+        """Register all the assets to be loaded."""
         self.context.assets.register_image("player_up", "assets/player/up.png")
         self.context.assets.register_image(
             "player_down", "assets/player/down.png"

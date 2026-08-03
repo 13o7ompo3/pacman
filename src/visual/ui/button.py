@@ -1,8 +1,10 @@
-from src.visual import Context, Node
-from src.visual.draw import Draw
+"""A button UI element for the game."""
+
+from typing import Any, Callable
+
+import pygame
 from pygame import (
     BLEND_RGBA_MULT,
-    KEYDOWN,
     MOUSEBUTTONDOWN,
     MOUSEBUTTONUP,
     Color,
@@ -11,12 +13,37 @@ from pygame import (
     Vector2,
 )
 from pygame.event import Event
-from pygame import draw
-from typing import Any, Callable
-import pygame
+
+from src.visual import Context, Node
+from src.visual.draw import Draw
 
 
 class Button(Node):
+    """A class that represents a button.
+
+    Attributes:
+        context (Context): The context of the button.
+        fg_color (Color): The foreground color of the button.
+        bg_color (Color): The background color of the button.
+        border_color (Color): The border color of the button.
+        padding (int): The padding around the content of the button.
+        content (Surface): The content of the button.
+        original_content (Surface): The original content of the button.
+        size (Vector2): The size of the button.
+        thickness (int): The thickness of the button's border.
+        border_radius (int): The radius of the button's border corners.
+        bg_rect (Rect): The rectangle representing the button's background.
+        fg_rect (Rect): The rectangle representing the button's foreground.
+        pressed_rect (Rect): The rectangle representing if the button pressed.
+        content_position (Vector2): The position of the content on the button.
+        pressed_content_position (Vector2): The position when pressed.
+        is_hovered (bool): A flag indicating if the button is hovered.
+        is_pressed (bool): A flag indicating if the button is pressed.
+        is_shortcut_down (bool): A flag indicating if a shortcut key pressed.
+        callback (Callable): The callback function to be called when pressed.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -31,6 +58,7 @@ class Button(Node):
         highlight_color: Color | None = None,
         padding: int = 3,
     ) -> None:
+        """Initialize a Button instance."""
         self.context = context
         self.fg_color = color
         self.bg_color = (
@@ -80,6 +108,15 @@ class Button(Node):
         self,
         content: str | Surface | list[Surface | str],
     ) -> Surface:
+        """Prepare the content for the button.
+
+        Args:
+            content (str | Surface | list[Surface | str]): The content.
+
+        Returns:
+            Surface: The prepared content as a Pygame Surface.
+
+        """
         if isinstance(content, str):
             content = (
                 self.context.assets.font("ui")
@@ -126,6 +163,13 @@ class Button(Node):
         return content
 
     def __setattr__(self, name: str, value: Any, /) -> None:
+        """Set an attribute and update the button's rectangle position if needed.
+
+        Args:
+            name (str): The name of the attribute.
+            value (Any): The value to set for the attribute.
+
+        """
         ret = super().__setattr__(name, value)
         if name == "local_position":
             x, y = self.world_position
@@ -142,6 +186,15 @@ class Button(Node):
         return ret
 
     def _on_input(self, event: Event) -> Event | None:
+        """Handle input events for the button.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+
+        """
         if hasattr(event, "pos"):
             x, y = event.pos
             self.is_hovered = self.bg_rect.collidepoint(x, y)
@@ -166,6 +219,7 @@ class Button(Node):
         return event
 
     def _on_draw(self) -> None:
+        """Draw the button on the screen."""
         if self.is_pressed:
             Draw.rect(
                 self.context.screen,
@@ -207,5 +261,6 @@ class Button(Node):
             self.context.screen.blit(self.content, self.content_position)
 
     def _on_redraw(self) -> None:
+        """Redraw the button."""
         self.content = self.original_content.copy()
         self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)

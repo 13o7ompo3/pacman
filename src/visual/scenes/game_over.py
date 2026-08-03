@@ -12,7 +12,13 @@ from typing import Callable
 
 
 class TerminalState(Enum):
-    """An enumeration representing the terminal state of the game."""
+    """An enumeration representing the terminal state of the game.
+
+    Attributes:
+        WON (str): Represents the state when the player has won the game.
+        LOST (str): Represents the state when the player has lost the game.
+
+    """
 
     WON = "won"
     LOST = "lost"
@@ -56,6 +62,7 @@ class InputForm(Node):
         )
 
         def go_to_title(_):
+            """Handle the transition to the title scene."""
             context.root_scene.clear_children()
             context.root_scene.add_child(TitleScene(context))
 
@@ -78,7 +85,12 @@ class InputForm(Node):
 
     @property
     def value(self) -> str:
-        """Return the current value of the text box."""
+        """Return the current value of the text box.
+
+        Returns:
+            str: The current text content of the text box.
+
+        """
         return self.text_box.content
 
 

@@ -59,6 +59,9 @@ class GameComponent:
         Args:
             event (Event): The input event to handle.
 
+        Returns:
+            Event | None: The event to propagate to the parent, or None.
+
         """
         if self.hidden:
             return event
@@ -78,6 +81,9 @@ class GameComponent:
 
         Args:
             event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event to propagate to the parent, or None.
 
         """
         return event
