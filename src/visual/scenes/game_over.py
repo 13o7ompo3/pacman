@@ -1,3 +1,5 @@
+"""A module representing the game over scene and related UI components."""
+
 from enum import Enum
 from pygame import Color, Vector2
 from src.visual import Node, Context
@@ -10,11 +12,20 @@ from typing import Callable
 
 
 class TerminalState(Enum):
+    """An enumeration representing the terminal state of the game."""
+
     WON = "won"
     LOST = "lost"
 
 
 class InputForm(Node):
+    """A class representing an input form for user authentication.
+
+    Attributes:
+        text_box (TextBox): The text box for user input.
+
+    """
+
     def __init__(
         self,
         context: "Context",
@@ -22,6 +33,7 @@ class InputForm(Node):
         is_password: bool,
         on_submit: Callable,
     ) -> None:
+        """Initialize the InputForm object."""
         from src.visual.scenes.title import TitleScene
 
         super().__init__(context)
@@ -66,11 +78,21 @@ class InputForm(Node):
 
     @property
     def value(self) -> str:
+        """Return the current value of the text box."""
         return self.text_box.content
 
 
 class LoginForms(Node):
+    """A class representing the login forms for user authentication.
+
+    Attributes:
+        username_form (InputForm): The input form for the username.
+        password_form (InputForm): The input form for the password.
+
+    """
+
     def __init__(self, context: "Context", final_score: int) -> None:
+        """Initialize the LoginForms object."""
         super().__init__(context)
 
         user_manager = self.context.user_manager
@@ -79,10 +101,12 @@ class LoginForms(Node):
         password_form: InputForm
 
         def on_username_submit(_):
+            """Handle the submission of the username form."""
             username_form.hidden = True
             password_form.hidden = False
 
         def on_password_submit(_):
+            """Handle the submission of the password form."""
             try:
                 if user_manager.is_existing_user(username_form.value):
                     user_manager.authenticate_user(
@@ -97,6 +121,7 @@ class LoginForms(Node):
                 from src.visual.scenes.title import TitleScene
 
                 def go_to_title(_):
+                    """Handle the transition to the title scene."""
                     context.root_scene.clear_children()
                     context.root_scene.add_child(TitleScene(context))
 
@@ -130,9 +155,17 @@ class LoginForms(Node):
 
 
 class LogoutForm(Node):
+    """A class representing the logout form for user authentication.
+
+    Attributes:
+        username (str): The username of the logged-in user.
+
+    """
+
     def __init__(
         self, context: "Context", username: str, on_logout: Callable
     ) -> None:
+        """Initialize the LogoutForm object."""
         super().__init__(context)
         score = Label(
             context,
@@ -147,9 +180,11 @@ class LogoutForm(Node):
         )
 
         def on_update(_):
+            """Handle the update of the user's high score."""
             from src.visual.scenes.title import TitleScene
 
             def on_accept(_):
+                """Handle the transition to the title scene."""
                 context.root_scene.clear_children()
                 context.root_scene.add_child(TitleScene(context))
 
@@ -192,9 +227,18 @@ class LogoutForm(Node):
 
 
 class GameOverScene(Node):
+    """A class representing the game over scene.
+
+    Attributes:
+        final_score (int): The final score of the player.
+        state (TerminalState): The terminal state of the game (won or lost).
+
+    """
+
     def __init__(
         self, context: Context, final_score: int, state: TerminalState
     ) -> None:
+        """Initialize the GameOverScene object."""
         super().__init__(context)
         panel = Panel(
             context,
@@ -239,6 +283,7 @@ class GameOverScene(Node):
         self.add_child(score)
 
         def show_login(button):
+            """Handle the transition to the login forms."""
             button.parent.free_from_scene()
             login_forms = LoginForms(context, final_score)
             self.add_child(login_forms)
