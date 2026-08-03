@@ -91,7 +91,7 @@ class Player(Node):
                 self.next_direction = Direction.LEFT
             if event.key in {pygame.K_RIGHT, pygame.K_d, pygame.K_l}:
                 self.next_direction = Direction.RIGHT
-            if self.direction is None:
+            if self.direction is None and self.next_direction is not None:
                 self.direction = self.next_direction
                 player_pos = self.maze.player.get_grid_position()
                 if self.maze.can_move(
