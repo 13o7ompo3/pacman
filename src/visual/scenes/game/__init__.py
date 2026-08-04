@@ -1,25 +1,15 @@
-<<<<<<< HEAD
 """A module that contains the GameScene class and related UI components."""
 
-=======
-from parser import LevelConfig
-from src.visual import Node, Context
-from src.logical.maze import Direction, LogicalMaze
-from src.visual.scenes.game.maze import VisualMaze
-from src.visual.draw import Draw
-from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
-from src.visual.ui.label import Label
-from pygame import Color, Vector2, draw, image, Surface
-from src.logical.core_types import PlayerState, GhostState
-from pygame.event import Event
-import pygame
->>>>>>> origin/main
 import math
+from collections.abc import Callable
 
-from pygame import Color, Surface, Vector2
+import pygame
+from pygame import Color, Surface, Vector2, draw, image
+from pygame.event import Event
 
 from parser import LevelConfig
-from src.logical.maze import LogicalMaze
+from src.logical.core_types import GhostState, PlayerState
+from src.logical.maze import Direction, LogicalMaze
 from src.visual import Context, Node
 from src.visual.draw import Draw
 from src.visual.scenes.game.maze import VisualMaze
@@ -27,7 +17,6 @@ from src.visual.scenes.pause import PauseScene
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
-from collections.abc import Callable
 
 
 class GumTimer(Node):
@@ -492,10 +481,17 @@ class GameScene(Node):
                 if event.key == pygame.K_n:
                     self.logical_maze.skip_to_next_level()
                 if event.key == pygame.K_f:
-                    self.logical_maze.cheat_freeze_ghosts = not self.logical_maze.cheat_freeze_ghosts
-                if event.key == pygame.K_g and self.logical_maze.player.state != PlayerState.DEAD:
+                    self.logical_maze.cheat_freeze_ghosts = (
+                        not self.logical_maze.cheat_freeze_ghosts
+                    )
+                if (
+                    event.key == pygame.K_g
+                    and self.logical_maze.player.state != PlayerState.DEAD
+                ):
                     self.logical_maze.player.state = PlayerState.POWERED_UP
-                    self.logical_maze.player.gum_timer = self.logical_maze.super_pacgum_duration
+                    self.logical_maze.player.gum_timer = (
+                        self.logical_maze.super_pacgum_duration
+                    )
                     for ghost in self.logical_maze.ghosts:
                         if ghost.state != GhostState.DEAD:
                             ghost.state = GhostState.FRIGHTENED
