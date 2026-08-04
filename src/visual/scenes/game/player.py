@@ -188,6 +188,10 @@ class Player(Node):
 
     def _on_draw(self) -> None:
         """Draw the player and its particles on the screen."""
+        if self.animated_position != self.target_position:
+            self.particles.play()
+        else:
+            self.particles.stop()
         self.particles.render()
         if self.direction is not None:
             sprite = self.sprites[self.direction]
