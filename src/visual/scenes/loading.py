@@ -222,3 +222,6 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "super_pacgum_instruction", "assets/instructions/super_pacgum.png"
         )
+        self.context.assets.register_image(
+            "winning_instruction", "assets/instructions/winning.png"
+        )

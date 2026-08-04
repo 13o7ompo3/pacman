@@ -125,6 +125,19 @@ class InstructionsScene(Node):
                 "Super Pacgum",
                 "When you eat a super pacgum, the ghosts become edible for a short time and they run away from you on sight.",
             ),
+            InstructionPage(
+                context,
+                Sprite(
+                    context,
+                    context.assets.image("winning_instruction"),
+                    1,
+                    16,
+                    2,
+                    True,
+                ),
+                "Winning",
+                "To win the game you must win the game in order to win.",
+            ),
         ]
 
         for page in self.pages:

@@ -16,7 +16,7 @@ class TitleScene(Node):
         title_text = Label(
             context,
             Vector2(300, 200),
-            [("Pac", context.colors.dark), ("Man", context.colors.light)],
+            [("Spo", context.colors.dark), ("oks", context.colors.light)],
             4,
         )
 
