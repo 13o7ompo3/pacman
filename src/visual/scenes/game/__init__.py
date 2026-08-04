@@ -389,36 +389,12 @@ class GameScene(Node):
             context.colors.darker,
         )
 
-        self.time_bar = InfoBar(
-            context,
-            "TIME LEFT",
-            "  0",
-            context.assets.image("clock_icon"),
-            int(context.width / 2 - self.maze.size.x / 2),
-            int(self.logical_maze.ticks_remaining / 60),
-            False,
-            context.colors.light,
-        )
-
-        self.gums_bar = InfoBar(
-            context,
-            "GUMS EATEN",
-            "43/200",
-            context.assets.image("gum_icon"),
-            int(context.width / 2 - self.maze.size.x / 2),
-            len(self.logical_maze.pacgums),
-            True,
-            context.colors.darker,
-        )
-
         self._refresh_positions()
         self.key_queue: list[int] = []
         self.cheats_enabled = False
         self.add_child(self.maze)
         self.add_child(self.score_title_label)
         self.add_child(self.level_title_label)
-        self.add_child(self.time_bar)
-        self.add_child(self.gums_bar)
         self.add_child(self.gum_timer)
         self.add_child(self.lives_left)
         self.add_child(pause_button)
@@ -440,12 +416,38 @@ class GameScene(Node):
         self.level_title_label.local_position = (
             self.maze.world_position + Vector2(0, self.maze.size.y + 40)
         )
+        self.time_bar = InfoBar(
+            self.context,
+            "TIME LEFT",
+            "  0",
+            self.context.assets.image("clock_icon"),
+            int(self.context.width / 2 - self.maze.size.x / 2),
+            int(self.logical_maze.ticks_remaining / 60),
+            False,
+            self.context.colors.light,
+        )
+
+        if hasattr(self, "time_bar") and hasattr(self, "gums_bar"):
+            self.time_bar.free_from_scene()
+            self.gums_bar.free_from_scene()
+        self.gums_bar = InfoBar(
+            self.context,
+            "GUMS EATEN",
+            "43/200",
+            self.context.assets.image("gum_icon"),
+            int(self.context.width / 2 - self.maze.size.x / 2),
+            len(self.logical_maze.pacgums),
+            True,
+            self.context.colors.darker,
+        )
         self.time_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 - 76
         )
         self.gums_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 + 50
         )
+        self.add_child(self.time_bar)
+        self.add_child(self.gums_bar)
 
     def _on_update(self, delta: float) -> None:
         """Update the game scene elements based on the logical maze state."""
