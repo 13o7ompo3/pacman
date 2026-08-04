@@ -36,7 +36,7 @@ class AtePacgumEvent(GameEvent):
 
 @dataclass(frozen=True)
 class AteSuperPacgumEvent(GameEvent):
-    """Player collected a power pellet — all non-dead ghosts now FRIGHTENED.
+    """Player ate a super pacgum.
 
     Attributes:
         x: Column of the eaten pellet.
@@ -68,9 +68,6 @@ class AteGhostEvent(GameEvent):
 class PlayerDiedEvent(GameEvent):
     """Player touched a CHASE ghost and lost one life.
 
-    lives_remaining > 0: respawn countdown is running.
-    Use PlayerRespawnedEvent to know when the player is back.
-
     Attributes:
         lives_remaining: Lives left after this death (always > 0 here;
             use GameOverEvent when lives reach zero).
@@ -92,7 +89,7 @@ class PlayerRespawnedEvent(GameEvent):
 
 @dataclass(frozen=True)
 class GhostRespawnedEvent(GameEvent):
-    """One specific ghost finished its respawn countdown and is active again.
+    """A ghost finished its respawn countdown and is active again.
 
     Attributes:
         ghost_id: Identity of the respawned ghost (0–3).
