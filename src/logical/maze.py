@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import Tuple, List, Optional, Set
 from mazegenerator import MazeGenerator  # type: ignore[import-not-found]
 from src.logical.core_types import (
@@ -292,19 +293,26 @@ class LogicalMaze:
             or direction != reverse_direction.get(ghost.last_direction)
         ] or valid_moves
 
+        if len(candidates) == 1:
+            return candidates[0]
         if ghost.state == GhostState.CHASE:
-            best_dir = min(
+            best_dir = sorted(
                 candidates,
-                key=lambda d: abs((ghost.x + d.value[0]) - px)
-                + abs((ghost.y + d.value[1]) - py),
+                key=lambda d: abs((ghost.x + d.value[0]) - px) ** 2
+                + abs((ghost.y + d.value[1]) - py) ** 2,
             )
         else:
-            best_dir = max(
+            best_dir = sorted(
                 candidates,
-                key=lambda d: abs((ghost.x + d.value[0]) - px)
-                + abs((ghost.y + d.value[1]) - py),
+                key=lambda d: abs((ghost.x + d.value[0]) - px) ** 2
+                + abs((ghost.y + d.value[1]) - py) ** 2, reverse=True
             )
-        return best_dir
+        if ((ghost.x + d.value[0]) == px or (ghost.y + d.value[1]) == py
+           for d in best_dir):
+            return best_dir[0]
+        if random.random() < 0.2:
+            return best_dir[1]
+        return best_dir[0]
 
     def respawn_player(self) -> None:
         """Reset the player and all ghosts after a death.
