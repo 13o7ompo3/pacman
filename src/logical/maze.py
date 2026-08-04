@@ -253,6 +253,10 @@ class LogicalMaze:
         """
         return self.player.invulnerability_timer > 0
 
+    def skip_to_next_level(self) -> None:
+        self.super_pacgums.clear()
+        self.pacgums.clear()
+
     def can_move(self, p1: Tuple[int, int], p2: Tuple[int, int]) -> bool:
         """Check whether an entity can move from p1 to p2.
 

@@ -1,5 +1,19 @@
+<<<<<<< HEAD
 """A module that contains the GameScene class and related UI components."""
 
+=======
+from parser import LevelConfig
+from src.visual import Node, Context
+from src.logical.maze import Direction, LogicalMaze
+from src.visual.scenes.game.maze import VisualMaze
+from src.visual.draw import Draw
+from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
+from src.visual.ui.label import Label
+from pygame import Color, Vector2, draw, image, Surface
+from src.logical.core_types import PlayerState, GhostState
+from pygame.event import Event
+import pygame
+>>>>>>> origin/main
 import math
 
 from pygame import Color, Surface, Vector2
@@ -409,6 +423,8 @@ class GameScene(Node):
         )
 
         self._refresh_positions()
+        self.key_queue: list[int] = []
+        self.cheats_enabled = False
         self.add_child(self.maze)
         self.add_child(self.score_title_label)
         self.add_child(self.level_title_label)
@@ -454,3 +470,34 @@ class GameScene(Node):
         self.time_bar.update_dynamic_text(
             int(self.logical_maze.ticks_remaining / 60)
         )
+
+    def _on_input(self, event: Event) -> Event | None:
+        if event.type == pygame.KEYDOWN:
+            self.key_queue.append(event.key)
+            if len(self.key_queue) == 5:
+                self.key_queue.pop(0)
+            if self.key_queue == [
+                pygame.K_KP_1,
+                pygame.K_KP_3,
+                pygame.K_KP_3,
+                pygame.K_KP_7,
+            ] or self.key_queue == [
+                pygame.K_1,
+                pygame.K_3,
+                pygame.K_3,
+                pygame.K_7,
+            ]:
+                self.cheats_enabled = not self.cheats_enabled
+            if self.cheats_enabled:
+                if event.key == pygame.K_n:
+                    self.logical_maze.skip_to_next_level()
+                if event.key == pygame.K_f:
+                    self.logical_maze.cheat_freeze_ghosts = not self.logical_maze.cheat_freeze_ghosts
+                if event.key == pygame.K_g and self.logical_maze.player.state != PlayerState.DEAD:
+                    self.logical_maze.player.state = PlayerState.POWERED_UP
+                    self.logical_maze.player.gum_timer = self.logical_maze.super_pacgum_duration
+                    for ghost in self.logical_maze.ghosts:
+                        if ghost.state != GhostState.DEAD:
+                            ghost.state = GhostState.FRIGHTENED
+                            ghost.last_direction = None
+        return event
