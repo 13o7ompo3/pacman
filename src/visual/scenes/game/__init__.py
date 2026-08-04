@@ -1,24 +1,40 @@
-from parser import LevelConfig
-from src.visual import Node, Context
-from src.logical.maze import Direction, LogicalMaze
-from src.visual.scenes.game.maze import VisualMaze
-from src.visual.draw import Draw
-from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
-from src.visual.ui.label import Label
-from pygame import Color, Vector2, draw, image, Surface
-from src.logical.core_types import PlayerState, GhostState
-from pygame.event import Event
-import pygame
-import math
+"""A module that contains the GameScene class and related UI components."""
 
-from src.visual.ui.button import Button
+import math
+from collections.abc import Callable
+
+import pygame
+from pygame import Color, Surface, Vector2, draw, image
+from pygame.event import Event
+
+from parser import LevelConfig
+from src.logical.core_types import GhostState, PlayerState
+from src.logical.maze import Direction, LogicalMaze
+from src.visual import Context, Node
+from src.visual.draw import Draw
+from src.visual.scenes.game.maze import VisualMaze
 from src.visual.scenes.pause import PauseScene
+from src.visual.ui.button import Button
+from src.visual.ui.label import Label
+from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 
 
 class GumTimer(Node):
+    """A class that represents a timer for the super pacgum effect.
+
+    Attributes:
+        logical_maze (LogicalMaze): The logical maze instance.
+        radius (int): The radius of the timer circle.
+
+    """
+
     def __init__(
-        self, context: Context, logical_maze: LogicalMaze, radius: int
+        self,
+        context: Context,
+        logical_maze: LogicalMaze,
+        radius: int,
     ) -> None:
+        """Initialize a GumTimer instance."""
         super().__init__(context)
         self.logical_maze = logical_maze
         self.radius = radius
@@ -30,6 +46,7 @@ class GumTimer(Node):
         self.add_child(self.label)
 
     def _on_draw(self) -> None:
+        """Draw the timer circle and label."""
         Draw.sector(
             self.context.screen,
             self.context.colors.dark,
@@ -57,6 +74,17 @@ class GumTimer(Node):
 
 
 class TitleLabel(Node):
+    """A class that represents a title label with static and dynamic text.
+
+    Attributes:
+        static_text (str): The static text of the label.
+        dynamic_text (str): The dynamic text of the label.
+        width (int): The width of the label.
+        line_thickness (int): The thickness of the lines.
+        accent_color (Color): The color of the dynamic text.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -65,6 +93,7 @@ class TitleLabel(Node):
         width: int,
         accent_color: Color,
     ) -> None:
+        """Initialize a TitleLabel instance."""
         super().__init__(context)
         self.static_text = static_text
         self.dynamic_text = dynamic_text
@@ -81,6 +110,12 @@ class TitleLabel(Node):
         )
 
     def update_dynamic_text(self, val: str) -> None:
+        """Update the dynamic text of the label, recreate the label on change.
+
+        Args:
+            val (str): The new dynamic text value.
+
+        """
         if self.dynamic_text != val:
             self.label = Label(
                 self.context,
@@ -93,6 +128,7 @@ class TitleLabel(Node):
             self.dynamic_text = val
 
     def _on_draw(self) -> None:
+        """Draw the title label with lines and text."""
         Draw.rect(
             self.context.screen,
             self.world_position
@@ -122,10 +158,24 @@ class TitleLabel(Node):
         self.label.render()
 
     def _on_redraw(self) -> None:
+        """Redraw the title label by recreating the label with updated text."""
         self.label._on_redraw()
 
 
 class InfoBar(Node):
+    """A class that represents an information bar.
+
+    Attributes:
+        static_text (str): The static text of the bar.
+        dynamic_text (str): The dynamic text of the bar.
+        icon (Surface): The icon to display on the bar.
+        width (int): The width of the bar.
+        max_progress (int): The maximum value of the progress bar.
+        reversed (bool): Whether the progress bar is reversed.
+        progress_color (Color): The color of the progress bar.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -137,6 +187,7 @@ class InfoBar(Node):
         reversed: bool,
         progress_color: Color,
     ) -> None:
+        """Initialize an InfoBar instance."""
         super().__init__(context)
         self.width = width
         self.icon = icon
@@ -172,6 +223,12 @@ class InfoBar(Node):
         self.add_child(self.progress)
 
     def update_dynamic_text(self, val: int) -> None:
+        """Update the dynamic text of the bar and progress value.
+
+        Args:
+            val (int): The new dynamic text value.
+
+        """
         if reversed:
             val = self.max_progress - val
         if self.dynamic_text != str(val):
@@ -182,6 +239,7 @@ class InfoBar(Node):
             self.progress.progress = val
 
     def _update_positions(self) -> None:
+        """Update the positions of the elements."""
         self.icon_pos = self.world_position + Vector2(
             0, self.static_label.get_size()[1] * 1.2
         )
@@ -198,11 +256,13 @@ class InfoBar(Node):
         )
 
     def _on_update(self, delta: float) -> None:
+        """Update the positions of the elements on position change."""
         if self.last_world_pos != self.world_position:
             self._update_positions()
             self.last_world_pos = self.world_position
 
     def _on_draw(self) -> None:
+        """Draw the information bar elements."""
         self.context.screen.blit(
             self.static_label,
             self.static_text_pos,
@@ -217,6 +277,7 @@ class InfoBar(Node):
         )
 
     def _on_redraw(self) -> None:
+        """Redraw the information bar elements."""
         self.static_label = self.context.assets.font("ui").render(
             self.static_text, False, self.context.colors.lighter
         )
@@ -226,7 +287,17 @@ class InfoBar(Node):
 
 
 class LivesLeft(Node):
+    """A class that represents the lives left in the game.
+
+    Attributes:
+        logical_maze (LogicalMaze): The logical maze instance.
+        last_level (int): The last level index.
+        lives_text (Surface): The text surface for displaying lives left.
+
+    """
+
     def __init__(self, context: "Context", logical_maze: LogicalMaze) -> None:
+        """Initialize a LivesLeft instance."""
         super().__init__(context)
 
         self.logical_maze = logical_maze
@@ -237,6 +308,7 @@ class LivesLeft(Node):
         )
 
     def _on_draw(self) -> None:
+        """Draw the lives left text and life icons."""
         self.context.screen.blit(
             self.lives_text,
             self.world_position,
@@ -248,17 +320,34 @@ class LivesLeft(Node):
             )
 
     def _on_redraw(self) -> None:
+        """Redraw the lives left text."""
         self.lives_text = self.context.assets.font("ui").render(
             "LIVES REMAINING: ", False, self.context.colors.lightest
         )
 
 
 class GameScene(Node):
-    def __init__(self, context: Context) -> None:
+    """A class that represents the main game scene.
+
+    Attributes:
+        logical_maze (LogicalMaze): The logical maze instance.
+        maze (VisualMaze): The visual maze instance.
+        score_title_label (TitleLabel): The score title label.
+        level_title_label (TitleLabel): The level title label.
+        time_bar (InfoBar): The time left information bar.
+        gums_bar (InfoBar): The gums eaten information bar.
+
+    """
+
+    def __init__(
+        self,
+        context: Context,
+    ) -> None:
+        """Initialize a GameScene instance."""
         super().__init__(context)
         levels = [
+            LevelConfig(width=10, height=10, seed=42),
             LevelConfig(width=15, height=15, seed=1337),
-            # LevelConfig(width=10, height=13, seed=42),
         ]
         max_ticks = 4000
         self.logical_maze = LogicalMaze(context.config.levels,
@@ -272,6 +361,7 @@ class GameScene(Node):
         self.maze.local_position = (
             Vector2(context.width, context.height) / 2 - self.maze.size / 2
         )
+        self.maze = self.maze
 
         pause_button = Button(
             context,
@@ -283,14 +373,9 @@ class GameScene(Node):
             ),
             shadow_color=context.colors.light,
         )
-        pause_button.local_position = Vector2(10, 10)
-        gum_timer = GumTimer(context, self.logical_maze, 24)
-        gum_timer.local_position = self.maze.local_position + Vector2(-160, 30)
+        self.gum_timer = GumTimer(context, self.logical_maze, 24)
 
-        lives_left = LivesLeft(context, self.logical_maze)
-        lives_left.local_position = self.maze.local_position + Vector2(
-            -170, self.maze.size.y - 80
-        )
+        self.lives_left = LivesLeft(context, self.logical_maze)
 
         self.score_title_label = TitleLabel(
             context,
@@ -298,9 +383,6 @@ class GameScene(Node):
             str(self.logical_maze.player.score),
             int(self.maze.size.x),
             context.colors.dark,
-        )
-        self.score_title_label.local_position = (
-            self.maze.world_position - Vector2(0, 50)
         )
 
         self.level_title_label = TitleLabel(
@@ -310,51 +392,69 @@ class GameScene(Node):
             int(self.maze.size.x),
             context.colors.darker,
         )
+
+        self._refresh_positions()
+        self.key_queue: list[int] = []
+        self.cheats_enabled = False
+        self.add_child(self.maze)
+        self.add_child(self.score_title_label)
+        self.add_child(self.level_title_label)
+        self.add_child(self.gum_timer)
+        self.add_child(self.lives_left)
+        self.add_child(pause_button)
+
+    def _refresh_positions(self) -> None:
+        self.maze.local_position = (
+            Vector2(self.context.width, self.context.height) / 2
+            - self.maze.size / 2
+        )
+        self.gum_timer.local_position = self.maze.local_position + Vector2(
+            -160, 30
+        )
+        self.lives_left.local_position = self.maze.local_position + Vector2(
+            -170, self.maze.size.y - 80
+        )
+        self.score_title_label.local_position = (
+            self.maze.world_position - Vector2(0, 50)
+        )
         self.level_title_label.local_position = (
             self.maze.world_position + Vector2(0, self.maze.size.y + 40)
         )
-
         self.time_bar = InfoBar(
-            context,
+            self.context,
             "TIME LEFT",
             "  0",
-            context.assets.image("clock_icon"),
-            int(context.width / 2 - self.maze.size.x / 2),
+            self.context.assets.image("clock_icon"),
+            int(self.context.width / 2 - self.maze.size.x / 2),
             int(self.logical_maze.ticks_remaining / 60),
             False,
-            context.colors.light,
+            self.context.colors.light,
+        )
+
+        if hasattr(self, "time_bar") and hasattr(self, "gums_bar"):
+            self.time_bar.free_from_scene()
+            self.gums_bar.free_from_scene()
+        self.gums_bar = InfoBar(
+            self.context,
+            "GUMS EATEN",
+            "43/200",
+            self.context.assets.image("gum_icon"),
+            int(self.context.width / 2 - self.maze.size.x / 2),
+            len(self.logical_maze.pacgums),
+            True,
+            self.context.colors.darker,
         )
         self.time_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 - 76
         )
-
-        self.gums_bar = InfoBar(
-            context,
-            "GUMS EATEN",
-            "43/200",
-            context.assets.image("gum_icon"),
-            int(context.width / 2 - self.maze.size.x / 2),
-            len(self.logical_maze.pacgums),
-            True,
-            context.colors.darker,
-        )
         self.gums_bar.local_position = self.maze.local_position + Vector2(
             self.maze.size.x + 10, self.maze.size.y / 2 + 50
         )
-
-        self.key_queue: list[int] = []
-        self.cheats_enabled = False
-
-        self.add_child(self.maze)
-        self.add_child(self.score_title_label)
-        self.add_child(self.level_title_label)
         self.add_child(self.time_bar)
         self.add_child(self.gums_bar)
-        self.add_child(gum_timer)
-        self.add_child(lives_left)
-        self.add_child(pause_button)
 
     def _on_update(self, delta: float) -> None:
+        """Update the game scene elements based on the logical maze state."""
         self.score_title_label.update_dynamic_text(
             str(self.logical_maze.player.score)
         )
@@ -387,10 +487,17 @@ class GameScene(Node):
                 if event.key == pygame.K_n:
                     self.logical_maze.skip_to_next_level()
                 if event.key == pygame.K_f:
-                    self.logical_maze.cheat_freeze_ghosts = not self.logical_maze.cheat_freeze_ghosts
-                if event.key == pygame.K_g and self.logical_maze.player.state != PlayerState.DEAD:
+                    self.logical_maze.cheat_freeze_ghosts = (
+                        not self.logical_maze.cheat_freeze_ghosts
+                    )
+                if (
+                    event.key == pygame.K_g
+                    and self.logical_maze.player.state != PlayerState.DEAD
+                ):
                     self.logical_maze.player.state = PlayerState.POWERED_UP
-                    self.logical_maze.player.gum_timer = self.logical_maze.super_pacgum_duration
+                    self.logical_maze.player.gum_timer = (
+                        self.logical_maze.super_pacgum_duration
+                    )
                     for ghost in self.logical_maze.ghosts:
                         if ghost.state != GhostState.DEAD:
                             ghost.state = GhostState.FRIGHTENED

@@ -1,0 +1,15 @@
+{
+	"levels": [
+		{
+			"width": 14,
+			"height": 14,
+			"seed": 42
+		},
+		{
+			"width": 15,
+			"height": 20,
+			"seed": 42
+		}
+
+	]
+}

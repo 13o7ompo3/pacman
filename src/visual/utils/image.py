@@ -1,15 +1,35 @@
+"""
+This module provides utility functions for image manipulation using Pygame.
+"""
+
 import pygame
 from pygame import Surface, Color
-from typing import Dict, Tuple
+from typing import Tuple
 import numpy as np
 from src.visual.palette import ColorPalette
 
 
 class Image:
+    """
+    A utility class for image manipulation using Pygame.
+    """
+
     @staticmethod
     def subsurface(
         surface: Surface, x: int, y: int, width: int, height: int
     ) -> Surface:
+        """
+        Create a subsurface from the given surface.
+
+        Args:
+            surface (Surface): The parent surface.
+            x (int): The x-coordinate of the top-left corner of the subsurface.
+            y (int): The y-coordinate of the top-left corner of the subsurface.
+            width (int): The width of the subsurface.
+            height (int): The height of the subsurface.
+        Returns:
+            Surface: A new surface representing the subsurface.
+        """
         parent_width, parent_height = surface.get_size()
         if x < 0 or y < 0 or width <= 0 or height <= 0:
             raise ValueError(
@@ -31,6 +51,16 @@ class Image:
 
     @staticmethod
     def flip_surface(surface: Surface, flip_x: bool, flip_y: bool) -> Surface:
+        """
+        Flip the given surface horizontally and/or vertically.
+
+        Args:
+            surface (Surface): The surface to flip.
+            flip_x (bool): Whether to flip horizontally.
+            flip_y (bool): Whether to flip vertically.
+        Returns:
+            Surface: A new surface that is the flipped version of the original.
+        """
         width = surface.get_width()
         height = surface.get_height()
         flipped_surface = pygame.Surface(
@@ -48,6 +78,16 @@ class Image:
 
     @staticmethod
     def split_surface(surface: Surface, rows: int, cols: int) -> list[Surface]:
+        """
+        Split a surface into a grid of smaller surfaces.
+
+        Args:
+            surface (Surface): The surface to split.
+            rows (int): The number of rows in the grid.
+            cols (int): The number of columns in the grid.
+        Returns:
+            list[Surface]: A list of subsurfaces representing the grid cells.
+        """
         width, height = surface.get_size()
         frame_width = width // cols
         frame_height = height // rows
@@ -122,6 +162,16 @@ class Image:
 
     @staticmethod
     def fill(surface: Surface, color: Tuple[int, int, int]) -> None:
+        """
+        Fill a surface with a solid color.
+
+        Args:
+            surface (Surface): The surface to fill.
+            color (Tuple[int, int, int]): The RGB color to fill the surface
+              with.
+        Returns:
+            None
+        """
         pixel_array = pygame.surfarray.pixels3d(surface)
         pixel_array[:, :] = color
 
@@ -129,6 +179,16 @@ class Image:
     def switch_palette(
         surface: Surface, old_palette: ColorPalette, new_palette: ColorPalette
     ) -> None:
+        """
+        Switch the colors of a surface from an old palette to a new palette.
+
+        Args:
+            surface (Surface): The surface whose colors are to be switched.
+            old_palette (ColorPalette): The original color palette.
+            new_palette (ColorPalette): The new color palette to switch to.
+        Returns:
+            None
+        """
         pixel_array = pygame.surfarray.pixels3d(surface)
 
         color_mapping = {
@@ -146,4 +206,13 @@ class Image:
 
     @staticmethod
     def rgb(color: Color) -> Tuple[int, int, int]:
+        """
+        Convert a Pygame Color object to an RGB tuple.
+
+        Args:
+            color (Color): The Pygame Color object to convert.
+        Returns:
+            Tuple[int, int, int]: A tuple representing the RGB values of the
+              color.
+        """
         return color.r, color.g, color.b

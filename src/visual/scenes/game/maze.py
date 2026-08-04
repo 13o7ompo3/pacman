@@ -1,11 +1,9 @@
-from inspect import cleandoc
+"""A module for visualizing a maze in a game."""
+
 from src.visual.draw import Draw
-from pydantic import BaseModel
-from pygame import KEYDOWN, Rect, Surface
-import pygame
-from pygame.event import Event
-from pygame import draw, Color, Vector2
-from typing import Dict, List, Tuple
+from pygame import Surface
+from pygame import Vector2
+from typing import Callable
 
 from src.logical.game_event import (
     AteGhostEvent,
@@ -17,22 +15,31 @@ from src.logical.game_event import (
     WinEvent,
 )
 from src.visual import Context, Node
-from src.logical.maze import Direction, LogicalMaze
+from src.logical.maze import LogicalMaze
 from src.visual.scenes.game.ghost import VisualGhost
 from src.visual.scenes.game.player import Player
 from src.visual.scenes.game_over import GameOverScene, TerminalState
 
 
 class Corner(Node):
+    """A class representing a corner in the maze.
+
+    Attributes:
+        surface (tuple): A tuple containing the surfaces.
+
+    """
+
     def __init__(
         self,
         context: Context,
         surface: tuple[Surface, Surface, Surface, Surface],
     ) -> None:
+        """Initialize the Corner object."""
         super().__init__(context)
         self.surface = surface
 
     def _on_draw(self) -> None:
+        """Draw the corner surfaces on the screen."""
         self.context.screen.blit(
             self.surface[0],
             self.world_position,
@@ -55,13 +62,28 @@ class Corner(Node):
 
 
 class VisualMaze(Node):
+    """A class representing the visual representation of the maze.
+
+    Attributes:
+        logical_maze (LogicalMaze): The logical representation of the maze.
+        cell_size (int): The size of each cell in the maze.
+        surfaces (dict): A dictionary maps corner configurations to surfaces.
+        ghosts (list[VisualGhost]): A list of visual representations of ghosts.
+        player (Player): The visual representation of the player.
+        level_up_callback (Callable): A callback function on level up.
+
+    """
+
     def __init__(
         self,
         context: Context,
         logical_maze: LogicalMaze,
         cell_size: int = 16,
+        level_up_callback: Callable = lambda: None,
     ) -> None:
+        """Initialize the VisualMaze object."""
         super().__init__(context)
+        self.level_up_callback = level_up_callback
         self.logical_maze = logical_maze
         self.cell_size = cell_size
 
@@ -168,6 +190,15 @@ class VisualMaze(Node):
     def get_surface_for_corner(
         self, cells: list[int]
     ) -> tuple[Surface, Surface, Surface, Surface]:
+        """Get the surface for a corner based on the surrounding cells.
+
+        Args:
+            cells (list[int]): A list of integers of the surrounding cells.
+
+        Returns:
+            tuple: A tuple containing the surfaces for the corner
+
+        """
         top = cells[0] & 2 | cells[1] & 8
         right = cells[1] & 4 | cells[3] & 1
         bottom = cells[2] & 2 | cells[3] & 8
@@ -178,11 +209,13 @@ class VisualMaze(Node):
         ]
 
     def refresh(self):
+        """Refresh the visual representation of the maze."""
         self.clear_children()
         width, height = self.logical_maze.width, self.logical_maze.height
         self.size = Vector2(width, height) * self.cell_size
 
         def sample_cell(x: int, y: int) -> int:
+            """Sample a cell in the logical maze, 0 if out of bounds."""
             if x < 0 and y < 0:
                 return 0
             if x < 0 and y >= height:
@@ -240,6 +273,12 @@ class VisualMaze(Node):
         self.add_child(self.player)
 
     def _on_update(self, delta: float) -> None:
+        """Update the visual representation of the maze and handle events.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         self.logical_maze.tick_timers()
         events = self.logical_maze.flush_events()
 
@@ -268,6 +307,7 @@ class VisualMaze(Node):
                 )
             if isinstance(event, LevelCompleteEvent):
                 self.refresh()
+                self.level_up_callback()
             if isinstance(event, WinEvent):
                 if self.parent:
                     self.parent.paused = True
@@ -279,6 +319,7 @@ class VisualMaze(Node):
                 self.refresh()
 
     def _on_draw(self) -> None:
+        """Draw the visual representation of the maze and pacgums."""
         for x, y in self.logical_maze.pacgums:
             Draw.circle(
                 self.context.screen,

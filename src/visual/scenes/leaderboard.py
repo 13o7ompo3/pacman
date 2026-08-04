@@ -1,12 +1,22 @@
+"""A module that defines the LeaderBoardScene class."""
+
 from src.visual import Node, Context
 from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
-from pygame import Color, Vector2, MOUSEBUTTONDOWN
+from pygame import Vector2, MOUSEBUTTONDOWN
 from pygame.event import Event
 
 
 class LeaderBoardScene(Node):
+    """A class that represents the leaderboard scene.
+
+    Attributes:
+        entries (list[Label]): A list of Label objects representing scores.
+
+    """
+
     def __init__(self, context: Context) -> None:
+        """Initialize a LeaderBoardScene instance."""
         super().__init__(context)
         width, height = context.width, context.height
         panel = Panel(
@@ -47,5 +57,14 @@ class LeaderBoardScene(Node):
             panel.add_child(entry)
 
     def _on_input(self, event: Event) -> Event | None:
+        """Handle input events for the leaderboard scene.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+
+        """
         if event.type == MOUSEBUTTONDOWN:
             self.context.root_scene.remove_child(self)

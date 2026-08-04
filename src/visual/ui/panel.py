@@ -1,12 +1,12 @@
+"""Define a panel UI element."""
+
 from src.visual import Node, Context
 from src.visual.draw import Draw
-from src.visual.ui.label import Label
 from pygame import (
     Color,
     Surface,
     Vector2,
     Rect,
-    draw,
     MOUSEBUTTONDOWN,
     MOUSEBUTTONUP,
 )
@@ -16,6 +16,17 @@ import pygame
 
 
 class Panel(Node):
+    """A class that represents a panel.
+
+    Attributes:
+        size (Vector2): The size of the panel.
+        rect (Rect): The rectangle representing the panel's position and size.
+        on_inside_press (Callable): A callback when pressed inside.
+        on_outside_press (Callable): A callback when pressed outside.
+        is_pressed (bool): A flag indicating when mouse button down.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -28,6 +39,7 @@ class Panel(Node):
         outer_border_color: Color | None = None,
         border_radius: int = 8,
     ) -> None:
+        """Initialize a Panel instance."""
         self.size = size
         self.rect = Rect((0, 0), self.size)
         self.on_inside_press = on_inside_press
@@ -63,7 +75,17 @@ class Panel(Node):
         )
         super().__init__(context)
 
-    def __setattr__(self, name: str, value: Any, /) -> None:
+    def __setattr__(self, name: str, value: Any) -> Any:
+        """Set an attribute and update the panel rectangle position if needed.
+
+        Args:
+            name (str): The name of the attribute.
+            value (Any): The value to set for the attribute.
+
+        Returns:
+            Any: The result of the attribute setting operation.
+
+        """
         ret = super().__setattr__(name, value)
         if name == "local_position":
             x, y = self.world_position
@@ -71,9 +93,19 @@ class Panel(Node):
         return ret
 
     def _on_draw(self) -> None:
+        """Draw the panel on the screen."""
         self.context.screen.blit(self.surface, self.world_position)
 
     def _on_input(self, event: Event) -> Event | None:
+        """Handle input events for the panel.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+
+        """
         if hasattr(event, "pos"):
             x, y = event.pos
             is_hovering = self.rect.collidepoint(x, y)

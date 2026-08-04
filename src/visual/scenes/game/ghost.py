@@ -1,16 +1,34 @@
+"""A module for the visual representation of ghosts in the game."""
+
 from src.logical.core_types import GhostState
 from src.visual.utils.particle import ParticleSystem
 import pygame
 from src.logical.entities import Ghost
-from src.visual.draw import Draw
-from src.logical.game_event import AteGhostEvent
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
-from pygame import Surface, draw, Color, Vector2, image, sprite
+from pygame import Surface, Color, Vector2
 
 
 class VisualGhost(Node):
+    """A class representing the visual representation of a ghost in the game.
+
+    Attributes:
+        id (int): The unique identifier for the ghost.
+        logical_maze (LogicalMaze): The logical representation of the maze.
+        logical_ghost (Ghost): The logical representation of the ghost.
+        step_size (int): The size of each step the ghost takes in the maze.
+        target_position (Vector2): Target position of the ghost in the maze.
+        animated_position (Vector2): Current animated position of the ghost.
+        ghost_step_timer (float): Timer to track the duration of ghost step.
+        speed (float): The speed at which the ghost moves.
+        ghost_step_duration (float): The duration of each ghost step.
+        sprite_neutral (Sprite): The sprite for the ghost in its neutral state.
+        sprite_running (Sprite): The sprite for the ghost in its running state.
+        particles (ParticleSystem): The particle system for the ghost.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -20,6 +38,7 @@ class VisualGhost(Node):
         step_size: int,
         speed: float,
     ) -> None:
+        """Initialize the VisualGhost object."""
         super().__init__(context)
         self.id = id
         self.logical_maze = maze
@@ -62,6 +81,12 @@ class VisualGhost(Node):
         )
 
     def _on_update(self, delta: float) -> None:
+        """Update the visual representation of the ghost.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         match self.logical_ghost.state:
             case GhostState.FRIGHTENED:
                 current_sprite = self.sprite_running
@@ -89,6 +114,7 @@ class VisualGhost(Node):
         )
 
     def _on_draw(self) -> None:
+        """Draw the visual representation of the ghost."""
         match self.logical_ghost.state:
             case GhostState.FRIGHTENED:
                 current_sprite = self.sprite_running
@@ -101,10 +127,18 @@ class VisualGhost(Node):
         current_sprite.render()
 
     def respawn(self, x, y):
+        """Respawn the ghost at the specified coordinates.
+
+        Args:
+            x (int): The x-coordinate to respawn the ghost.
+            y (int): The y-coordinate to respawn the ghost.
+
+        """
         self.target_position = Vector2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
         self.dead = False
 
     def _on_redraw(self) -> None:
+        """Redraw the ghost's sprites."""
         self.sprite_neutral.redraw()
         self.sprite_running.redraw()
