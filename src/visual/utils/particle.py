@@ -53,8 +53,11 @@ class ParticleSystem(Node):
         self.amount = amount
         self.emission_rate = self.amount / self.lifetime
         self.time_since_last_emission = 0.0
+        self.playing = True
 
     def _on_update(self, delta_time: float) -> None:
+        if not self.playing:
+            return
         self.time_since_last_emission += delta_time
         while self.time_since_last_emission >= 1.0 / self.emission_rate:
             self.time_since_last_emission -= 1.0 / self.emission_rate
@@ -78,3 +81,9 @@ class ParticleSystem(Node):
 
     def _on_draw(self) -> None:
         pass
+
+    def play(self) -> None:
+        self.playing = True
+
+    def stop(self) -> None:
+        self.playing = False
