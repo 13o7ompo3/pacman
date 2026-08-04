@@ -10,11 +10,10 @@ graph TD;
 ```
 # Pac-Man
 
-• A “Description” section that clearly presents the project, including its goal and a
-brief overview.
 ## Description:
 
 This project is a Python remake of the original Pac-man game using minimal features from pygame graphics library.
+The goal of the project is to create a playable version of the classic Pac-man game, complete with a maze, ghosts, and power-ups. The game is designed to be simple yet engaging, providing players with a nostalgic experience while also showcasing the capabilities of Python and pygame.
 
 • An “Instructions” section containing any relevant information about compilation,
 installation, and/or execution.
@@ -101,14 +100,64 @@ WE ADDED A PASSWORD ALONGSIDE THE USERNAME, BECAUSE IDK LIFE IS TOO EASY I GUESS
 used to generate mazes.
 ## Maze Generation:
 
-• an Implementation section with a technical summary of your implementation.
-## Implementation:
+
 - the visual engine
 - the logical engine:
 ===TODO===: OSSAMA 3MER HAD SECTION!!!
 
 • A General Software Architecture section, with high-level overview of the software architecture (modules, classes, and their relationships).
 ## General Software Architecture:
+
+### Code Structure:
+
+```
+src
+│
+├── db_manager
+│   └── user.py
+│
+├── logical
+│   ├── core_types.py
+│   ├── entities.py
+│   ├── game_event.py
+│   └── maze.py
+│
+└── visual
+    ├── __init__.py
+    ├── draw.py
+    ├── palette.py
+    │
+    ├── scenes
+    │   ├── game
+    │   │   ├── __init__.py
+    │   │   ├── ghost.py
+    │   │   ├── maze.py
+    │   │   └── player.py
+    │   ├── game_over.py
+    │   ├── leaderboard.py
+    │   ├── loading.py
+    │   ├── pause.py
+    │   ├── root.py
+    │   └── title.py
+    │
+    ├── ui
+    │   ├── button.py
+    │   ├── label.py
+    │   ├── panel.py
+    │   ├── progress.py
+    │   ├── prompt.py
+    │   └── text_box.py
+    │
+    └── utils
+        ├── asset_manager.py
+        ├── image.py
+        ├── parallax.py
+        ├── particle.py
+        └── sprite.py
+```
+
+• an Implementation section with a technical summary of your implementation.
+## Implementation:
 
 • A Project Management section, with a brief overview of how you managed the
 project and a link to the dedicated project management directory.
