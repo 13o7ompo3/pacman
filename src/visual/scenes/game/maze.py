@@ -3,6 +3,7 @@
 from src.visual.draw import Draw
 from pygame import Surface
 from pygame import Vector2
+from typing import Callable
 
 from src.logical.game_event import (
     AteGhostEvent,
@@ -69,6 +70,7 @@ class VisualMaze(Node):
         surfaces (dict): A dictionary maps corner configurations to surfaces.
         ghosts (list[VisualGhost]): A list of visual representations of ghosts.
         player (Player): The visual representation of the player.
+        level_up_callback (Callable): A callback function on level up.
 
     """
 
@@ -77,9 +79,11 @@ class VisualMaze(Node):
         context: Context,
         logical_maze: LogicalMaze,
         cell_size: int = 16,
+        level_up_callback: Callable = lambda: None,
     ) -> None:
         """Initialize the VisualMaze object."""
         super().__init__(context)
+        self.level_up_callback = level_up_callback
         self.logical_maze = logical_maze
         self.cell_size = cell_size
 
@@ -303,6 +307,7 @@ class VisualMaze(Node):
                 )
             if isinstance(event, LevelCompleteEvent):
                 self.refresh()
+                self.level_up_callback()
             if isinstance(event, WinEvent):
                 if self.parent:
                     self.parent.paused = True

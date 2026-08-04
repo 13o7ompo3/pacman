@@ -1,18 +1,19 @@
 """A module that contains the GameScene class and related UI components."""
 
-from parser import LevelConfig
-from src.visual import Node, Context
-from src.logical.maze import LogicalMaze
-from src.visual.scenes.game.maze import VisualMaze
-from src.visual.draw import Draw
-from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
-from src.visual.ui.label import Label
-from pygame import Color, Vector2
-from pygame import Surface
 import math
 
-from src.visual.ui.button import Button
+from pygame import Color, Surface, Vector2
+
+from parser import LevelConfig
+from src.logical.maze import LogicalMaze
+from src.visual import Context, Node
+from src.visual.draw import Draw
+from src.visual.scenes.game.maze import VisualMaze
 from src.visual.scenes.pause import PauseScene
+from src.visual.ui.button import Button
+from src.visual.ui.label import Label
+from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
+from collections.abc import Callable
 
 
 class GumTimer(Node):
@@ -25,7 +26,10 @@ class GumTimer(Node):
     """
 
     def __init__(
-        self, context: Context, logical_maze: LogicalMaze, radius: int
+        self,
+        context: Context,
+        logical_maze: LogicalMaze,
+        radius: int,
     ) -> None:
         """Initialize a GumTimer instance."""
         super().__init__(context)
@@ -332,20 +336,25 @@ class GameScene(Node):
 
     """
 
-    def __init__(self, context: Context) -> None:
+    def __init__(
+        self,
+        context: Context,
+    ) -> None:
         """Initialize a GameScene instance."""
         super().__init__(context)
         levels = [
+            LevelConfig(width=10, height=10, seed=42),
             LevelConfig(width=15, height=15, seed=1337),
-            # LevelConfig(width=10, height=13, seed=42),
         ]
         max_ticks = 4000
         self.logical_maze = LogicalMaze(levels, max_ticks=max_ticks)
-        self.maze = VisualMaze(context, self.logical_maze)
-        self.maze = self.maze
-        self.maze.local_position = (
-            Vector2(context.width, context.height) / 2 - self.maze.size / 2
+
+        self.maze = VisualMaze(
+            context,
+            self.logical_maze,
+            level_up_callback=self._refresh_positions,
         )
+        self.maze = self.maze
 
         pause_button = Button(
             context,
@@ -357,14 +366,9 @@ class GameScene(Node):
             ),
             shadow_color=context.colors.light,
         )
-        pause_button.local_position = Vector2(10, 10)
-        gum_timer = GumTimer(context, self.logical_maze, 24)
-        gum_timer.local_position = self.maze.local_position + Vector2(-160, 30)
+        self.gum_timer = GumTimer(context, self.logical_maze, 24)
 
-        lives_left = LivesLeft(context, self.logical_maze)
-        lives_left.local_position = self.maze.local_position + Vector2(
-            -170, self.maze.size.y - 80
-        )
+        self.lives_left = LivesLeft(context, self.logical_maze)
 
         self.score_title_label = TitleLabel(
             context,
@@ -373,9 +377,6 @@ class GameScene(Node):
             int(self.maze.size.x),
             context.colors.dark,
         )
-        self.score_title_label.local_position = (
-            self.maze.world_position - Vector2(0, 50)
-        )
 
         self.level_title_label = TitleLabel(
             context,
@@ -383,9 +384,6 @@ class GameScene(Node):
             str(self.logical_maze.current_level_idx + 1),
             int(self.maze.size.x),
             context.colors.darker,
-        )
-        self.level_title_label.local_position = (
-            self.maze.world_position + Vector2(0, self.maze.size.y + 40)
         )
 
         self.time_bar = InfoBar(
@@ -398,9 +396,6 @@ class GameScene(Node):
             False,
             context.colors.light,
         )
-        self.time_bar.local_position = self.maze.local_position + Vector2(
-            self.maze.size.x + 10, self.maze.size.y / 2 - 76
-        )
 
         self.gums_bar = InfoBar(
             context,
@@ -412,18 +407,40 @@ class GameScene(Node):
             True,
             context.colors.darker,
         )
-        self.gums_bar.local_position = self.maze.local_position + Vector2(
-            self.maze.size.x + 10, self.maze.size.y / 2 + 50
-        )
 
+        self._refresh_positions()
         self.add_child(self.maze)
         self.add_child(self.score_title_label)
         self.add_child(self.level_title_label)
         self.add_child(self.time_bar)
         self.add_child(self.gums_bar)
-        self.add_child(gum_timer)
-        self.add_child(lives_left)
+        self.add_child(self.gum_timer)
+        self.add_child(self.lives_left)
         self.add_child(pause_button)
+
+    def _refresh_positions(self) -> None:
+        self.maze.local_position = (
+            Vector2(self.context.width, self.context.height) / 2
+            - self.maze.size / 2
+        )
+        self.gum_timer.local_position = self.maze.local_position + Vector2(
+            -160, 30
+        )
+        self.lives_left.local_position = self.maze.local_position + Vector2(
+            -170, self.maze.size.y - 80
+        )
+        self.score_title_label.local_position = (
+            self.maze.world_position - Vector2(0, 50)
+        )
+        self.level_title_label.local_position = (
+            self.maze.world_position + Vector2(0, self.maze.size.y + 40)
+        )
+        self.time_bar.local_position = self.maze.local_position + Vector2(
+            self.maze.size.x + 10, self.maze.size.y / 2 - 76
+        )
+        self.gums_bar.local_position = self.maze.local_position + Vector2(
+            self.maze.size.x + 10, self.maze.size.y / 2 + 50
+        )
 
     def _on_update(self, delta: float) -> None:
         """Update the game scene elements based on the logical maze state."""
