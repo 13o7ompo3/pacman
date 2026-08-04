@@ -261,7 +261,12 @@ class GameScene(Node):
             # LevelConfig(width=10, height=13, seed=42),
         ]
         max_ticks = 4000
-        self.logical_maze = LogicalMaze(levels, max_ticks=max_ticks)
+        self.logical_maze = LogicalMaze(context.config.levels,
+                                        context.config.points_per_pacgum,
+                                        context.config.points_per_super_pacgum,
+                                        context.config.points_per_ghost,
+                                        max_ticks,
+                                        context.config.super_pacgum_duration)
         self.maze = VisualMaze(context, self.logical_maze)
         self.maze = self.maze
         self.maze.local_position = (

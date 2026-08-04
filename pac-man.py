@@ -16,6 +16,7 @@ from src.visual.ui.panel import Panel
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.text_box import TextBox
 from src.visual.utils.asset_manager import AssetManager
+from parser import parse_config
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -32,8 +33,9 @@ def main():
     user_manager = UserManager()
 
     assets = AssetManager()
+    config = parse_config("config.json")
 
-    context = Context(surface, WIDTH, HEIGHT, assets, user_manager)
+    context = Context(surface, WIDTH, HEIGHT, assets, user_manager, config)
     loading_scene = LoadingScene(context)
     context.root_scene.add_child(loading_scene)
 
