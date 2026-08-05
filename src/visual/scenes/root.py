@@ -6,6 +6,7 @@ from src.visual import Node, Context
 from src.visual.utils.image import Image
 from src.visual.palette import ColorPalette
 from copy import deepcopy
+from src.visual.utils.parallax import Parallax
 
 
 class RootScene(Node):
@@ -51,6 +52,18 @@ class RootScene(Node):
                 self.context.assets.image("fistat6_palette")
             ),
         ]
+        parallax = Parallax(
+            self.context,
+            [
+                (self.context.assets.image("background_layer1"), 0.2),
+                (self.context.assets.image("background_layer2"), 0.4),
+                (self.context.assets.image("background_layer3"), 0.6),
+                (self.context.assets.image("background_layer4"), 0.8),
+            ],
+            40,
+        )
+        self.add_child(parallax)
+        self.children = self.children[::-1]
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the root scene.

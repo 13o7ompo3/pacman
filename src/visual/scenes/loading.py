@@ -245,3 +245,17 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "winning_instruction", "assets/instructions/winning.png"
         )
+
+        # load background layers
+        self.context.assets.register_image(
+            "background_layer1", "assets/parallax/layer_1.png"
+        )
+        self.context.assets.register_image(
+            "background_layer2", "assets/parallax/layer_2.png"
+        )
+        self.context.assets.register_image(
+            "background_layer3", "assets/parallax/layer_3.png"
+        )
+        self.context.assets.register_image(
+            "background_layer4", "assets/parallax/layer_4.png"
+        )
