@@ -80,6 +80,7 @@ class LoadingScene(Node):
         self.time += delta
 
     def _register_assets(self) -> None:
+        # load animations
         self.context.assets.register_image("player_up", "assets/player/up.png")
         self.context.assets.register_image(
             "player_down", "assets/player/down.png"
@@ -99,6 +100,8 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "ghost_running", "assets/ghost/ghost_running.png"
         )
+
+        # load tileset
         self.context.assets.register_image(
             "tile_ball_bottom_left", "assets/tiles/ball_bottom_left.png"
         )
@@ -141,6 +144,8 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "tile_full_rect", "assets/tiles/full_rect.png"
         )
+
+        # load tiles
         self.context.assets.register_image(
             "clock_icon", "assets/icons/clock.png"
         )
@@ -167,7 +172,17 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "update_icon", "assets/icons/update.png"
         )
+        self.context.assets.register_image(
+            "instructions_icon", "assets/icons/instructions.png"
+        )
+        self.context.assets.register_image(
+            "next_icon", "assets/icons/next.png"
+        )
+        self.context.assets.register_image(
+            "previous_icon", "assets/icons/previous.png"
+        )
 
+        # load palettes
         self.context.assets.register_image(
             "oil-6_palette", "assets/palettes/oil-6-1x.png"
         )
@@ -195,4 +210,18 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "fistat6_palette", "assets/palettes/fistat6-1x.png"
+        )
+
+        # load instructions
+        self.context.assets.register_image(
+            "movements_instruction", "assets/instructions/movements.png"
+        )
+        self.context.assets.register_image(
+            "losing_instruction", "assets/instructions/losing.png"
+        )
+        self.context.assets.register_image(
+            "super_pacgum_instruction", "assets/instructions/super_pacgum.png"
+        )
+        self.context.assets.register_image(
+            "winning_instruction", "assets/instructions/winning.png"
         )
