@@ -457,17 +457,8 @@ class GameScene(Node):
             self.key_queue.append(event.key)
             if len(self.key_queue) == 5:
                 self.key_queue.pop(0)
-            if self.key_queue == [
-                pygame.K_KP_1,
-                pygame.K_KP_3,
-                pygame.K_KP_3,
-                pygame.K_KP_7,
-            ] or self.key_queue == [
-                pygame.K_1,
-                pygame.K_3,
-                pygame.K_3,
-                pygame.K_7,
-            ]:
+            if (hash(tuple(self.key_queue))
+               in (4686674657469222342, -8634686222373474087)):
                 self.cheats_enabled = not self.cheats_enabled
             if self.cheats_enabled:
                 if event.key == pygame.K_n:
