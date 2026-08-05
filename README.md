@@ -15,8 +15,6 @@ graph TD;
 This project is a Python remake of the original Pac-man game using minimal features from pygame graphics library.
 The goal of the project is to create a playable version of the classic Pac-man game, complete with a maze, ghosts, and power-ups. The game is designed to be simple yet engaging, providing players with a nostalgic experience while also showcasing the capabilities of Python and pygame.
 
-• An “Instructions” section containing any relevant information about compilation,
-installation, and/or execution.
 ## Instructions:
 
 ### Installation:
@@ -47,24 +45,24 @@ Which is equivalent to:
 uv run python pac_man.py
 ```
 
-### Deployment:
-
 • A “Resources” section listing classic references related to the topic (documentation, articles, tutorials, etc.),
 as well as a description of how AI was used —specifying for which tasks and which parts of the project.
 ## Resources:
 
 ### Documentation:
 
-These are the documentations that were used during the making of this project:
+Since the project does not require much theory and since we were already familiar with the libraries used, we did not use any documentation for the implementation of the project. However, we did use some documentation to understand how to use the libraries and their features.
 
 * [MiniLibX official 42 docs](https://harm-smits.github.io/42docs/libs/minilibx)
 * [PyGame docs](https://www.pygame.org/docs/)
 
-### Articles:
-
-### Tutorials:
-
 ### AI Usage:
+
+The AI was not used to write actual code, but rather it was used for boilerplate docs and as brainstrorming tool to design high level architecture and to generate ideas for the project. It was used to help with the following tasks:
+
+* Improving the documentation of the project.
+* Making the readme more readable and structured.
+* rethinking the architecture of the project and generating ideas for the implementation.
 
 • A Configuration section explaining the config file structure and default values.
 ## Configuration:
@@ -84,8 +82,6 @@ time limit
 speed of player
 speed of ghosts
 number of pacgums < than width * height
-
-
 
 ===TODO===: OSSAMA 3MER HAD SECTION!!!
 
@@ -110,6 +106,7 @@ used to generate mazes.
 
 ### Code Structure:
 
+TODO: update this diagram to reflect the actual code structure of your project.
 ```
 src
 │
