@@ -225,7 +225,7 @@ class InfoBar(Node):
             val (int): The new dynamic text value.
 
         """
-        if reversed:
+        if self.reversed:
             val = self.max_progress - val
         if self.dynamic_text != str(val):
             self.dynamic_text = str(val)
@@ -343,7 +343,8 @@ class GameScene(Node):
                                         context.config.points_per_pacgum,
                                         context.config.points_per_super_pacgum,
                                         context.config.points_per_ghost,
-                                        context.config.super_pacgum_duration)
+                                        context.config.super_pacgum_duration,
+                                        lives=context.config.lives)
         self.maze = VisualMaze(
             context, self.logical_maze, level_up_callback=self._init_widgets
         )
