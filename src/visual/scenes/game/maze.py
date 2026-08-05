@@ -262,13 +262,15 @@ class VisualMaze(Node):
                 self.logical_maze,
                 logical_ghost,
                 self.cell_size,
-                20,
+                self.logical_maze.current_level.speed * 0.75,
             )
             ghost.local_position = Vector2(self.cell_size) / 2
             self.ghosts.append(ghost)
             self.add_child(ghost)
 
-        self.player = Player(self.context, self.logical_maze, self.cell_size)
+        self.player = Player(self.context,
+                             self.logical_maze, self.cell_size,
+                             self.logical_maze.current_level.speed)
         self.player.local_position = Vector2(self.cell_size) / 2
         self.add_child(self.player)
 
