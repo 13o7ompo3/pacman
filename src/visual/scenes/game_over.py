@@ -1,19 +1,37 @@
+"""A module representing the game over scene and related UI components."""
+
 from enum import Enum
-from pygame import Color, Vector2
+from pygame import Vector2
 from src.visual import Node, Context
 from src.visual.ui.label import Label
+from src.visual.ui.button import Button
 from src.visual.ui.panel import Panel
 from src.visual.ui.text_box import TextBox
 from src.visual.ui.prompt import Prompt
 from typing import Callable
 
 
-class LoginStep(Enum):
-    USERNAME = "username"
-    PASSWORD = "password"
+class TerminalState(Enum):
+    """An enumeration representing the terminal state of the game.
+
+    Attributes:
+        WON (str): Represents the state when the player has won the game.
+        LOST (str): Represents the state when the player has lost the game.
+
+    """
+
+    WON = "won"
+    LOST = "lost"
 
 
 class InputForm(Node):
+    """A class representing an input form for user authentication.
+
+    Attributes:
+        text_box (TextBox): The text box for user input.
+
+    """
+
     def __init__(
         self,
         context: "Context",
@@ -21,13 +39,16 @@ class InputForm(Node):
         is_password: bool,
         on_submit: Callable,
     ) -> None:
+        """Initialize the InputForm object."""
+        from src.visual.scenes.title import TitleScene
+
         super().__init__(context)
 
         label = Label(
             context,
             Vector2(300, 200),
             [
-                (label_text, Color("white")),
+                (label_text, context.colors.lightest),
             ],
         )
         label.local_position = (
@@ -39,61 +60,65 @@ class InputForm(Node):
             Vector2(context.width / 2, context.height * 5 / 8)
             - self.text_box.size / 2
         )
+
+        def go_to_title(_):
+            """Handle the transition to the title scene."""
+            context.root_scene.clear_children()
+            context.root_scene.add_child(TitleScene(context))
+
+        title_button = Button(
+            context,
+            [context.assets.image("return_icon"), "Quit To Tittle"],
+            Vector2(150, 30),
+            context.colors.dark,
+            go_to_title,
+            shadow_color=context.colors.darker,
+        )
+        title_button.local_position = (
+            Vector2(context.width / 2, context.height * 6 / 8)
+            - title_button.size / 2
+        )
+
         self.add_child(label)
         self.add_child(self.text_box)
+        self.add_child(title_button)
 
     @property
     def value(self) -> str:
+        """Return the current value of the text box.
+
+        Returns:
+            str: The current text content of the text box.
+
+        """
         return self.text_box.content
 
 
-class GameOverScene(Node):
-    def __init__(self, context: Context, final_score: int) -> None:
+class LoginForms(Node):
+    """A class representing the login forms for user authentication.
+
+    Attributes:
+        username_form (InputForm): The input form for the username.
+        password_form (InputForm): The input form for the password.
+
+    """
+
+    def __init__(self, context: "Context", final_score: int) -> None:
+        """Initialize the LoginForms object."""
         super().__init__(context)
-        self.login_step = LoginStep.USERNAME
-        panel = Panel(
-            context,
-            Vector2(300, 450),
-            Color("darkgray"),
-            on_outside_press=lambda x: None,
-        )
-        panel.local_position = Vector2(
-            context.width / 2 - panel.size.x / 2, context.height / 7
-        )
 
-        title = Label(
-            context,
-            Vector2(300, 200),
-            [("Game Over", Color("orange"))],
-            2,
-        )
-        title.local_position = (
-            Vector2(context.width / 2, context.height / 4) - title.size / 2
-        )
-
-        score = Label(
-            context,
-            Vector2(300, 200),
-            [
-                ("Final Score: ", Color("white")),
-                (str(final_score), Color("gold")),
-            ],
-        )
-        score.local_position = (
-            Vector2(context.width / 2, context.height * 3 / 8) - score.size / 2
-        )
-
-        self.username: str = ""
         user_manager = self.context.user_manager
 
         username_form: InputForm
         password_form: InputForm
 
         def on_username_submit(_):
+            """Handle the submission of the username form."""
             username_form.hidden = True
             password_form.hidden = False
 
         def on_password_submit(_):
+            """Handle the submission of the password form."""
             try:
                 if user_manager.is_existing_user(username_form.value):
                     user_manager.authenticate_user(
@@ -104,9 +129,23 @@ class GameOverScene(Node):
                         username_form.value, password_form.value
                     )
                 user_manager.update_highscore(final_score)
-            except Exception as error:
-                print(error)
 
+                from src.visual.scenes.title import TitleScene
+
+                def go_to_title(_):
+                    """Handle the transition to the title scene."""
+                    context.root_scene.clear_children()
+                    context.root_scene.add_child(TitleScene(context))
+
+                self.add_child(
+                    Prompt(
+                        context,
+                        "Success",
+                        f"Updated score for {username_form.value}",
+                        go_to_title,
+                    )
+                )
+            except Exception as error:
                 self.add_child(
                     Prompt(context, "Error", str(error), lambda x: None)
                 )
@@ -119,12 +158,155 @@ class GameOverScene(Node):
             context, "Username: ", False, on_username_submit
         )
         password_form = InputForm(
-            context, "Password: ", False, on_password_submit
+            context, "Password: ", True, on_password_submit
         )
         password_form.hidden = True
+
+        self.add_child(password_form)
+        self.add_child(username_form)
+
+
+class LogoutForm(Node):
+    """A class representing the logout form for user authentication.
+
+    Attributes:
+        username (str): The username of the logged-in user.
+
+    """
+
+    def __init__(
+        self, context: "Context", username: str, on_logout: Callable
+    ) -> None:
+        """Initialize the LogoutForm object."""
+        super().__init__(context)
+        score = Label(
+            context,
+            Vector2(300, 200),
+            [
+                ("Logged in as: ", context.colors.lightest),
+                (username, context.colors.light),
+            ],
+        )
+        score.local_position = (
+            Vector2(context.width / 2, context.height * 4 / 8) - score.size / 2
+        )
+
+        def on_update(_):
+            """Handle the update of the user's high score."""
+            from src.visual.scenes.title import TitleScene
+
+            def on_accept(_):
+                """Handle the transition to the title scene."""
+                context.root_scene.clear_children()
+                context.root_scene.add_child(TitleScene(context))
+
+            self.add_child(
+                Prompt(
+                    context,
+                    "Success",
+                    f"Updated score for {username}",
+                    on_accept,
+                )
+            )
+
+        update_button = Button(
+            context,
+            [context.assets.image("update_icon"), "Update"],
+            Vector2(80, 30),
+            context.colors.light,
+            on_update,
+            shadow_color=context.colors.dark,
+        )
+        update_button.local_position = (
+            Vector2(context.width / 2 - 50, context.height * 5 / 8)
+            - update_button.size / 2
+        )
+        logout_button = Button(
+            context,
+            [context.assets.image("exit_icon"), "Logout"],
+            Vector2(80, 30),
+            context.colors.dark,
+            on_logout,
+            shadow_color=context.colors.darker,
+        )
+        logout_button.local_position = (
+            Vector2(context.width / 2 + 50, context.height * 5 / 8)
+            - logout_button.size / 2
+        )
+        self.add_child(score)
+        self.add_child(update_button)
+        self.add_child(logout_button)
+
+
+class GameOverScene(Node):
+    """A class representing the game over scene.
+
+    Attributes:
+        final_score (int): The final score of the player.
+        state (TerminalState): The terminal state of the game (won or lost).
+
+    """
+
+    def __init__(
+        self, context: Context, final_score: int, state: TerminalState
+    ) -> None:
+        """Initialize the GameOverScene object."""
+        super().__init__(context)
+        panel = Panel(
+            context,
+            Vector2(300, 350),
+            context.colors.darker,
+            border_color=context.colors.darkest,
+            on_outside_press=lambda _: None,
+        )
+        panel.local_position = Vector2(
+            context.width / 2 - panel.size.x / 2, context.height / 7
+        )
+
+        label_text = (
+            [("Game Over", context.colors.dark)]
+            if state is TerminalState.LOST
+            else [("Wa Tbark Allah 3lik Ou Saf", context.colors.light)]
+        )
+        title = Label(
+            context,
+            Vector2(400, 200),
+            label_text,
+            2,
+        )
+        title.local_position = (
+            Vector2(context.width / 2, context.height / 4) - title.size / 2
+        )
+
+        score = Label(
+            context,
+            Vector2(300, 200),
+            [
+                ("Final Score: ", context.colors.light),
+                (str(final_score), context.colors.lighter),
+            ],
+        )
+        score.local_position = (
+            Vector2(context.width / 2, context.height * 3 / 8) - score.size / 2
+        )
 
         self.add_child(panel)
         self.add_child(title)
         self.add_child(score)
-        self.add_child(password_form)
-        self.add_child(username_form)
+
+        def show_login(button):
+            """Handle the transition to the login forms."""
+            button.parent.free_from_scene()
+            login_forms = LoginForms(context, final_score)
+            self.add_child(login_forms)
+
+        if context.user_manager.loged_in_user is None:
+            login_forms = LoginForms(context, final_score)
+            self.add_child(login_forms)
+        else:
+            logout_form = LogoutForm(
+                context,
+                str(context.user_manager.loged_in_user.username),
+                show_login,
+            )
+            self.add_child(logout_form)

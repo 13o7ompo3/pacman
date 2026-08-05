@@ -4,7 +4,6 @@ PACKAGE_MANAGER = uv
 CONFIG = config.json
 
 install:
-	echo $(SRC)
 	@printf "\e[34m%s\e[0m\n" "installing program dependencies.."
 	@$(PACKAGE_MANAGER) sync
 
