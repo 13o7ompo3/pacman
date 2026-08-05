@@ -97,6 +97,21 @@ class Player(Node):
             0.4,
             20,
         )
+        self.super_pacgum_silhouette = ParticleSystem(
+            context,
+            Sprite(
+                context,
+                context.assets.image("player_silhouette"),
+                1,
+                4,
+                10,
+                False,
+            ),
+            (Vector2(), Vector2()),
+            (Vector2(), Vector2()),
+            0.4,
+            4,
+        )
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the player.
@@ -142,11 +157,15 @@ class Player(Node):
 
         """
         self.particles.update(delta)
+        self.super_pacgum_silhouette.update(delta)
         if not self.dead:
             self.animated_position = self.animated_position.move_towards(
                 self.target_position, delta * self.speed
             )
             self.particles.local_position = (
+                self.world_position + self.animated_position
+            )
+            self.super_pacgum_silhouette.local_position = (
                 self.world_position + self.animated_position
             )
 
@@ -188,10 +207,15 @@ class Player(Node):
 
     def _on_draw(self) -> None:
         """Draw the player and its particles on the screen."""
+        self.super_pacgum_silhouette.render()
         if self.animated_position != self.target_position:
-            self.particles.play()
+            if self.maze.player.gum_timer > 0:
+                self.super_pacgum_silhouette.play()
+            else:
+                self.particles.play()
         else:
             self.particles.stop()
+            self.super_pacgum_silhouette.stop()
         self.particles.render()
         if self.direction is not None:
             sprite = self.sprites[self.direction]

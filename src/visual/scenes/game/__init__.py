@@ -339,7 +339,7 @@ class GameScene(Node):
         """Initialize a GameScene instance."""
         super().__init__(context)
         levels = [
-            LevelConfig(width=10, height=10, seed=42),
+            LevelConfig(width=20, height=28, seed=42),
             LevelConfig(width=15, height=15, seed=1337),
         ]
         self.logical_maze = LogicalMaze(levels)

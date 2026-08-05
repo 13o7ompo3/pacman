@@ -115,6 +115,9 @@ class LoadingScene(Node):
             "player_idle", "assets/player/idle.png"
         )
         self.context.assets.register_image(
+            "player_silhouette", "assets/player/silhouette.png"
+        )
+        self.context.assets.register_image(
             "ghost_neutral", "assets/ghost/ghost_neutral.png"
         )
         self.context.assets.register_image(
