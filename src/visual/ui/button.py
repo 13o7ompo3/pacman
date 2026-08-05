@@ -53,7 +53,7 @@ class Button(Node):
         callback: Callable,
         shortcuts: set[int] = set(),
         thickness: int = 5,
-        border_radius: int = 8,
+        border_radius: int = 4,
         shadow_color: Color | None = None,
         highlight_color: Color | None = None,
         padding: int = 3,
