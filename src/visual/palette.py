@@ -1,9 +1,23 @@
+"""A module for defining color palettes."""
+
 from dataclasses import dataclass
-from pygame import Color, PixelArray, Surface
+from pygame import Color, Surface
 
 
 @dataclass
 class ColorPalette:
+    """A color palette with six shades of a color.
+
+    Attributes:
+        darkest (Color): The darkest shade of the color.
+        darker (Color): A darker shade of the color.
+        dark (Color): A dark shade of the color.
+        light (Color): A light shade of the color.
+        lighter (Color): A lighter shade of the color.
+        lightest (Color): The lightest shade of the color.
+
+    """
+
     darkest: Color
     darker: Color
     dark: Color
@@ -13,6 +27,15 @@ class ColorPalette:
 
     @classmethod
     def load_from_surface(cls, surface: Surface) -> "ColorPalette":
+        """Load a color palette from a surface.
+
+        Args:
+            surface (Surface): The surface to load the color palette from.
+
+        Returns:
+            ColorPalette: The loaded color palette.
+
+        """
         darkest = surface.get_at((0, 0))
         darker = surface.get_at((1, 0))
         dark = surface.get_at((2, 0))
@@ -30,14 +53,6 @@ class ColorPalette:
         )
 
 
-# DEFAULT_PALETTE = ColorPalette(
-#     Color("#18215d"),
-#     Color("#503197"),
-#     Color("#bf53c9"),
-#     Color("#e17cb7"),
-#     Color("#efaaa5"),
-#     Color("#f6e0c8"),
-# )
 DEFAULT_PALETTE = ColorPalette(
     Color("#272744"),
     Color("#494d7e"),

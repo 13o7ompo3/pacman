@@ -1,16 +1,34 @@
+"""A module containing the Player class for the game."""
+
 import pygame
-from src.visual.draw import Draw
+from pygame import KEYDOWN, Color, Surface, Vector2
 from pygame.event import Event
-from pygame import draw, Color, Vector2, KEYDOWN, image, Surface
-from src.visual.utils.sprite import Sprite
-from src.visual.utils.particle import ParticleSystem
-from src.logical.core_types import PlayerState
-from src.logical.game_event import PlayerDiedEvent, PlayerRespawnedEvent
-from src.visual import Context, Node
+
 from src.logical.maze import Direction, LogicalMaze
+from src.visual import Context, Node
+from src.visual.utils.particle import ParticleSystem
+from src.visual.utils.sprite import Sprite
 
 
 class Player(Node):
+    """A class representing the player in the game.
+
+    Attributes:
+        direction (Direction): The current direction of the player.
+        next_direction (Direction): The next direction the player will move in.
+        target_position (Vector2): Target position of the player in the maze.
+        animated_position (Vector2): Current animated position of the player.
+        step_size (int): The size of each step the player takes in the maze.
+        maze (LogicalMaze): The logical representation of the maze.
+        speed (float): The speed at which the player moves.
+        dead (bool): Whether the player is dead or not.
+        sprites (dict): A dictionary of sprites for each direction.
+        idle_img (Surface): The image to display when the player is idle.
+        particle_img (Surface): The image to use for the particle system.
+        particles (ParticleSystem): The particle system for the player.
+
+    """
+
     def __init__(
         self,
         context: Context,
@@ -18,6 +36,7 @@ class Player(Node):
         step_size: int,
         speed: float = 80,
     ) -> None:
+        """Initialize the Player object."""
         super().__init__(context)
         self.direction = None
         self.next_direction = None
@@ -80,6 +99,15 @@ class Player(Node):
         )
 
     def _on_input(self, event: Event) -> Event | None:
+        """Handle input events for the player.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+
+        """
         if self.hidden:
             return
         if event.type == KEYDOWN:
@@ -91,11 +119,28 @@ class Player(Node):
                 self.next_direction = Direction.LEFT
             if event.key in {pygame.K_RIGHT, pygame.K_d, pygame.K_l}:
                 self.next_direction = Direction.RIGHT
-            if self.direction is None:
+            if self.direction is None and self.next_direction is not None:
                 self.direction = self.next_direction
+                player_pos = self.maze.player.get_grid_position()
+                if self.maze.can_move(
+                    player_pos,
+                    (
+                        player_pos[0] + self.direction.value[0],
+                        player_pos[1] + self.direction.value[1],
+                    ),
+                ):
+                    self.target_position = (
+                        Vector2(player_pos) + self.direction.value
+                    ) * self.step_size
         return event
 
     def _on_update(self, delta: float) -> None:
+        """Update the player's state.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         self.particles.update(delta)
         if not self.dead:
             self.animated_position = self.animated_position.move_towards(
@@ -105,30 +150,48 @@ class Player(Node):
                 self.world_position + self.animated_position
             )
 
-        if (
-            self.animated_position == self.target_position
-            and self.direction is not None
-        ):
+        if self.animated_position == self.target_position:
+            self._step_target_position()
+        elif self.direction is not None:
+            self.sprites[self.direction].update(delta)
+
+    def _step_target_position(self):
+        """Update the target position of the player based the direction."""
+        if self.direction is not None:
             self.maze.tick_player(self.direction)
             player_pos = self.maze.player.get_grid_position()
-
             if self.next_direction and self.maze.can_move_player(
                 self.next_direction
             ):
                 self.direction = self.next_direction
+            if self.maze.can_move(
+                player_pos,
+                (
+                    player_pos[0] + self.direction.value[0],
+                    player_pos[1] + self.direction.value[1],
+                ),
+            ):
                 self.target_position = (
-                    Vector2(player_pos) + Vector2(self.next_direction.value)
+                    Vector2(player_pos) + self.direction.value
                 ) * self.step_size
-            else:
-                self.target_position = Vector2(player_pos) * self.step_size
-        elif self.direction is not None:
-            self.sprites[self.direction].update(delta)
 
     def respawn(self, x, y):
+        """Respawn the player at the given grid coordinates (x, y).
+
+        Args:
+            x (int): The x-coordinate to respawn the player.
+            y (int): The y-coordinate to respawn the player.
+
+        """
         self.target_position = Vector2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
 
     def _on_draw(self) -> None:
+        """Draw the player and its particles on the screen."""
+        if self.animated_position != self.target_position:
+            self.particles.play()
+        else:
+            self.particles.stop()
         self.particles.render()
         if self.direction is not None:
             sprite = self.sprites[self.direction]
@@ -145,6 +208,7 @@ class Player(Node):
             )
 
     def _on_redraw(self) -> None:
+        """Redraw the player and its particles."""
         particle_color = Color(self.context.colors.lightest)
         particle_color.a = 100
         self.particle_img.fill(particle_color)
