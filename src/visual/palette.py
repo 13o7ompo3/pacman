@@ -24,9 +24,10 @@ class ColorPalette:
     light: Color
     lighter: Color
     lightest: Color
+    bruh: str
 
     @classmethod
-    def load_from_surface(cls, surface: Surface) -> "ColorPalette":
+    def load_from_surface(cls, surface: Surface, bruh) -> "ColorPalette":
         """Load a color palette from a surface.
 
         Args:
@@ -43,14 +44,7 @@ class ColorPalette:
         lighter = surface.get_at((4, 0))
         lightest = surface.get_at((5, 0))
 
-        return cls(
-            darkest,
-            darker,
-            dark,
-            light,
-            lighter,
-            lightest,
-        )
+        return cls(darkest, darker, dark, light, lighter, lightest, bruh)
 
 
 DEFAULT_PALETTE = ColorPalette(
@@ -60,4 +54,5 @@ DEFAULT_PALETTE = ColorPalette(
     Color("#c69fa5"),
     Color("#f2d3ab"),
     Color("#fbf5ef"),
+    "hello",
 )
