@@ -21,6 +21,7 @@ class TitleScene(Node):
     def __init__(self, context: Context) -> None:
         """Initialize a TitleScene instance."""
         super().__init__(context)
+        context.root_scene.parallax_background.velocity = 60
         button_size = Vector2(130, 38)
         title_text = Label(
             context,

@@ -26,9 +26,9 @@ class LoadingScene(Node):
         def on_finish(_: ProgressBar) -> None:
             """Handle the completion of asset loading."""
             self.free_from_scene()
+            self.context.root_scene.finish_loading()
             title_scene = TitleScene(context)
             context.root_scene.add_child(title_scene)
-            self.context.root_scene.load_themes()
 
         # only load the font for the loading screen
         context.assets.register_font(
@@ -113,6 +113,9 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "player_idle", "assets/player/idle.png"
+        )
+        self.context.assets.register_image(
+            "player_silhouette", "assets/player/silhouette.png"
         )
         self.context.assets.register_image(
             "ghost_neutral", "assets/ghost/ghost_neutral.png"
@@ -244,4 +247,18 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "winning_instruction", "assets/instructions/winning.png"
+        )
+
+        # load background layers
+        self.context.assets.register_image(
+            "background_layer1", "assets/parallax/layer_1.png"
+        )
+        self.context.assets.register_image(
+            "background_layer2", "assets/parallax/layer_2.png"
+        )
+        self.context.assets.register_image(
+            "background_layer3", "assets/parallax/layer_3.png"
+        )
+        self.context.assets.register_image(
+            "background_layer4", "assets/parallax/layer_4.png"
         )

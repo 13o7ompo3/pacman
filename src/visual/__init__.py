@@ -118,7 +118,6 @@ class GameComponent:
         if self.parent is not None:
             self.parent.remove_child(self)
 
-    @final
     def clear_children(self) -> None:
         """Remove a child component to this one."""
         self.children.clear()

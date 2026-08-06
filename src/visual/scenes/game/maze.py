@@ -322,6 +322,12 @@ class VisualMaze(Node):
 
     def _on_draw(self) -> None:
         """Draw the visual representation of the maze and pacgums."""
+        Draw.rect(
+            self.context.screen,
+            self.world_position,
+            self.size,
+            fill_color=self.context.colors.darkest,
+        )
         for x, y in self.logical_maze.pacgums:
             Draw.circle(
                 self.context.screen,

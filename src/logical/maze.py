@@ -472,12 +472,6 @@ class LogicalMaze:
                     ghost.state = GhostState.FRIGHTENED
                     ghost.last_direction = None
 
-        if self.is_level_complete:
-            if self.next_level():
-                events.add(LevelCompleteEvent())
-            else:
-                events.add(WinEvent(final_score=self.player.score))
-
         return events
 
     def _resolve_ghost_collision(self, ghost: Ghost) -> Set[GameEvent]:
@@ -633,7 +627,7 @@ class LogicalMaze:
         """Advance all time-based state by one frame.
 
         Call this every frame regardless of player/ghost speed.
-        Handles five independent countdowns:
+        Handles five independent countdowns and signals end of level:
 
         - Player death countdown: counts down after PlayerDiedEvent, then
         auto-respawns the player and emits PlayerRespawnedEvent. The level
@@ -709,6 +703,12 @@ class LogicalMaze:
         self.elapsed_ticks += 1
         if self.is_time_up:
             events.add(TimeUpEvent())
+
+        if self.is_level_complete:
+            if self.next_level():
+                events.add(LevelCompleteEvent())
+            else:
+                events.add(WinEvent(final_score=self.player.score))
 
         self._pending_events.update(events)
         return
