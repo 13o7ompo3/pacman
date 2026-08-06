@@ -67,21 +67,21 @@ The AI was not used to write actual code, but rather it was used for boilerplate
 • A Configuration section explaining the config file structure and default values.
 ## Configuration:
 
-| Field | Description | Type | Default |
-|-------|-------------|------|---------|
-|LEVELS|             |      |         |
-|POINTS_PER_PACGUM|
-|POINTS_PER_SUPER_PACGUM|
-|POINTS_PER_GHOST|
-|SUPERGUM_DURATION|
+| Field                   | Description                                     | Type |
+|-------------------------|-------------------------------------------------|------|
+| LEVELS                  | List of levels to be played                     | list |
+| POINTS_PER_PACGUM       | Points awarded for each pac-gum consumed        | int  |
+| POINTS_PER_SUPER_PACGUM | Points awarded for each super pac-gum consumed  | int  |
+| POINTS_PER_GHOST        | Points awarded for each ghost consumed          | int  |
+| SUPERGUM_DURATION       | Duration of the super pac-gum effect in seconds | int  |
+| NUM_HEARTS              | Number of lives the player has                  | int  |
 
 Fields of the levels:
 width height
 seed of the maze
 time limit
-speed of player
-speed of ghosts
-number of pacgums < than width * height
+speed
+number of pacgums
 
 ===TODO===: OSSAMA 3MER HAD SECTION!!!
 
