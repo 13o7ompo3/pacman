@@ -348,6 +348,7 @@ class GameScene(Node):
         self.maze = VisualMaze(
             context, self.logical_maze, level_up_callback=self._init_widgets
         )
+        self.cheats_enabled = False
         self._init_widgets()
 
     def _init_widgets(self) -> None:
@@ -431,7 +432,6 @@ class GameScene(Node):
             self.maze.size.x + 10, self.maze.size.y / 2 + 50
         )
         self.key_queue: list[int] = []
-        self.cheats_enabled = False
 
         self.add_child(self.maze)
         self.add_child(self.score_title_label)
