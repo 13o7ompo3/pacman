@@ -85,7 +85,6 @@ class Parallax(Node):
             value (float): the new value.
 
         """
-        print(len(self.children))
         for layer in self.children:
             if isinstance(layer, ParallaxLayer):
                 layer.velocity /= self._velocity
