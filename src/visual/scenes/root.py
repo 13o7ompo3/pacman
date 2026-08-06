@@ -52,7 +52,7 @@ class RootScene(Node):
                 self.context.assets.image("fistat6_palette")
             ),
         ]
-        parallax = Parallax(
+        self.parallax_background = Parallax(
             self.context,
             [
                 (self.context.assets.image("background_layer1"), 0.2),
@@ -62,8 +62,14 @@ class RootScene(Node):
             ],
             40,
         )
-        self.add_child(parallax)
-        self.children = self.children[::-1]
+        self.children.insert(0, self.parallax_background)
+
+    def clear_children(self) -> None:
+        """Clear all children of the root node except the background."""
+        if hasattr(self, "parallax_background"):
+            del self.children[1:]
+        else:
+            super().clear_children()
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the root scene.
