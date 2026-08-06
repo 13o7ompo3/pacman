@@ -26,9 +26,9 @@ class LoadingScene(Node):
         def on_finish(_: ProgressBar) -> None:
             """Handle the completion of asset loading."""
             self.free_from_scene()
+            self.context.root_scene.finish_loading()
             title_scene = TitleScene(context)
             context.root_scene.add_child(title_scene)
-            self.context.root_scene.load_themes()
 
         # only load the font for the loading screen
         context.assets.register_font(

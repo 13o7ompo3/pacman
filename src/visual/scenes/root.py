@@ -24,7 +24,7 @@ class RootScene(Node):
         self.current_theme_index = 0
         self.themes = None
 
-    def load_themes(self):
+    def finish_loading(self):
         """Load color themes from assets."""
         self.themes = [
             ColorPalette.load_from_surface(

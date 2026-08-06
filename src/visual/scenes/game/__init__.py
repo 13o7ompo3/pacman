@@ -339,9 +339,11 @@ class GameScene(Node):
         """Initialize a GameScene instance."""
         super().__init__(context)
         levels = [
-            LevelConfig(width=20, height=28, seed=42),
+            LevelConfig(width=10, height=10, seed=42),
+            LevelConfig(width=12, height=12, seed=42),
             LevelConfig(width=15, height=15, seed=1337),
         ]
+        context.root_scene.parallax_background.velocity = 20
         self.logical_maze = LogicalMaze(levels)
         self.maze = VisualMaze(
             context, self.logical_maze, level_up_callback=self._init_widgets
@@ -490,3 +492,11 @@ class GameScene(Node):
                             ghost.state = GhostState.FRIGHTENED
                             ghost.last_direction = None
         return event
+
+    def _on_draw(self) -> None:
+        Draw.rect(
+            self.context.screen,
+            Vector2(),
+            (self.context.width, self.context.height),
+            fill_color=Color((0, 0, 0, 100)),
+        )
