@@ -368,12 +368,15 @@ class GameScene(Node):
         pause_button.local_position = Vector2(10, 10)
         gum_timer = GumTimer(self.context, self.logical_maze, 24)
         gum_timer.local_position = Vector2(
-            self.maze.local_position.x - 160, 150
+            self.maze.local_position.x / 2 - gum_timer.label.size.x / 2, 150
         )
 
         lives_left = LivesLeft(self.context, self.logical_maze)
         lives_left.local_position = Vector2(
-            self.maze.local_position.x - 170, self.context.height - 200
+            self.maze.local_position.x / 2
+            - lives_left.lives_text.get_size()[0] / 2
+            + 10,
+            self.context.height - 200,
         )
 
         self.score_title_label = TitleLabel(
