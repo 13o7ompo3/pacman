@@ -1,8 +1,11 @@
 """Root scene for the game."""
 
-from pygame import K_t, KEYUP
+from typing import Iterator
+from pygame import K_t, KEYUP, Vector2
 from pygame.event import Event
 from src.visual import Node, Context
+from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
+from src.visual.ui.prompt import Prompt
 from src.visual.utils.image import Image
 from src.visual.palette import ColorPalette
 from copy import deepcopy
@@ -23,6 +26,7 @@ class RootScene(Node):
         super().__init__(context)
         self.current_theme_index = 0
         self.themes = None
+        self.loading_iter: Iterator | None = None
 
     def finish_loading(self):
         """Load color themes from assets."""
@@ -81,7 +85,35 @@ class RootScene(Node):
             Event | None: The event if it was not handled, otherwise None.
 
         """
-        if event.type == KEYUP and event.key == K_t and self.themes:
+        if event.type == KEYUP and event.key == K_t:
+            self.loading_iter = self.cycle_theme()
+
+    def cycle_theme(self) -> Iterator:
+        loading_alert = Prompt(
+            self.context,
+            "Loading new theme..",
+            "",
+            lambda _: None,
+        )
+        loading_bar = ProgressBar(
+            self.context,
+            Vector2(loading_alert.content.get_size()[0] - 30, 20),
+            ProgressBarOrientation.HORIZONTAL,
+            self.context.colors.light,
+            total=len(self.context.assets.images),
+        )
+        loading_alert.add_child(loading_bar)
+        loading_bar.local_position = (
+            Vector2(loading_alert.content.get_size()) / 2
+            - loading_bar.size / 2
+        )
+
+        self.context.root_scene.add_child(loading_alert)
+
+        for child_node in self.context.root_scene.children:
+            child_node.paused = True
+
+        if self.themes:
             old_theme = deepcopy(self.context.colors)
             self.current_theme_index = (self.current_theme_index + 1) % len(
                 self.themes
@@ -97,8 +129,15 @@ class RootScene(Node):
             for image in self.context.assets.images:
                 surface = self.context.assets.image(image)
                 Image.switch_palette(surface, old_theme, new_theme)
+                loading_bar.progress += 1
+                yield
 
-            self.redraw()
+        for child_node in self.context.root_scene.children:
+            child_node.paused = False
+
+        loading_alert.free_from_scene()
+        loading_bar.free_from_scene()
+        self.redraw()
 
     def _copy_color(self, color1, color2) -> None:
         """Copy the RGBA values from one color to another.
@@ -112,3 +151,10 @@ class RootScene(Node):
         color1.g = color2.g
         color1.b = color2.b
         color1.a = color2.a
+
+    def _on_update(self, delta: float) -> None:
+        if self.loading_iter is not None:
+            try:
+                next(self.loading_iter)
+            except StopIteration:
+                self.loading_iter = None
