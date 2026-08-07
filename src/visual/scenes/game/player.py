@@ -211,8 +211,10 @@ class Player(Node):
         if self.animated_position != self.target_position:
             if self.maze.player.gum_timer > 0:
                 self.super_pacgum_silhouette.play()
+                self.particles.stop()
             else:
                 self.particles.play()
+                self.super_pacgum_silhouette.stop()
         else:
             self.particles.stop()
             self.super_pacgum_silhouette.stop()
