@@ -5,6 +5,7 @@ from typing import final
 from pygame import Surface, Vector2
 from pygame.event import Event
 
+from parser import Config
 from src.db_manager.user import UserManager
 from src.visual.palette import DEFAULT_PALETTE
 from src.visual.utils.asset_manager import AssetManager
@@ -197,6 +198,7 @@ class Context:
         height: int,
         assets: AssetManager,
         user_manager: UserManager,
+        config: Config
     ) -> None:
         """Initialize a Context instance."""
         from src.visual.scenes.root import RootScene
@@ -209,3 +211,4 @@ class Context:
         self.colors = DEFAULT_PALETTE
         self.game_running = True
         self.root_scene = RootScene(self)
+        self.config = config

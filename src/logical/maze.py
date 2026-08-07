@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import Tuple, List, Set
 from mazegenerator import MazeGenerator  # type: ignore[import-not-found]
 from src.logical.core_types import (
@@ -36,8 +37,8 @@ class LogicalMaze:
         points_pacgum: int = 10,
         points_super_pacgum: int = 50,
         points_ghost: int = 200,
-        max_ticks: int = 90 * 60,
         super_pacgum_duration: int = 2500,
+        lives: int = 3,
         respawn_delay: int = 180,
         invulnerability_duration: int = 120,
         ghost_respawn_delay: int = 300,
@@ -75,7 +76,7 @@ class LogicalMaze:
         self.points_pacgum: int = points_pacgum
         self.points_super_pacgum: int = points_super_pacgum
         self.points_ghost: int = points_ghost
-        self.max_ticks: int = max_ticks
+        self.max_ticks: int
         self.elapsed_ticks: int = 0
         self.super_pacgum_duration: int = super_pacgum_duration
         self.respawn_delay: int = respawn_delay
@@ -86,6 +87,7 @@ class LogicalMaze:
         self.cheat_freeze_ghosts: bool = False
         self._pending_events: set[GameEvent] = set()
         self.player: Player = Player(0, 0)
+        self.player.lives = lives
         self.load_level(0)
 
     def load_level(self, level_idx: int) -> None:
@@ -107,6 +109,7 @@ class LogicalMaze:
         self.width = self.current_level.width
         self.height = self.current_level.height
         self.base_seed = self.current_level.seed
+        self.max_ticks = self.current_level.level_max_time * 60
 
         seed = self.base_seed
         self.maze_generator = MazeGenerator(
@@ -145,19 +148,6 @@ class LogicalMaze:
             self.load_level(self.current_level_idx + 1)
             return True
         return False
-
-    def restart_game(self) -> None:
-        """Hard reset for a brand new game session.
-
-        Arguments:
-            None
-        Returns:
-            None
-
-        """
-        self.player.lives = 3
-        self.player.score = 0
-        self.load_level(0)
 
     def _initialize_ghosts(self) -> list[Ghost]:
         """Place ghosts in their four corner spawn points.
@@ -375,23 +365,26 @@ class LogicalMaze:
             or direction != reverse_direction.get(ghost.last_direction)
         ] or valid_moves
 
+        if len(candidates) == 1:
+            return candidates[0]
         if ghost.state == GhostState.CHASE:
-            best_dir = min(
+            best_dir = sorted(
                 candidates,
-                key=lambda d: (
-                    abs((ghost.x + d.value[0]) - px)
-                    + abs((ghost.y + d.value[1]) - py)
-                ),
+                key=lambda d: abs((ghost.x + d.value[0]) - px) ** 2
+                + abs((ghost.y + d.value[1]) - py) ** 2,
             )
         else:
-            best_dir = max(
+            best_dir = sorted(
                 candidates,
-                key=lambda d: (
-                    abs((ghost.x + d.value[0]) - px)
-                    + abs((ghost.y + d.value[1]) - py)
-                ),
+                key=lambda d: abs((ghost.x + d.value[0]) - px) ** 2
+                + abs((ghost.y + d.value[1]) - py) ** 2, reverse=True
             )
-        return best_dir
+        if any((ghost.x + d.value[0]) == px or (ghost.y + d.value[1]) == py
+           for d in best_dir):
+            return best_dir[0]
+        if random.random() < 0.2:
+            return best_dir[1]
+        return best_dir[0]
 
     def respawn_player(self) -> None:
         """Reset the player and all ghosts after a death.

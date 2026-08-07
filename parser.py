@@ -10,20 +10,20 @@ class LevelConfig(BaseModel):
     width: int = Field(default=28, ge=10)
     height: int = Field(default=31, ge=10)
     seed: str | int = Field(default=1337)
+    level_max_time: int = Field(default=90, ge=10)
+    speed: float = Field(default=100, ge=1, le=100)
+    pacgum: int = Field(default=1337, ge=0)
 
 
 class Config(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    highscore_filename: str = "highscores.json"
-    level: List[LevelConfig] = Field(default_factory=lambda: [LevelConfig()])
-    lives: int = Field(default=3, ge=1)
-    pacgum: int = Field(default=42, ge=0)
+    levels: List[LevelConfig] = Field(default_factory=lambda: [LevelConfig()])
+    lives: int = Field(default=3, ge=1, le=5)
     points_per_pacgum: int = Field(default=10, ge=0)
     points_per_super_pacgum: int = Field(default=50, ge=0)
     points_per_ghost: int = Field(default=200, ge=0)
-    seed: int = Field(default=42)
-    level_max_time: int = Field(default=90, ge=10)
+    super_pacgum_duration: int = Field(default=500, ge=200)
 
 
 def _strip_comments(content: str) -> str:

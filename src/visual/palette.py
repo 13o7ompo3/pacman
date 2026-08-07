@@ -43,14 +43,7 @@ class ColorPalette:
         lighter = surface.get_at((4, 0))
         lightest = surface.get_at((5, 0))
 
-        return cls(
-            darkest,
-            darker,
-            dark,
-            light,
-            lighter,
-            lightest,
-        )
+        return cls(darkest, darker, dark, light, lighter, lightest)
 
 
 DEFAULT_PALETTE = ColorPalette(

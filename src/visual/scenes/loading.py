@@ -206,33 +206,91 @@ class LoadingScene(Node):
         )
 
         # load palettes
+        # self.context.assets.register_image(
+        #     "oil-6_palette", "assets/palettes/oil-6-1x.png"
+        # )
         self.context.assets.register_image(
-            "oil-6_palette", "assets/palettes/oil-6-1x.png"
+            "6353yh4-redux-1x", "assets/palettes/6353yh4-redux-1x.png"
         )
         self.context.assets.register_image(
-            "cryptic-ocean_palette", "assets/palettes/cryptic-ocean-1x.png"
+            "6-violets-1x", "assets/palettes/6-violets-1x.png"
         )
         self.context.assets.register_image(
-            "robots-are-cool_palette", "assets/palettes/robots-are-cool-1x.png"
+            "ash-persimmon-6-1x", "assets/palettes/ash-persimmon-6-1x.png"
         )
         self.context.assets.register_image(
-            "molten_palette", "assets/palettes/molten-1x.png"
+            "black-and-white-6-1x", "assets/palettes/black-and-white-6-1x.png"
         )
         self.context.assets.register_image(
-            "enbydiade6_palette", "assets/palettes/enbydiade6-1x.png"
+            "blackhole6-1x", "assets/palettes/blackhole6-1x.png"
         )
         self.context.assets.register_image(
-            "vintage-voltage_palette", "assets/palettes/vintage-voltage-1x.png"
+            "bluberry-6-1x", "assets/palettes/bluberry-6-1x.png"
         )
         self.context.assets.register_image(
-            "bluberry-6_palette", "assets/palettes/bluberry-6-1x.png"
+            "blue-screen-of-palette-1x",
+            "assets/palettes/blue-screen-of-palette-1x.png",
         )
         self.context.assets.register_image(
-            "grape-soda-arcade_palette",
-            "assets/palettes/grape-soda-arcade-1x.png",
+            "cave6-1x", "assets/palettes/cave6-1x.png"
         )
         self.context.assets.register_image(
-            "fistat6_palette", "assets/palettes/fistat6-1x.png"
+            "cryptic-ocean-1x", "assets/palettes/cryptic-ocean-1x.png"
+        )
+        self.context.assets.register_image(
+            "depths-1x", "assets/palettes/depths-1x.png"
+        )
+        self.context.assets.register_image(
+            "enbydiade6-1x", "assets/palettes/enbydiade6-1x.png"
+        )
+        self.context.assets.register_image(
+            "fistat6-1x", "assets/palettes/fistat6-1x.png"
+        )
+        self.context.assets.register_image(
+            "grape-soda-arcade-1x", "assets/palettes/grape-soda-arcade-1x.png"
+        )
+        self.context.assets.register_image(
+            "ice-cream-land-1x", "assets/palettes/ice-cream-land-1x.png"
+        )
+        self.context.assets.register_image(
+            "icywitch-1x", "assets/palettes/icywitch-1x.png"
+        )
+        self.context.assets.register_image(
+            "inkpink-1x", "assets/palettes/inkpink-1x.png"
+        )
+        self.context.assets.register_image(
+            "lavendertown-1x", "assets/palettes/lavendertown-1x.png"
+        )
+        self.context.assets.register_image(
+            "midnight-epipelagic-1x",
+            "assets/palettes/midnight-epipelagic-1x.png",
+        )
+        self.context.assets.register_image(
+            "monometalic-1x", "assets/palettes/monometalic-1x.png"
+        )
+        self.context.assets.register_image(
+            "noelles-room-1x", "assets/palettes/noelles-room-1x.png"
+        )
+        self.context.assets.register_image(
+            "robots-are-cool-1x", "assets/palettes/robots-are-cool-1x.png"
+        )
+        self.context.assets.register_image(
+            "roserust-1x", "assets/palettes/roserust-1x.png"
+        )
+        self.context.assets.register_image(
+            "sandy-06-1x", "assets/palettes/sandy-06-1x.png"
+        )
+        self.context.assets.register_image(
+            "sepia6-1x", "assets/palettes/sepia6-1x.png"
+        )
+        self.context.assets.register_image(
+            "spooky6-1x", "assets/palettes/spooky6-1x.png"
+        )
+        self.context.assets.register_image(
+            "teaviie-1x", "assets/palettes/teaviie-1x.png"
+        )
+        self.context.assets.register_image(
+            "vintage-voltage-1x", "assets/palettes/vintage-voltage-1x.png"
         )
 
         # load instructions
