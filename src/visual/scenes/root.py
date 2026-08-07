@@ -10,6 +10,7 @@ from src.visual.utils.image import Image
 from src.visual.palette import ColorPalette
 from copy import deepcopy
 from src.visual.utils.parallax import Parallax
+from random import shuffle
 
 
 class RootScene(Node):
@@ -32,30 +33,88 @@ class RootScene(Node):
         """Load color themes from assets."""
         self.themes = [
             ColorPalette.load_from_surface(
-                self.context.assets.image("cryptic-ocean_palette")
+                self.context.assets.image("6353yh4-redux-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("robots-are-cool_palette")
+                self.context.assets.image("6-violets-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("molten_palette")
+                self.context.assets.image("ash-persimmon-6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("enbydiade6_palette")
+                self.context.assets.image("black-and-white-6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("vintage-voltage_palette")
+                self.context.assets.image("blackhole6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("bluberry-6_palette")
+                self.context.assets.image("bluberry-6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("grape-soda-arcade_palette")
+                self.context.assets.image("blue-screen-of-palette-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("fistat6_palette")
+                self.context.assets.image("cave6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("cryptic-ocean-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("depths-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("enbydiade6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("fistat6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("grape-soda-arcade-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("ice-cream-land-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("icywitch-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("inkpink-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("lavendertown-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("midnight-epipelagic-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("monometalic-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("noelles-room-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("robots-are-cool-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("roserust-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("sandy-06-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("sepia6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("spooky6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("teaviie-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("vintage-voltage-1x"),
             ),
         ]
+        shuffle(self.themes)
         self.parallax_background = Parallax(
             self.context,
             [
