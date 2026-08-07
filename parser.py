@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, ValidationError, Field
+from pydantic import BaseModel, ConfigDict, ValidationError, Field, model_validator
 import json
 import logging
 from typing import List
@@ -11,7 +11,7 @@ class LevelConfig(BaseModel):
     height: int = Field(default=31, ge=10)
     seed: str | int = Field(default=1337)
     level_max_time: int = Field(default=90, ge=10)
-    speed: float = Field(default=100, ge=1, le=100)
+    speed: float = Field(default=50, ge=1, le=100)
     pacgum: int = Field(default=1337, ge=0)
 
 
@@ -24,6 +24,41 @@ class Config(BaseModel):
     points_per_super_pacgum: int = Field(default=50, ge=0)
     points_per_ghost: int = Field(default=200, ge=0)
     super_pacgum_duration: int = Field(default=500, ge=200)
+
+    @model_validator(mode="after")
+    def validator(self) -> "Config":
+        default_levels = [LevelConfig(width=10, height=10, seed=1337,
+                                      level_max_time=90, speed=70,
+                                      pacgum=1337),
+                          LevelConfig(width=14, height=15, seed=42,
+                                      level_max_time=90, speed=70,
+                                      pacgum=1337),
+                          LevelConfig(width=15, height=15, seed=1337,
+                                      level_max_time=90, speed=90,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=42,
+                                      level_max_time=90, speed=70,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=1337,
+                                      level_max_time=90, speed=90,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=42,
+                                      level_max_time=90, speed=70,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=1337,
+                                      level_max_time=90, speed=90,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=42,
+                                      level_max_time=90, speed=70,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=1337,
+                                      level_max_time=90, speed=90,
+                                      pacgum=1337),
+                          LevelConfig(width=13, height=15, seed=42,
+                                      level_max_time=90, speed=100,
+                                      pacgum=1337)]
+        self.levels = default_levels
+        return self
 
 
 def _strip_comments(content: str) -> str:
