@@ -28,6 +28,7 @@ class TitleScene(Node):
             Vector2(300, 200),
             [("Spo", context.colors.dark), ("oks", context.colors.light)],
             4,
+            font=context.assets.font("title"),
         )
 
         def start_game(_):

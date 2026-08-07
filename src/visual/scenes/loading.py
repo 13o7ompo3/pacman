@@ -32,7 +32,7 @@ class LoadingScene(Node):
 
         # only load the font for the loading screen
         context.assets.register_font(
-            "ui", "assets/perfect_dos_vga_437.ttf", 16
+            "ui", "assets/fonts/perfect_dos_vga_437.ttf", 16
         )
         context.assets.load()
         self._register_assets()
@@ -100,6 +100,12 @@ class LoadingScene(Node):
 
     def _register_assets(self) -> None:
         """Register all the assets to be loaded."""
+
+        # load fonts
+        self.context.assets.register_font(
+            "title", "assets/fonts/alagard.ttf", 16
+        )
+
         # load animations
         self.context.assets.register_image("player_up", "assets/player/up.png")
         self.context.assets.register_image(
