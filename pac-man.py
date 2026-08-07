@@ -55,7 +55,6 @@ def main():
         context.root_scene.update(delta)
 
         # render the scene tree
-        surface.fill(context.colors.darkest)
         context.root_scene.render()
 
         pygame.display.flip()

@@ -1,7 +1,10 @@
 """A module for defining color palettes."""
 
 from dataclasses import dataclass
+import logging
 from pygame import Color, Surface
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -36,6 +39,12 @@ class ColorPalette:
             ColorPalette: The loaded color palette.
 
         """
+        if surface.get_size() != (6, 1):
+            logger.error(
+                f"A palette has size {surface.get_size()} instead of {(6, 1)}"
+            )
+            exit()
+
         darkest = surface.get_at((0, 0))
         darker = surface.get_at((1, 0))
         dark = surface.get_at((2, 0))

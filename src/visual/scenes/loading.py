@@ -65,8 +65,6 @@ class LoadingScene(Node):
         )
 
         self.loading_iter = self.context.assets.load_progress()
-        self.time = 0
-        self.load_time_per_item = 0
 
         self.add_child(label)
         self.add_child(self.progress_bar)
@@ -78,25 +76,20 @@ class LoadingScene(Node):
             delta (float): The time elapsed since the last update.
 
         """
-        if self.time >= self.load_time_per_item:
-            try:
-                ret = next(self.loading_iter)
-                if isinstance(ret, Exception):
+        try:
+            ret = next(self.loading_iter)
+            if isinstance(ret, Exception):
 
-                    def on_accept(_) -> None:
-                        """Handle the acceptance of the error prompt."""
-                        self.context.game_running = False
+                def on_accept(_) -> None:
+                    """Handle the acceptance of the error prompt."""
+                    self.context.game_running = False
 
-                    prompt = Prompt(self.context, "Error", str(ret), on_accept)
-                    self.add_child(prompt)
-                else:
-                    self.progress_bar.progress += 1
-            except StopIteration:
-                pass
-
-            self.time = 0
-
-        self.time += delta
+                prompt = Prompt(self.context, "Error", str(ret), on_accept)
+                self.add_child(prompt)
+            else:
+                self.progress_bar.progress += 1
+        except StopIteration:
+            pass
 
     def _register_assets(self) -> None:
         """Register all the assets to be loaded."""

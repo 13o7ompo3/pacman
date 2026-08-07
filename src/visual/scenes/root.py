@@ -11,6 +11,10 @@ from src.visual.palette import ColorPalette
 from copy import deepcopy
 from src.visual.utils.parallax import Parallax
 from random import shuffle
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class RootScene(Node):
@@ -199,6 +203,7 @@ class RootScene(Node):
 
         loading_alert.free_from_scene()
         loading_bar.free_from_scene()
+        logger.info("color palette changed successfully")
         self.redraw()
 
     def _copy_color(self, color1, color2) -> None:
