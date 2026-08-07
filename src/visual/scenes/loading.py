@@ -168,7 +168,7 @@ class LoadingScene(Node):
             "tile_full_rect", "assets/tiles/full_rect.png"
         )
 
-        # load tiles
+        # load icons
         self.context.assets.register_image(
             "clock_icon", "assets/icons/clock.png"
         )
@@ -203,6 +203,9 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "previous_icon", "assets/icons/previous.png"
+        )
+        self.context.assets.register_image(
+            "theme_icon", "assets/icons/theme.png"
         )
 
         # load palettes

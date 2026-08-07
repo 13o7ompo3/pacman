@@ -145,7 +145,10 @@ class RootScene(Node):
 
         """
         if event.type == KEYUP and event.key == K_t:
-            self.loading_iter = self.cycle_theme()
+            self.change_theme()
+
+    def change_theme(self) -> None:
+        self.loading_iter = self.cycle_theme()
 
     def cycle_theme(self) -> Iterator:
         loading_alert = Prompt(
