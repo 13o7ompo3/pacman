@@ -10,6 +10,7 @@ from src.visual.utils.image import Image
 from src.visual.palette import ColorPalette
 from copy import deepcopy
 from src.visual.utils.parallax import Parallax
+from random import shuffle
 
 
 class RootScene(Node):
@@ -32,220 +33,88 @@ class RootScene(Node):
         """Load color themes from assets."""
         self.themes = [
             ColorPalette.load_from_surface(
-                self.context.assets.image("2sois-1x"), "2sois-1x"
-            ),
-            ColorPalette.load_from_surface(
                 self.context.assets.image("6353yh4-redux-1x"),
-                "6353yh4-redux-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("6-violets-1x"), "6-violets-1x"
+                self.context.assets.image("6-violets-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("ash-persimmon-6-1x"),
-                "ash-persimmon-6-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("autumn-decay-1x"), "autumn-decay-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("berries-and-cream-1x"),
-                "berries-and-cream-1x",
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("black-and-white-6-1x"),
-                "black-and-white-6-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("blackhole6-1x"), "blackhole6-1x"
+                self.context.assets.image("blackhole6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("bluberry-6-1x"), "bluberry-6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("blue-newspaper-1x"),
-                "blue-newspaper-1x",
+                self.context.assets.image("bluberry-6-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("blue-screen-of-palette-1x"),
-                "blue-screen-of-palette-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("brazil-flag-1x"), "brazil-flag-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("bronze-palette-1x"),
-                "bronze-palette-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("calm-n-chloric-1x"),
-                "calm-n-chloric-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("carver6-1x"), "carver6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("cave6-1x"), "cave6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("ciboulette-6-1x"), "ciboulette-6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("city-street-6-1x"),
-                "city-street-6-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("cloudfrenzy-1x"), "cloudfrenzy-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("clown-cake-1x"), "clown-cake-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("compliment6-1x"), "compliment6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("crabs-orange-red-palette-1x"),
-                "crabs-orange-red-palette-1x",
+                self.context.assets.image("cave6-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("cryptic-ocean-1x"),
-                "cryptic-ocean-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("curiosities-1x"), "curiosities-1x"
+                self.context.assets.image("depths-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("cybergum6-1x"), "cybergum6-1x"
+                self.context.assets.image("enbydiade6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("cyclope6-1x"), "cyclope6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("depths-1x"), "depths-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("discordant-6-1x"), "discordant-6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("dnot-froget-1x"), "dnot-froget-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("eggdealer6-1x"), "eggdealer6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("eibre-19-1x"), "eibre-19-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("enbydiade6-1x"), "enbydiade6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("enchanted-6-1x"), "enchanted-6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("extinction-1x"), "extinction-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("fistat6-1x"), "fistat6-1x"
+                self.context.assets.image("fistat6-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("grape-soda-arcade-1x"),
-                "grape-soda-arcade-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("greedpit-1x"), "greedpit-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("hope-diamond-1x"), "hope-diamond-1x"
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("ice-cream-land-1x"),
-                "ice-cream-land-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("ice-cream-spice-1x"),
-                "ice-cream-spice-1x",
+                self.context.assets.image("icywitch-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("icywitch-1x"), "icywitch-1x"
+                self.context.assets.image("inkpink-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("inkpink-1x"), "inkpink-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("joker-6-1x"), "joker-6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("lavendertown-1x"), "lavendertown-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("lv-weaver-801-1x"),
-                "lv-weaver-801-1x",
+                self.context.assets.image("lavendertown-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("midnight-epipelagic-1x"),
-                "midnight-epipelagic-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("monometalic-1x"), "monometalic-1x"
+                self.context.assets.image("monometalic-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("noelles-room-1x"), "noelles-room-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("pink-neon-sign-6-1x"),
-                "pink-neon-sign-6-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("puffball-6-1x"), "puffball-6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("retro-perfect-1x"),
-                "retro-perfect-1x",
+                self.context.assets.image("noelles-room-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("robots-are-cool-1x"),
-                "robots-are-cool-1x",
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("roserust-1x"), "roserust-1x"
+                self.context.assets.image("roserust-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("sailers-friday-1x"),
-                "sailers-friday-1x",
+                self.context.assets.image("sandy-06-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("sandy-06-1x"), "sandy-06-1x"
+                self.context.assets.image("sepia6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("seoul-city-1x"), "seoul-city-1x"
+                self.context.assets.image("spooky6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("sepia6-1x"), "sepia6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("septembit-23-1x"), "septembit-23-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("snail-village-1x"),
-                "snail-village-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("spooky6-1x"), "spooky6-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("teaviie-1x"), "teaviie-1x"
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("unicorn-6-1x"), "unicorn-6-1x"
+                self.context.assets.image("teaviie-1x"),
             ),
             ColorPalette.load_from_surface(
                 self.context.assets.image("vintage-voltage-1x"),
-                "vintage-voltage-1x",
-            ),
-            ColorPalette.load_from_surface(
-                self.context.assets.image("yamazaki-1x"), "yamazaki-1x"
             ),
         ]
+        shuffle(self.themes)
         self.parallax_background = Parallax(
             self.context,
             [
@@ -309,7 +178,6 @@ class RootScene(Node):
                 self.themes
             )
             new_theme = self.themes[self.current_theme_index]
-            print(new_theme.bruh)
             self._copy_color(self.context.colors.darkest, new_theme.darkest)
             self._copy_color(self.context.colors.darker, new_theme.darker)
             self._copy_color(self.context.colors.dark, new_theme.dark)

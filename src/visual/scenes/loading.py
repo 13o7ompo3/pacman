@@ -210,9 +210,6 @@ class LoadingScene(Node):
         #     "oil-6_palette", "assets/palettes/oil-6-1x.png"
         # )
         self.context.assets.register_image(
-            "2sois-1x", "assets/palettes/2sois-1x.png"
-        )
-        self.context.assets.register_image(
             "6353yh4-redux-1x", "assets/palettes/6353yh4-redux-1x.png"
         )
         self.context.assets.register_image(
@@ -220,12 +217,6 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "ash-persimmon-6-1x", "assets/palettes/ash-persimmon-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "autumn-decay-1x", "assets/palettes/autumn-decay-1x.png"
-        )
-        self.context.assets.register_image(
-            "berries-and-cream-1x", "assets/palettes/berries-and-cream-1x.png"
         )
         self.context.assets.register_image(
             "black-and-white-6-1x", "assets/palettes/black-and-white-6-1x.png"
@@ -237,81 +228,20 @@ class LoadingScene(Node):
             "bluberry-6-1x", "assets/palettes/bluberry-6-1x.png"
         )
         self.context.assets.register_image(
-            "blue-newspaper-1x", "assets/palettes/blue-newspaper-1x.png"
-        )
-        self.context.assets.register_image(
             "blue-screen-of-palette-1x",
             "assets/palettes/blue-screen-of-palette-1x.png",
-        )
-        self.context.assets.register_image(
-            "brazil-flag-1x", "assets/palettes/brazil-flag-1x.png"
-        )
-        self.context.assets.register_image(
-            "bronze-palette-1x", "assets/palettes/bronze-palette-1x.png"
-        )
-        self.context.assets.register_image(
-            "calm-n-chloric-1x", "assets/palettes/calm-n-chloric-1x.png"
-        )
-        self.context.assets.register_image(
-            "carver6-1x", "assets/palettes/carver6-1x.png"
         )
         self.context.assets.register_image(
             "cave6-1x", "assets/palettes/cave6-1x.png"
         )
         self.context.assets.register_image(
-            "ciboulette-6-1x", "assets/palettes/ciboulette-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "city-street-6-1x", "assets/palettes/city-street-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "cloudfrenzy-1x", "assets/palettes/cloudfrenzy-1x.png"
-        )
-        self.context.assets.register_image(
-            "clown-cake-1x", "assets/palettes/clown-cake-1x.png"
-        )
-        self.context.assets.register_image(
-            "compliment6-1x", "assets/palettes/compliment6-1x.png"
-        )
-        self.context.assets.register_image(
-            "crabs-orange-red-palette-1x",
-            "assets/palettes/crabs-orange-red-palette-1x.png",
-        )
-        self.context.assets.register_image(
             "cryptic-ocean-1x", "assets/palettes/cryptic-ocean-1x.png"
-        )
-        self.context.assets.register_image(
-            "curiosities-1x", "assets/palettes/curiosities-1x.png"
-        )
-        self.context.assets.register_image(
-            "cybergum6-1x", "assets/palettes/cybergum6-1x.png"
-        )
-        self.context.assets.register_image(
-            "cyclope6-1x", "assets/palettes/cyclope6-1x.png"
         )
         self.context.assets.register_image(
             "depths-1x", "assets/palettes/depths-1x.png"
         )
         self.context.assets.register_image(
-            "discordant-6-1x", "assets/palettes/discordant-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "dnot-froget-1x", "assets/palettes/dnot-froget-1x.png"
-        )
-        self.context.assets.register_image(
-            "eggdealer6-1x", "assets/palettes/eggdealer6-1x.png"
-        )
-        self.context.assets.register_image(
-            "eibre-19-1x", "assets/palettes/eibre-19-1x.png"
-        )
-        self.context.assets.register_image(
             "enbydiade6-1x", "assets/palettes/enbydiade6-1x.png"
-        )
-        self.context.assets.register_image(
-            "enchanted-6-1x", "assets/palettes/enchanted-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "extinction-1x", "assets/palettes/extinction-1x.png"
         )
         self.context.assets.register_image(
             "fistat6-1x", "assets/palettes/fistat6-1x.png"
@@ -320,16 +250,7 @@ class LoadingScene(Node):
             "grape-soda-arcade-1x", "assets/palettes/grape-soda-arcade-1x.png"
         )
         self.context.assets.register_image(
-            "greedpit-1x", "assets/palettes/greedpit-1x.png"
-        )
-        self.context.assets.register_image(
-            "hope-diamond-1x", "assets/palettes/hope-diamond-1x.png"
-        )
-        self.context.assets.register_image(
             "ice-cream-land-1x", "assets/palettes/ice-cream-land-1x.png"
-        )
-        self.context.assets.register_image(
-            "ice-cream-spice-1x", "assets/palettes/ice-cream-spice-1x.png"
         )
         self.context.assets.register_image(
             "icywitch-1x", "assets/palettes/icywitch-1x.png"
@@ -338,13 +259,7 @@ class LoadingScene(Node):
             "inkpink-1x", "assets/palettes/inkpink-1x.png"
         )
         self.context.assets.register_image(
-            "joker-6-1x", "assets/palettes/joker-6-1x.png"
-        )
-        self.context.assets.register_image(
             "lavendertown-1x", "assets/palettes/lavendertown-1x.png"
-        )
-        self.context.assets.register_image(
-            "lv-weaver-801-1x", "assets/palettes/lv-weaver-801-1x.png"
         )
         self.context.assets.register_image(
             "midnight-epipelagic-1x",
@@ -357,37 +272,16 @@ class LoadingScene(Node):
             "noelles-room-1x", "assets/palettes/noelles-room-1x.png"
         )
         self.context.assets.register_image(
-            "pink-neon-sign-6-1x", "assets/palettes/pink-neon-sign-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "puffball-6-1x", "assets/palettes/puffball-6-1x.png"
-        )
-        self.context.assets.register_image(
-            "retro-perfect-1x", "assets/palettes/retro-perfect-1x.png"
-        )
-        self.context.assets.register_image(
             "robots-are-cool-1x", "assets/palettes/robots-are-cool-1x.png"
         )
         self.context.assets.register_image(
             "roserust-1x", "assets/palettes/roserust-1x.png"
         )
         self.context.assets.register_image(
-            "sailers-friday-1x", "assets/palettes/sailers-friday-1x.png"
-        )
-        self.context.assets.register_image(
             "sandy-06-1x", "assets/palettes/sandy-06-1x.png"
         )
         self.context.assets.register_image(
-            "seoul-city-1x", "assets/palettes/seoul-city-1x.png"
-        )
-        self.context.assets.register_image(
             "sepia6-1x", "assets/palettes/sepia6-1x.png"
-        )
-        self.context.assets.register_image(
-            "septembit-23-1x", "assets/palettes/septembit-23-1x.png"
-        )
-        self.context.assets.register_image(
-            "snail-village-1x", "assets/palettes/snail-village-1x.png"
         )
         self.context.assets.register_image(
             "spooky6-1x", "assets/palettes/spooky6-1x.png"
@@ -396,13 +290,7 @@ class LoadingScene(Node):
             "teaviie-1x", "assets/palettes/teaviie-1x.png"
         )
         self.context.assets.register_image(
-            "unicorn-6-1x", "assets/palettes/unicorn-6-1x.png"
-        )
-        self.context.assets.register_image(
             "vintage-voltage-1x", "assets/palettes/vintage-voltage-1x.png"
-        )
-        self.context.assets.register_image(
-            "yamazaki-1x", "assets/palettes/yamazaki-1x.png"
         )
 
         # load instructions
