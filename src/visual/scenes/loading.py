@@ -328,3 +328,17 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "supergum_item", "assets/items/supergum.png"
         )
+
+        # load particles
+        self.context.assets.register_image(
+            "particle_1x1", "assets/particles/particle_1x1.png"
+        )
+        self.context.assets.register_image(
+            "particle_2x2", "assets/particles/particle_2x2.png"
+        )
+        self.context.assets.register_image(
+            "particle_3x3", "assets/particles/particle_3x3.png"
+        )
+        self.context.assets.register_image(
+            "particle_4x4", "assets/particles/particle_4x4.png"
+        )

@@ -7,7 +7,7 @@ from src.logical.entities import Ghost
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
-from pygame import Surface, Color, Vector2
+from pygame import PixelArray, Surface, Color, Vector2
 
 
 class VisualGhost(Node):
@@ -67,10 +67,14 @@ class VisualGhost(Node):
             17,
             True,
         )
-        particle_img = Surface((1, 1), flags=pygame.SRCALPHA)
-        particle_color = Color("white")
-        particle_color.a = 100
-        particle_img.fill(particle_color)
+        particle_img = context.assets.image("particle_1x1")
+        with PixelArray(particle_img) as array:
+            w, h = particle_img.get_size()
+            for x in range(w):
+                for y in range(h):
+                    color = Color(array[x, y])
+                    color.a = 100
+                    array[x, y] = color
         self.particles = ParticleSystem(
             context,
             particle_img,

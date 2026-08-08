@@ -1,6 +1,8 @@
 """A module for visualizing a maze in a game."""
 
 from src.visual.draw import Draw
+from src.visual.utils.particle import ParticleSystem
+from src.visual.utils.shake import Shake
 from pygame import Surface
 from pygame import Vector2
 from typing import Callable
@@ -8,6 +10,7 @@ from src.visual.utils.timer import Timer
 
 from src.logical.game_event import (
     AteGhostEvent,
+    AteSuperPacgumEvent,
     GameOverEvent,
     GhostRespawnedEvent,
     LevelCompleteEvent,
@@ -199,12 +202,45 @@ class VisualMaze(Node):
                     component.paused = False
 
         self.freeze_timer = Timer(
-            0.3,
+            0.2,
             on_finish=on_freeze_timer_finished,
             on_start=on_freeze_timer_started,
         )
         # add the timer to the root and only freeze the game scene
         context.root_scene.add_child(self.freeze_timer)
+
+        self.shake = Shake(context, 0.5, Vector2(6, 0), Vector2())
+        context.root_scene.add_child(self.shake)
+
+        particle_img = context.assets.image("particle_3x3")
+        # self._set_surface_alpha(particle_img, 100)
+        particle_scatter = 100
+        self.supergum_particles = ParticleSystem(
+            context,
+            particle_img,
+            (
+                Vector2(particle_scatter, particle_scatter),
+                Vector2(-particle_scatter, -particle_scatter),
+            ),
+            (Vector2(0, 0), Vector2(0, 0)),
+            0.2,
+            12,
+        )
+        self.supergum_particles.playing = False
+
+        def on_supergum_particles_timer_start(_) -> None:
+            self.supergum_particles.play()
+
+        def on_supergum_particles_timer_finished(_) -> None:
+            self.supergum_particles.stop()
+
+        self.supergum_particles_timer = Timer(
+            0.2,
+            on_start=on_supergum_particles_timer_start,
+            on_finish=on_supergum_particles_timer_finished,
+        )
+        self.add_child(self.supergum_particles)
+        self.add_child(self.supergum_particles_timer)
 
     def get_surface_for_corner(
         self, cells: list[int]
@@ -293,7 +329,6 @@ class VisualMaze(Node):
             self.cell_size,
             self.logical_maze.current_level.speed,
         )
-        self.player.local_position = Vector2(self.cell_size) / 2
 
         self.add_child(self.player)
 
@@ -309,17 +344,22 @@ class VisualMaze(Node):
 
         for event in events:
             if isinstance(event, PlayerDiedEvent):
-                self.player.hidden = True
-                self.player.direction = None
-                self.player.next_direction = None
+                self.player.die()
+                self.shake.apply()
             if isinstance(event, PlayerRespawnedEvent):
-                self.player.hidden = False
                 self.player.respawn(event.x, event.y)
                 for ghost in self.ghosts:
                     ghost.respawn(ghost.logical_ghost.x, ghost.logical_ghost.y)
             if isinstance(event, AteGhostEvent):
                 self.freeze_timer.start()
                 self.ghosts[event.ghost_id].hidden = True
+            if isinstance(event, AteSuperPacgumEvent):
+                self.supergum_particles.local_position = (
+                    Vector2(event.x, event.y) * self.cell_size
+                    + Vector2(self.cell_size, self.cell_size) / 2
+                )
+                self.supergum_particles_timer.start()
+                self.freeze_timer.start()
             if isinstance(event, GhostRespawnedEvent):
                 self.ghosts[event.ghost_id].respawn(event.x, event.y)
                 self.ghosts[event.ghost_id].hidden = False

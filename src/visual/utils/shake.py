@@ -29,15 +29,15 @@ class Shake(Node):
         self.total_time = total_time
         self.magnitude = magnitude
         self.acceleration = acceleration
-        self.__delta_magnitude = magnitude
-        self.__time: float = 0
+        self.__delta_magnitude = magnitude.copy()
+        self.__time: float = total_time
         self.__target_original_position: Vector2 = Vector2()
 
     def apply(self) -> None:
         """Apply the shake effect to the parent node."""
         if isinstance(self.parent, Node):
             self.__time = 0
-            self.__delta_magnitude = self.magnitude
+            self.__delta_magnitude = self.magnitude.copy()
             self.__target_original_position = self.parent.local_position
 
     def _on_update(self, delta: float) -> None:
@@ -48,8 +48,7 @@ class Shake(Node):
 
         """
         if isinstance(self.parent, Node):
-            self.__delta_magnitude += self.acceleration * delta
-            if self.__time <= self.total_time:
+            if self.__time < self.total_time:
                 rand_value = Vector2()
                 if int(self.__delta_magnitude.x) > 0:
                     rand_value.x = randint(
@@ -66,6 +65,7 @@ class Shake(Node):
                 )
 
                 self.__time += delta
+                self.__delta_magnitude += self.acceleration * delta
 
             else:
                 self.parent.local_position = self.__target_original_position

@@ -23,13 +23,7 @@ class Timer(GameComponent):
         on_start: Callable = lambda _: None,
         repeating: bool = False,
     ) -> None:
-        """Initialize the timer component.
-
-        Args:
-            time (float): The time in seconds after which the callback is triggered.
-            on_finish (Callable): The callback function to be called when the timer finishes.
-            repeating (bool, optional): Whether the timer should repeat after finishing. Defaults to False.
-        """
+        """Initialize the timer component."""
         super().__init__()
         self.time = time
         self.on_start = on_start
