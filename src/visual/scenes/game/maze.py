@@ -268,9 +268,12 @@ class VisualMaze(Node):
             self.ghosts.append(ghost)
             self.add_child(ghost)
 
-        self.player = Player(self.context,
-                             self.logical_maze, self.cell_size,
-                             self.logical_maze.current_level.speed)
+        self.player = Player(
+            self.context,
+            self.logical_maze,
+            self.cell_size,
+            self.logical_maze.current_level.speed,
+        )
         self.player.local_position = Vector2(self.cell_size) / 2
         self.add_child(self.player)
 
@@ -329,22 +332,22 @@ class VisualMaze(Node):
             fill_color=self.context.colors.darkest,
         )
         for x, y in self.logical_maze.pacgums:
-            Draw.circle(
-                self.context.screen,
+            gum_img = self.context.assets.image("gum_item")
+            self.context.screen.blit(
+                gum_img,
                 self.world_position
                 + Vector2(self.cell_size) / 2
-                + Vector2(x, y) * self.cell_size,
-                2,
-                self.context.colors.darker,
+                + Vector2(x, y) * self.cell_size
+                - Vector2(gum_img.get_size()) / 2,
             )
         for x, y in self.logical_maze.super_pacgums:
-            Draw.circle(
-                self.context.screen,
+            supergum_img = self.context.assets.image("supergum_item")
+            self.context.screen.blit(
+                supergum_img,
                 self.world_position
                 + Vector2(self.cell_size) / 2
-                + Vector2(x, y) * self.cell_size,
-                3,
-                self.context.colors.lightest,
+                + Vector2(x, y) * self.cell_size
+                - Vector2(supergum_img.get_size()) / 2,
             )
 
         ft_small = [
@@ -354,8 +357,10 @@ class VisualMaze(Node):
             [0, 0, 1, 0, 1, 0, 0],
             [0, 0, 1, 0, 1, 1, 1],
         ]
-        if (len(ft_small)*2 > self.logical_maze.height
-           or len(ft_small[0])*2 > self.logical_maze.width):
+        if (
+            len(ft_small) * 2 > self.logical_maze.height
+            or len(ft_small[0]) * 2 > self.logical_maze.width
+        ):
             return
         posy = int((self.logical_maze.height - len(ft_small)) / 2)
         posx = int((self.logical_maze.width - len(ft_small[0])) / 2)

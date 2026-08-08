@@ -141,7 +141,7 @@ class Button(Node):
                         .convert_alpha()
                     )
                 elif isinstance(content[i], Surface):
-                    content[i] = content[i].convert_alpha()
+                    content[i] = content[i]
                 w, h = content[i].get_size()
                 size.x += w
                 if h > size.y:
