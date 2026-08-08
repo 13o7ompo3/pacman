@@ -322,3 +322,9 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "background_layer4", "assets/parallax/layer_4.png"
         )
+
+        # load items
+        self.context.assets.register_image("gum_item", "assets/items/gum.png")
+        self.context.assets.register_image(
+            "supergum_item", "assets/items/supergum.png"
+        )
