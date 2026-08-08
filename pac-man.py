@@ -9,6 +9,7 @@ logging.basicConfig(
 def main():
     import os
 
+    # hide pygame hello message
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
     import pygame
     from pygame.time import Clock
