@@ -1,22 +1,5 @@
 import logging
 
-import pygame
-import math
-from pygame.time import Clock
-from pygame import Color, Vector2, Rect
-from src.visual.draw import Draw
-
-from src.db_manager.user import UserManager
-from src.visual import Context, GameComponent, Node
-from src.visual.scenes.game import VisualMaze
-from src.visual.scenes.loading import LoadingScene
-from src.visual.scenes.title import TitleScene
-from src.visual.ui.label import Label
-from src.visual.ui.panel import Panel
-from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
-from src.visual.ui.text_box import TextBox
-from src.visual.utils.asset_manager import AssetManager
-from parser import parse_config
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -24,6 +7,19 @@ logging.basicConfig(
 
 
 def main():
+    import os
+
+    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+    import pygame
+    from pygame.time import Clock
+    from src.visual.draw import Draw
+
+    from src.db_manager.user import UserManager
+    from src.visual import Context
+    from src.visual.scenes.loading import LoadingScene
+    from src.visual.utils.asset_manager import AssetManager
+    from parser import parse_config
+
     pygame.init()
     pygame.font.init()
 
@@ -48,11 +44,15 @@ def main():
             ):
                 context.game_running = False
 
+            # send input events to the node tree
             context.root_scene.handle_input(event)
 
         # update the scene tree
         delta = clock.tick() / 1000
         context.root_scene.update(delta)
+
+        # clear the background
+        Draw.rect(surface, (0, 0), (WIDTH, HEIGHT), context.colors.darkest)
 
         # render the scene tree
         context.root_scene.render()
