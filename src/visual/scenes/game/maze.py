@@ -4,6 +4,7 @@ from src.visual.draw import Draw
 from pygame import Surface
 from pygame import Vector2
 from typing import Callable
+from src.visual.utils.timer import Timer
 
 from src.logical.game_event import (
     AteGhostEvent,
@@ -187,6 +188,24 @@ class VisualMaze(Node):
         }
         self.refresh()
 
+        def on_freeze_timer_started(timer: Timer) -> None:
+            for component in context.root_scene.children:
+                if component is not timer:
+                    component.paused = True
+
+        def on_freeze_timer_finished(timer: Timer) -> None:
+            for component in context.root_scene.children:
+                if component is not timer:
+                    component.paused = False
+
+        self.freeze_timer = Timer(
+            0.3,
+            on_finish=on_freeze_timer_finished,
+            on_start=on_freeze_timer_started,
+        )
+        # add the timer to the root and only freeze the game scene
+        context.root_scene.add_child(self.freeze_timer)
+
     def get_surface_for_corner(
         self, cells: list[int]
     ) -> tuple[Surface, Surface, Surface, Surface]:
@@ -275,6 +294,7 @@ class VisualMaze(Node):
             self.logical_maze.current_level.speed,
         )
         self.player.local_position = Vector2(self.cell_size) / 2
+
         self.add_child(self.player)
 
     def _on_update(self, delta: float) -> None:
@@ -298,6 +318,7 @@ class VisualMaze(Node):
                 for ghost in self.ghosts:
                     ghost.respawn(ghost.logical_ghost.x, ghost.logical_ghost.y)
             if isinstance(event, AteGhostEvent):
+                self.freeze_timer.start()
                 self.ghosts[event.ghost_id].hidden = True
             if isinstance(event, GhostRespawnedEvent):
                 self.ghosts[event.ghost_id].respawn(event.x, event.y)

@@ -17,7 +17,11 @@ class Timer(GameComponent):
     """
 
     def __init__(
-        self, time: float, on_finish: Callable, repeating: bool = False
+        self,
+        time: float,
+        on_finish: Callable,
+        on_start: Callable = lambda _: None,
+        repeating: bool = False,
     ) -> None:
         """Initialize the timer component.
 
@@ -28,6 +32,7 @@ class Timer(GameComponent):
         """
         super().__init__()
         self.time = time
+        self.on_start = on_start
         self.on_finish = on_finish
         self.repeating = repeating
         self.counting = False
@@ -35,6 +40,8 @@ class Timer(GameComponent):
 
     def start(self) -> None:
         """Start the timer."""
+        self.on_start(self)
+        self.elapsed: float = 0
         self.counting = True
 
     def stop(self) -> None:
