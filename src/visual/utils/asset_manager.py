@@ -128,6 +128,10 @@ class AssetManager:
             )
         except FileNotFoundError:
             yield Exception("File not found")
+        except PermissionError:
+            yield Exception("Could not read from file")
+        except IsADirectoryError:
+            yield Exception("File path was a directory")
         except pygame.error as error:
             yield error
         except Exception:

@@ -338,12 +338,14 @@ class GameScene(Node):
     def __init__(self, context: Context) -> None:
         """Initialize a GameScene instance."""
         super().__init__(context)
-        self.logical_maze = LogicalMaze(context.config.levels,
-                                        context.config.points_per_pacgum,
-                                        context.config.points_per_super_pacgum,
-                                        context.config.points_per_ghost,
-                                        context.config.super_pacgum_duration,
-                                        lives=context.config.lives)
+        self.logical_maze = LogicalMaze(
+            context.config.levels,
+            context.config.points_per_pacgum,
+            context.config.points_per_super_pacgum,
+            context.config.points_per_ghost,
+            context.config.super_pacgum_duration,
+            lives=context.config.lives,
+        )
 
         self.maze = VisualMaze(
             context, self.logical_maze, level_up_callback=self._init_widgets
@@ -421,7 +423,7 @@ class GameScene(Node):
         self.gums_bar = InfoBar(
             self.context,
             "GUMS EATEN",
-            "43/200",
+            "",
             self.context.assets.image("gum_icon"),
             int(self.context.width / 2 - self.maze.size.x / 2),
             len(self.logical_maze.pacgums),
@@ -460,8 +462,10 @@ class GameScene(Node):
             self.key_queue.append(event.key)
             if len(self.key_queue) == 5:
                 self.key_queue.pop(0)
-            if (hash(tuple(self.key_queue))
-               in (4686674657469222342, -8634686222373474087)):
+            if hash(tuple(self.key_queue)) in (
+                4686674657469222342,
+                -8634686222373474087,
+            ):
                 self.cheats_enabled = not self.cheats_enabled
             if self.cheats_enabled:
                 if event.key == pygame.K_n:

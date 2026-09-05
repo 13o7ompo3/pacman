@@ -90,6 +90,8 @@ class VisualMaze(Node):
         self.level_up_callback = level_up_callback
         self.logical_maze = logical_maze
         self.cell_size = cell_size
+        self.tick_timer = 0
+        self.time_per_tick = 1 / 60
 
         self.surfaces = {
             (False, False, False, False): (
@@ -317,7 +319,7 @@ class VisualMaze(Node):
                 self.logical_maze,
                 logical_ghost,
                 self.cell_size,
-                self.logical_maze.current_level.speed * 0.75,
+                self.logical_maze.current_level.speed * 0.4,
             )
             ghost.local_position = Vector2(self.cell_size) / 2
             self.ghosts.append(ghost)
@@ -339,7 +341,11 @@ class VisualMaze(Node):
             delta (float): The time elapsed since the last update.
 
         """
-        self.logical_maze.tick_timers()
+        self.tick_timer += delta
+        if self.tick_timer >= self.time_per_tick:
+            self.logical_maze.tick_timers()
+            self.tick_timer = 0
+
         events = self.logical_maze.flush_events()
 
         for event in events:
