@@ -19,7 +19,6 @@ from src.logical.game_event import (
     PowerUpExpiredEvent,
     LevelCompleteEvent,
     GameOverEvent,
-    TimeUpEvent,
     WinEvent,
 )
 from src.logical.entities import Player, Ghost
@@ -377,10 +376,13 @@ class LogicalMaze:
             best_dir = sorted(
                 candidates,
                 key=lambda d: abs((ghost.x + d.value[0]) - px) ** 2
-                + abs((ghost.y + d.value[1]) - py) ** 2, reverse=True
+                + abs((ghost.y + d.value[1]) - py) ** 2,
+                reverse=True,
             )
-        if any((ghost.x + d.value[0]) == px or (ghost.y + d.value[1]) == py
-           for d in best_dir):
+        if any(
+            (ghost.x + d.value[0]) == px or (ghost.y + d.value[1]) == py
+            for d in best_dir
+        ):
             return best_dir[0]
         if random.random() < 0.2:
             return best_dir[1]
@@ -702,7 +704,7 @@ class LogicalMaze:
         # 5. Level clock
         self.elapsed_ticks += 1
         if self.is_time_up:
-            events.add(TimeUpEvent())
+            events.add(GameOverEvent(self.player.score))
 
         if self.is_level_complete:
             if self.next_level():
