@@ -24,8 +24,9 @@ def main():
     pygame.init()
     pygame.font.init()
 
-    WIDTH, HEIGHT = 640, 480
-    surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
+    SCALE = 4
+    WIDTH, HEIGHT = 640 * SCALE, 480 * SCALE
+    surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
     user_manager = UserManager()
 
