@@ -206,5 +206,8 @@ class InstructionsScene(Node):
         self.add_child(previous_button)
         self.add_child(return_button)
 
+    def _on_input(self, event: Event) -> Event | None:
+        return
+
     def _on_draw(self) -> None:
         self.context.screen.fill(self.context.colors.darker)
