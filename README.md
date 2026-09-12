@@ -156,6 +156,9 @@ src
 • an Implementation section with a technical summary of your implementation.
 ## Implementation:
 
+- The project is implemented in Python using the Pygame library for the visual aspects of the game. The logical engine is responsible for handling the game mechanics, including player movement, ghost AI, and collision detection and pending events. The visual engine handles rendering the game elements on the screen.
+- Logic and visual engines are separated into different modules, allowing for better organization and maintainability of the codebase. Communication between the two engines is done through events and shared data structures, allowing for a clear separation of concerns and easier debugging.
+
 • A Project Management section, with a brief overview of how you managed the
 project and a link to the dedicated project management directory.
 ## Project Management:
