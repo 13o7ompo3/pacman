@@ -28,6 +28,7 @@ deploy:
 clean:
 	@printf "\e[32m%s\e[0m\n" "cleaning residual files.."
 	@rm -rf  __pycache__ .mypy_cache
+	@find src/ -name __pycache__ -type d -exec rm -rf {} +
 
 lint:
 	@printf "\e[33m%s\e[0m\n" "checking flake8.."
