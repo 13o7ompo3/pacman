@@ -1,3 +1,5 @@
+SRC_DIR = src
+SRC = $(shell find $(SRC_DIR) -path '*/__pycache__' -prune -o -type f -name '*.py' -print)
 PACKAGE_MANAGER = uv
 CONFIG = config.json
 
@@ -17,7 +19,7 @@ deploy:
 	@$(PACKAGE_MANAGER) run pyinstaller \
 		--onefile \
 		--windowed \
-		--name Spooks \
+		--name Pac-man \
 		--add-data "assets:assets" \
 		pac-man.py
 	@printf "\e[34m%s\e[0m\n" "successfully saved the game to ./dist/Pac-man"
@@ -26,22 +28,20 @@ deploy:
 clean:
 	@printf "\e[32m%s\e[0m\n" "cleaning residual files.."
 	@rm -rf  __pycache__ .mypy_cache
-	@find . -name __pycache__ -type d -exec rm -rf {} +
+	@find src/ -name __pycache__ -type d -exec rm -rf {} +
 
 lint:
 	@printf "\e[33m%s\e[0m\n" "checking flake8.."
-	@$(PACKAGE_MANAGER) run flake8 src/ pac-man.py
+	@$(PACKAGE_MANAGER) run flake8 $(SRC)
 	@printf "\e[33m%s\e[0m\n" "checking mypy.."
-	@$(PACKAGE_MANAGER) run mypy src/ pac-man.py --warn-return-any \
+	@$(PACKAGE_MANAGER) run mypy $(SRC) --warn-return-any \
 		   --warn-unused-ignores \
 		   --ignore-missing-imports \
 		   --disallow-untyped-defs \
 		   --check-untyped-defs
-	@printf "\e[34m%s\e[0m\n" "All files passed linting"
 
 lint-strict:
 	@printf "\e[33m%s\e[0m\n" "checking flake8.."
-	@$(PACKAGE_MANAGER) run flake8 src/ pac-man.py
+	@$(PACKAGE_MANAGER) run flake8 $(SRC)
 	@printf "\e[33m%s\e[0m\n" "checking mypy strict.."
-	@$(PACKAGE_MANAGER) run mypy src/ pac-man.py --strict
-	@printf "\e[34m%s\e[0m\n" "All files passed linting"
+	@$(PACKAGE_MANAGER) run mypy $(SRC) --strict
