@@ -106,52 +106,56 @@ used to generate mazes.
 
 ### Code Structure:
 
-TODO: update this diagram to reflect the actual code structure of your project.
+The sctucture of the files in this project is as follows:
+
 ```
-src
-│
-├── db_manager
+src/
+├── db_manager/
 │   └── user.py
-│
-├── logical
+├── logical/
 │   ├── core_types.py
 │   ├── entities.py
 │   ├── game_event.py
 │   └── maze.py
-│
-└── visual
-    ├── __init__.py
-    ├── draw.py
-    ├── palette.py
-    │
-    ├── scenes
-    │   ├── game
+└── visual/
+    ├── scenes/
+    │   ├── game/
     │   │   ├── __init__.py
     │   │   ├── ghost.py
     │   │   ├── maze.py
     │   │   └── player.py
     │   ├── game_over.py
+    │   ├── instructions.py
     │   ├── leaderboard.py
     │   ├── loading.py
     │   ├── pause.py
     │   ├── root.py
     │   └── title.py
-    │
-    ├── ui
+    ├── ui/
     │   ├── button.py
     │   ├── label.py
     │   ├── panel.py
     │   ├── progress.py
     │   ├── prompt.py
     │   └── text_box.py
-    │
-    └── utils
-        ├── asset_manager.py
-        ├── image.py
-        ├── parallax.py
-        ├── particle.py
-        └── sprite.py
+    ├── utils/
+    │   ├── asset_manager.py
+    │   ├── image.py
+    │   ├── parallax.py
+    │   ├── particle.py
+    │   ├── shake.py
+    │   ├── sprite.py
+    │   └── timer.py
+    ├── __init__.py
+    ├── draw.py
+    └── palette.py
 ```
+
+The project was puposefully split into three main sections:
+
+* **Visual**: which conatains the visual game engine and anything front-end related.
+* **Logical**: the back-end engine handeling the generation and collisions.
+* **Database Manager**: high-score tracking system using json.
 
 • an Implementation section with a technical summary of your implementation.
 ## Implementation:
