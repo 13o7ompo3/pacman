@@ -225,7 +225,7 @@ class InfoBar(Node):
             val (int): The new dynamic text value.
 
         """
-        if reversed:
+        if self.reversed:
             val = self.max_progress - val
         if self.dynamic_text != str(val):
             self.dynamic_text = str(val)
@@ -338,14 +338,19 @@ class GameScene(Node):
     def __init__(self, context: Context) -> None:
         """Initialize a GameScene instance."""
         super().__init__(context)
-        levels = [
-            LevelConfig(width=10, height=10, seed=42),
-            LevelConfig(width=15, height=15, seed=1337),
-        ]
-        self.logical_maze = LogicalMaze(levels)
+        self.logical_maze = LogicalMaze(
+            context.config.levels,
+            context.config.points_per_pacgum,
+            context.config.points_per_super_pacgum,
+            context.config.points_per_ghost,
+            context.config.super_pacgum_duration,
+            lives=context.config.lives,
+        )
+
         self.maze = VisualMaze(
             context, self.logical_maze, level_up_callback=self._init_widgets
         )
+        self.cheats_enabled = False
         self._init_widgets()
 
     def _init_widgets(self) -> None:
@@ -368,12 +373,15 @@ class GameScene(Node):
         pause_button.local_position = Vector2(10, 10)
         gum_timer = GumTimer(self.context, self.logical_maze, 24)
         gum_timer.local_position = Vector2(
-            self.maze.local_position.x - 160, 150
+            self.maze.local_position.x / 2 - gum_timer.label.size.x / 2, 150
         )
 
         lives_left = LivesLeft(self.context, self.logical_maze)
         lives_left.local_position = Vector2(
-            self.maze.local_position.x - 170, self.context.height - 200
+            self.maze.local_position.x / 2
+            - lives_left.lives_text.get_size()[0] / 2
+            + 10,
+            self.context.height - 200,
         )
 
         self.score_title_label = TitleLabel(
@@ -415,7 +423,7 @@ class GameScene(Node):
         self.gums_bar = InfoBar(
             self.context,
             "GUMS EATEN",
-            "43/200",
+            "",
             self.context.assets.image("gum_icon"),
             int(self.context.width / 2 - self.maze.size.x / 2),
             len(self.logical_maze.pacgums),
@@ -426,7 +434,6 @@ class GameScene(Node):
             self.maze.size.x + 10, self.maze.size.y / 2 + 50
         )
         self.key_queue: list[int] = []
-        self.cheats_enabled = False
 
         self.add_child(self.maze)
         self.add_child(self.score_title_label)
@@ -455,17 +462,10 @@ class GameScene(Node):
             self.key_queue.append(event.key)
             if len(self.key_queue) == 5:
                 self.key_queue.pop(0)
-            if self.key_queue == [
-                pygame.K_KP_1,
-                pygame.K_KP_3,
-                pygame.K_KP_3,
-                pygame.K_KP_7,
-            ] or self.key_queue == [
-                pygame.K_1,
-                pygame.K_3,
-                pygame.K_3,
-                pygame.K_7,
-            ]:
+            if hash(tuple(self.key_queue)) in (
+                4686674657469222342,
+                -8634686222373474087,
+            ):
                 self.cheats_enabled = not self.cheats_enabled
             if self.cheats_enabled:
                 if event.key == pygame.K_n:
@@ -487,3 +487,11 @@ class GameScene(Node):
                             ghost.state = GhostState.FRIGHTENED
                             ghost.last_direction = None
         return event
+
+    def _on_draw(self) -> None:
+        Draw.rect(
+            self.context.screen,
+            Vector2(),
+            (self.context.width, self.context.height),
+            fill_color=Color((0, 0, 0, 100)),
+        )

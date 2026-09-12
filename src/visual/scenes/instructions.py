@@ -110,7 +110,9 @@ class InstructionsScene(Node):
                     True,
                 ),
                 "Losing",
-                "In order to lose you must be an absolute loser.",
+                "You have three lives each run. if you run into a ghost while"
+                " not on super pacgum, you lose a life. "
+                "when you lose all three lives, you lose the game.",
             ),
             InstructionPage(
                 context,
@@ -123,7 +125,8 @@ class InstructionsScene(Node):
                     True,
                 ),
                 "Super Pacgum",
-                "When you eat a super pacgum, the ghosts become edible for a short time and they run away from you on sight.",
+                "When you eat a super pacgum, the ghosts become edible"
+                " for a short time and they run away from you on sight.",
             ),
             InstructionPage(
                 context,
@@ -136,7 +139,10 @@ class InstructionsScene(Node):
                     True,
                 ),
                 "Winning",
-                "To win the game you must win the game in order to win.",
+                "You have a default total of 10 levels. "
+                "in order to win a level, you must eat all pacgums. "
+                "once you do, you move on to the next level. "
+                "if you finish all levels, you win the game.",
             ),
         ]
 

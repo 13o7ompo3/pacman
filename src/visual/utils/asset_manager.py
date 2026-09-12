@@ -5,6 +5,10 @@ from typing import Iterator
 from pygame import Surface, image
 import pygame
 from pygame.font import Font
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class AssetManager:
@@ -119,8 +123,15 @@ class AssetManager:
                 del self._registered_fonts[key]
                 self._loaded_fonts[key] = Font(path, size)
                 yield key
+            logger.info(
+                f"{self.total_assets} assets have been successfully loaded"
+            )
         except FileNotFoundError:
             yield Exception("File not found")
+        except PermissionError:
+            yield Exception("Could not read from file")
+        except IsADirectoryError:
+            yield Exception("File path was a directory")
         except pygame.error as error:
             yield error
         except Exception:

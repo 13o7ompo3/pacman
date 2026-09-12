@@ -21,12 +21,14 @@ class TitleScene(Node):
     def __init__(self, context: Context) -> None:
         """Initialize a TitleScene instance."""
         super().__init__(context)
+        context.root_scene.parallax_background.velocity = 60
         button_size = Vector2(130, 38)
         title_text = Label(
             context,
             Vector2(300, 200),
             [("Spo", context.colors.dark), ("oks", context.colors.light)],
             4,
+            font=context.assets.font("title"),
         )
 
         def start_game(_):
@@ -86,6 +88,15 @@ class TitleScene(Node):
             shadow_color=context.colors.darker,
         )
 
+        theme_button = Button(
+            context,
+            context.assets.image("theme_icon"),
+            Vector2(32, 32),
+            context.colors.light,
+            lambda _: context.root_scene.change_theme(),
+            shadow_color=context.colors.dark,
+        )
+
         width, height = context.width, context.height
         title_text.local_position = (
             Vector2(width / 2, height / 6) - title_text.size / 2
@@ -102,9 +113,13 @@ class TitleScene(Node):
         exit_button.local_position = (
             Vector2(width / 2, height * 5 / 6) - exit_button.size / 2
         )
+        theme_button.local_position = (
+            Vector2(width, height) - theme_button.size - Vector2(10, 10)
+        )
 
         self.add_child(title_text)
         self.add_child(start_button)
         self.add_child(leaderboard_button)
         self.add_child(instructions_button)
         self.add_child(exit_button)
+        self.add_child(theme_button)

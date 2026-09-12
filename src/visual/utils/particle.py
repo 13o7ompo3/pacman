@@ -1,5 +1,8 @@
 """This module provides utility classes
 for implementing particle systems in Pygame."""
+
+from posixpath import splitdrive
+from src.visual.utils.sprite import Sprite
 from src.visual import Node, Context
 from pygame import Surface, Vector2
 import random
@@ -8,10 +11,11 @@ from typing import Tuple
 
 class Particle(Node):
     """A class representing a single particle in a particle system."""
+
     def __init__(
         self,
         context: Context,
-        surface: Surface,
+        particle_object: Surface | Sprite,
         position: Vector2,
         velocity: Vector2,
         acceleration: Vector2,
@@ -28,43 +32,60 @@ class Particle(Node):
             lifetime (float): The lifetime of the particle, in seconds.
         """
         super().__init__(context)
-        self.surface = surface
+        if isinstance(particle_object, Sprite):
+            self.particle_object = Sprite(
+                context,
+                particle_object.surface,
+                particle_object.rows,
+                particle_object.cols,
+                particle_object.fps,
+                particle_object.repeat,
+            )
+        else:
+            self.particle_object = particle_object
         self.local_position = position
         self.velocity = velocity
         self.acceleration = acceleration
         self.lifetime = lifetime
         self.age = 0.0
 
-    def _on_update(self, delta_time: float) -> None:
+    def _on_update(self, delta: float) -> None:
         """Update the particle's position and age.
 
         Args:
             delta_time (float): The time elapsed since the last update,
               in seconds.
         """
-        self.age += delta_time
+        self.age += delta
         if self.age >= self.lifetime:
             self.free_from_scene()
             return
 
-        self.local_position += self.velocity * delta_time
-        self.velocity += self.acceleration * delta_time
+        self.local_position += self.velocity * delta
+        self.velocity += self.acceleration * delta
+        if isinstance(self.particle_object, Sprite):
+            self.particle_object.local_position = self.local_position
+            self.particle_object.update(delta)
+            if not self.particle_object.playing:
+                self.free_from_scene()
 
     def _on_draw(self) -> None:
         """Draw the particle on the screen if it is still alive."""
-        if self.age < self.lifetime:
+        if isinstance(self.particle_object, Sprite):
+            self.particle_object.render()
+        else:
             self.context.screen.blit(
-                self.surface,
-                tuple(map(int, self.local_position))
+                self.particle_object, tuple(map(int, self.local_position))
             )
 
 
 class ParticleSystem(Node):
     """A class representing a particle system that emits particles."""
+
     def __init__(
         self,
         context: Context,
-        surface: Surface,
+        particle_object: Surface | Sprite,
         velocity_range: Tuple[Vector2, Vector2],
         acceleration_range: Tuple[Vector2, Vector2],
         lifetime: float,
@@ -84,7 +105,7 @@ class ParticleSystem(Node):
             amount (int): The number of existing particles at any given time.
         """
         super().__init__(context)
-        self.surface = surface
+        self.particle_object = particle_object
         self.velocity_range = velocity_range
         self.acceleration_range = acceleration_range
         self.lifetime = lifetime
@@ -93,27 +114,31 @@ class ParticleSystem(Node):
         self.time_since_last_emission = 0.0
         self.playing = True
 
-    def _on_update(self, delta_time: float) -> None:
+    def _on_update(self, delta: float) -> None:
         if not self.playing:
             return
-        self.time_since_last_emission += delta_time
+        self.time_since_last_emission += delta
         while self.time_since_last_emission >= 1.0 / self.emission_rate:
             self.time_since_last_emission -= 1.0 / self.emission_rate
             velocity = Vector2(
-                random.uniform(self.velocity_range[0].x,
-                               self.velocity_range[1].x),
-                random.uniform(self.velocity_range[0].y,
-                               self.velocity_range[1].y),
+                random.uniform(
+                    self.velocity_range[0].x, self.velocity_range[1].x
+                ),
+                random.uniform(
+                    self.velocity_range[0].y, self.velocity_range[1].y
+                ),
             )
             acceleration = Vector2(
-                random.uniform(self.acceleration_range[0].x,
-                               self.acceleration_range[1].x),
-                random.uniform(self.acceleration_range[0].y,
-                               self.acceleration_range[1].y),
+                random.uniform(
+                    self.acceleration_range[0].x, self.acceleration_range[1].x
+                ),
+                random.uniform(
+                    self.acceleration_range[0].y, self.acceleration_range[1].y
+                ),
             )
             new_particle = Particle(
                 context=self.context,
-                surface=self.surface,
+                particle_object=self.particle_object,
                 position=self.world_position.copy(),
                 velocity=velocity,
                 acceleration=acceleration,

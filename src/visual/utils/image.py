@@ -2,10 +2,10 @@
 This module provides utility functions for image manipulation using Pygame.
 """
 
-import pygame
-from pygame import Surface, Color
-from typing import Tuple
 import numpy as np
+import pygame
+from pygame import Color, Surface
+
 from src.visual.palette import ColorPalette
 
 
@@ -44,9 +44,11 @@ class Image:
             flags=surface.get_flags(),
             depth=surface.get_bitsize(),
         )
-        with pygame.PixelArray(surface) as parent_array:
-            with pygame.PixelArray(child_surface) as child_array:
-                child_array[:] = parent_array[x : x + width, y : y + height]  # type: ignore[index]
+        with (
+            pygame.PixelArray(surface) as parent_array,
+            pygame.PixelArray(child_surface) as child_array,
+        ):
+            child_array[:] = parent_array[x : x + width, y : y + height]  # type: ignore[index]
         return child_surface
 
     @staticmethod
@@ -68,12 +70,14 @@ class Image:
             flags=surface.get_flags(),
             depth=surface.get_bitsize(),
         )
-        with pygame.PixelArray(surface) as original_array:
-            with pygame.PixelArray(flipped_surface) as flipped_array:
-                x_slice = slice(None, None, -1) if flip_x else slice(None)
-                y_slice = slice(None, None, -1) if flip_y else slice(None)
+        with (
+            pygame.PixelArray(surface) as original_array,
+            pygame.PixelArray(flipped_surface) as flipped_array,
+        ):
+            x_slice = slice(None, None, -1) if flip_x else slice(None)
+            y_slice = slice(None, None, -1) if flip_y else slice(None)
 
-                flipped_array[:] = original_array[x_slice, y_slice]  # type: ignore[index]
+            flipped_array[:] = original_array[x_slice, y_slice]  # type: ignore[index]
         return flipped_surface
 
     @staticmethod
@@ -108,7 +112,7 @@ class Image:
     def blit(
         dest_surface: Surface,
         source_surface: Surface,
-        position: Tuple[int, int] | Tuple[float, float] | pygame.Vector2,
+        position: tuple[int, int] | tuple[float, float] | pygame.Vector2,
     ) -> None:
         if isinstance(position, pygame.Vector2):
             position = position.x, position.y
@@ -161,7 +165,7 @@ class Image:
             dst_slice_rgb[:] = blended_rgb.astype(np.uint8)
 
     @staticmethod
-    def fill(surface: Surface, color: Tuple[int, int, int]) -> None:
+    def fill(surface: Surface, color: tuple[int, int, int]) -> None:
         """
         Fill a surface with a solid color.
 
@@ -205,7 +209,7 @@ class Image:
             pixel_array[mask] = new_color
 
     @staticmethod
-    def rgb(color: Color) -> Tuple[int, int, int]:
+    def rgb(color: Color) -> tuple[int, int, int]:
         """
         Convert a Pygame Color object to an RGB tuple.
 
