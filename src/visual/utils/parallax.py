@@ -34,7 +34,7 @@ class ParallaxLayer(Node):
         while self.local_position.x > self.surface.get_width():
             self.local_position.x -= self.surface.get_width()
 
-    def _on_draw(self):
+    def _on_draw(self) -> None:
         """Draw the layer on the screen,
         handling wrapping for continuous scrolling.
         """

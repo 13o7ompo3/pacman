@@ -43,7 +43,7 @@ class Timer(GameComponent):
     def start(self) -> None:
         """Start the timer."""
         self.on_start(self)
-        self.elapsed: float = 0
+        self.elapsed = 0
         self.counting = True
 
     def stop(self) -> None:

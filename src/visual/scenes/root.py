@@ -5,7 +5,7 @@ from copy import deepcopy
 from random import shuffle
 from typing import Iterator
 
-from pygame import KEYUP, K_t, Vector2
+from pygame import KEYUP, Color, K_t, Vector2
 from pygame.event import Event
 
 from src.visual import Context, Node
@@ -35,10 +35,10 @@ class RootScene(Node):
         """
         super().__init__(context)
         self.current_theme_index = 0
-        self.themes = None
+        self.themes: list[ColorPalette] | None = None
         self.loading_iter: Iterator | None = None
 
-    def finish_loading(self):
+    def finish_loading(self) -> None:
         """Load color themes from assets."""
         self.themes = [
             ColorPalette.load_from_surface(
@@ -120,7 +120,8 @@ class RootScene(Node):
                 self.context.assets.image("vintage-voltage-1x"),
             ),
         ]
-        shuffle(self.themes)
+        if self.themes:
+            shuffle(self.themes)
         self.parallax_background = Parallax(
             self.context,
             [
@@ -152,6 +153,7 @@ class RootScene(Node):
         """
         if event.type == KEYUP and event.key == K_t:
             self.change_theme()
+        return None
 
     def change_theme(self) -> None:
         """Change the color theme of the game."""
@@ -215,7 +217,7 @@ class RootScene(Node):
         logger.info("color palette changed successfully")
         self.redraw()
 
-    def _copy_color(self, color1, color2) -> None:
+    def _copy_color(self, color1: Color, color2: Color) -> None:
         """Copy the RGBA values from one color to another.
 
         Args:

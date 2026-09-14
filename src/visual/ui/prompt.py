@@ -139,4 +139,4 @@ class Prompt(Node):
             Event | None: The event if it was not handled, otherwise None.
 
         """
-        return
+        return None

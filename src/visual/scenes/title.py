@@ -36,7 +36,7 @@ class TitleScene(Node):
             font=context.assets.font("title"),
         )
 
-        def start_game(button: Button):
+        def start_game(button: Button) -> None:
             """Start the game by removing the title scene.
 
             Args:
@@ -55,7 +55,7 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def open_leader_board(button: Button):
+        def open_leader_board(button: Button) -> None:
             """Open the leaderboard scene by removing the title scene.
 
             Args:
@@ -72,7 +72,7 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def open_instructions(button: Button):
+        def open_instructions(button: Button) -> None:
             """Open the instructions scene by removing the title scene.
 
             Args:
@@ -93,7 +93,7 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def quit_game(button: Button):
+        def quit_game(button: Button) -> None:
             """Quit the game by setting the game_running flag to False.
 
             Args:

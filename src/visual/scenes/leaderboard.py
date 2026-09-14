@@ -73,3 +73,4 @@ class LeaderBoardScene(Node):
         """
         if event.type == MOUSEBUTTONDOWN:
             self.context.root_scene.remove_child(self)
+        return None

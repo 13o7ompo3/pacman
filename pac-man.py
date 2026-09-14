@@ -22,7 +22,7 @@ def set_icon() -> None:
     except IsADirectoryError:
         logging.error("Icon path was a directory")
         exit(1)
-    except pygame.error | Exception:
+    except (RuntimeError, Exception):
         logging.error("Could not load game icon")
         exit(1)
 

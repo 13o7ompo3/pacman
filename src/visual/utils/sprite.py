@@ -1,5 +1,6 @@
 """This module provides utility classes and functions
 for handling sprites and animations in Pygame."""
+
 from pygame import Surface
 from src.visual import Node, Context
 from src.visual.utils.image import Image
@@ -8,6 +9,7 @@ from typing import Dict, Tuple
 
 class Sprite(Node):
     """A class representing a sprite with animation capabilities."""
+
     def __init__(
         self,
         context: Context,
@@ -103,16 +105,16 @@ class Sprite(Node):
         self.flip_x = flip_x
         self.flip_y = flip_y
 
-    def play(self):
+    def play(self) -> None:
         """Start or resume the sprite's animation."""
         self.playing = True
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the sprite's animation."""
         self.playing = False
 
     def _on_redraw(self) -> None:
         """Split the sprite sheet into individual frames
-            and compute flipped frames."""
+        and compute flipped frames."""
         self.frames = Image.split_surface(self.surface, self.rows, self.cols)
         self.flipped_frames = self.__compute_flipped_frames()

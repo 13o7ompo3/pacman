@@ -67,7 +67,7 @@ class TextBox(Node):
         return self._content
 
     @content.setter
-    def content(self, val: str):
+    def content(self, val: str) -> None:
         """Set the current content of the text box.
 
         Args:
@@ -103,6 +103,7 @@ class TextBox(Node):
                 self.content = self.content[:-1]
             elif len(self.content) < self.length:
                 self.content += event.unicode
+        return None
 
     def _on_draw(self) -> None:
         """Draw the text box on the screen."""

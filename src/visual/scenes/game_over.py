@@ -130,7 +130,7 @@ class LoginForms(Node):
         username_form: InputForm
         password_form: InputForm
 
-        def on_username_submit(input_form: InputForm):
+        def on_username_submit(input_form: InputForm) -> None:
             """Handle the submission of the username form.
 
             Args:
@@ -139,7 +139,7 @@ class LoginForms(Node):
             username_form.hidden = True
             password_form.hidden = False
 
-        def on_password_submit(input_form: InputForm):
+        def on_password_submit(input_form: InputForm) -> None:
             """Handle the submission of the password form.
 
             Args:
@@ -158,7 +158,7 @@ class LoginForms(Node):
 
                 from src.visual.scenes.title import TitleScene
 
-                def go_to_title(button: Button):
+                def go_to_title(button: Button) -> None:
                     """Handle the transition to the title scene.
 
                     Args:
@@ -227,7 +227,7 @@ class LogoutForm(Node):
             Vector2(context.width / 2, context.height * 4 / 8) - score.size / 2
         )
 
-        def on_update(button: Button):
+        def on_update(button: Button) -> None:
             """Handle the update of the user's high score.
 
             Args:
@@ -235,7 +235,7 @@ class LogoutForm(Node):
             """
             from src.visual.scenes.title import TitleScene
 
-            def on_accept(prompt: Prompt):
+            def on_accept(prompt: Prompt) -> None:
                 """Handle the transition to the title scene.
 
                 Args:
@@ -344,13 +344,14 @@ class GameOverScene(Node):
         self.add_child(title)
         self.add_child(score)
 
-        def show_login(button: Button):
+        def show_login(button: Button) -> None:
             """Handle the transition to the login forms.
 
             Args:
                 button (Button): The button that triggered the transition.
             """
-            button.parent.free_from_scene()
+            if isinstance(button.parent, Node):
+                button.parent.free_from_scene()
             login_forms = LoginForms(context, final_score)
             self.add_child(login_forms)
 

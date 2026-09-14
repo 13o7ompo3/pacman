@@ -72,10 +72,12 @@ class GameComponent:
         for child in self.children[::-1]:
             ret = child.handle_input(event)
             if ret is None:
-                return
+                return None
 
         if propagate_event:
             return self._on_input(event)
+        else:
+            return None
 
     def _on_input(self, event: Event) -> Event | None:
         """Override to handle input for component.

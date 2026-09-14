@@ -131,3 +131,4 @@ class Panel(Node):
                     self.on_inside_press(self)
             elif event.type == MOUSEBUTTONUP:
                 self.on_outside_press(self)
+        return None

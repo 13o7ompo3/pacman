@@ -31,7 +31,7 @@ class PauseScene(Node):
 
         width, height = context.width, context.height
 
-        def resume_game(button: Button):
+        def resume_game(button: Button) -> None:
             """Resume the game by removing the pause scene.
 
             Args:
@@ -70,7 +70,7 @@ class PauseScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def go_to_title(button: Button):
+        def go_to_title(button: Button) -> None:
             """Go to the title scene by clearing the root scene.
 
             Args:
