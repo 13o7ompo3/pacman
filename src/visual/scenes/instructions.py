@@ -195,7 +195,7 @@ class InstructionsScene(Node):
         self.current_page_idx = 0
         self.pages[self.current_page_idx].hidden = False
 
-        def go_next(button: Button):
+        def go_next(button: Button) -> None:
             """Go to the next instruction page.
 
             Args:
@@ -272,7 +272,7 @@ class InstructionsScene(Node):
         Returns:
             Event | None: The event if it was not handled, otherwise None.
         """
-        return
+        return None
 
     def _on_draw(self) -> None:
         """Draw the instructions scene."""

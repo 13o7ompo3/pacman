@@ -45,8 +45,8 @@ class Player(Node):
             speed (float): The speed at which the player moves.
         """
         super().__init__(context)
-        self.direction = None
-        self.next_direction = None
+        self.direction: Direction | None = None
+        self.next_direction: Direction | None = None
         self.target_position = (
             Vector2(maze.player.x, maze.player.y) * step_size
             + Vector2(step_size, step_size) / 2
@@ -106,7 +106,6 @@ class Player(Node):
             20,
         )
         particle_img = context.assets.image("particle_4x4")
-        # self._set_surface_alpha(particle_img, 100)
         particle_scatter = 100
         death_particles = ParticleSystem(
             context,
@@ -188,7 +187,7 @@ class Player(Node):
 
         """
         if self.hidden:
-            return
+            return None
         if event.type == KEYDOWN:
             if event.key in {pygame.K_UP, pygame.K_w, pygame.K_k}:
                 self.next_direction = Direction.UP
@@ -201,7 +200,7 @@ class Player(Node):
             if self.direction is None and self.next_direction is not None:
                 self.direction = self.next_direction
                 player_pos = self.maze.player.get_grid_position()
-                if self.maze.can_move(
+                if self.direction and self.maze.can_move(
                     player_pos,
                     (
                         player_pos[0] + self.direction.value[0],
@@ -236,7 +235,7 @@ class Player(Node):
         elif self.direction is not None:
             self.sprites[self.direction].update(delta)
 
-    def _step_target_position(self):
+    def _step_target_position(self) -> None:
         """Update the target position of the player based the direction."""
         if self.direction is not None:
             self.maze.tick_player(self.direction)
@@ -263,7 +262,7 @@ class Player(Node):
         self.direction = None
         self.next_direction = None
 
-    def respawn(self, x, y) -> None:
+    def respawn(self, x: int, y: int) -> None:
         """Respawn the player at the given grid coordinates (x, y).
 
         Args:

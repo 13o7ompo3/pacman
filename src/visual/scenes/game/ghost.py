@@ -55,7 +55,7 @@ class VisualGhost(Node):
         self.target_position = Vector2(ghost.x, ghost.y) * step_size
         self.animated_position = self.target_position.copy()
 
-        self.ghost_step_timer = 0
+        self.ghost_step_timer = 0.0
         self.speed = speed
         self.ghost_step_duration = step_size / self.speed
 
@@ -138,7 +138,7 @@ class VisualGhost(Node):
         )
         current_sprite.render()
 
-    def respawn(self, x, y):
+    def respawn(self, x: int, y: int) -> None:
         """Respawn the ghost at the specified coordinates.
 
         Args:

@@ -89,7 +89,7 @@ class LoadingScene(Node):
             ret = next(self.loading_iter)
             if isinstance(ret, Exception):
 
-                def on_accept(prompt) -> None:
+                def on_accept(prompt: Prompt) -> None:
                     """Handle the acceptance of the error prompt.
 
                     Args:

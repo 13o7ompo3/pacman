@@ -81,14 +81,14 @@ class Label(Node):
             min_size.y = max(min_size.y, surface.get_size()[1])
             min_size.x += surface.get_size()[0]
 
-        text = Surface(min_size, pygame.SRCALPHA)
+        text_surf = Surface(min_size, pygame.SRCALPHA)
         offset = Vector2()
         for surface in text_surfaces:
-            text.blit(surface, offset)
+            text_surf.blit(surface, offset)
             offset.x += surface.get_size()[0]
 
-        text = transform.scale_by(text, self.scale)
-        text_size = Vector2(text.get_size())
+        text_surf = transform.scale_by(text_surf, self.scale)
+        text_size = Vector2(text_surf.get_size())
 
         label_size = Vector2(
             max(self.box_size.x, text_size.x),
@@ -106,4 +106,4 @@ class Label(Node):
             1,
             self.border_radius,
         )
-        self.text.blit(text, label_size / 2 - text_size / 2)
+        self.text.blit(text_surf, label_size / 2 - text_size / 2)

@@ -102,7 +102,7 @@ class VisualMaze(Node):
         self.level_up_callback = level_up_callback
         self.logical_maze = logical_maze
         self.cell_size = cell_size
-        self.tick_timer = 0
+        self.tick_timer = 0.0
         self.time_per_tick = 1 / 60
 
         self.surfaces = {
@@ -297,7 +297,7 @@ class VisualMaze(Node):
             (bool(top), bool(right), bool(bottom), bool(left))
         ]
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Refresh the visual representation of the maze."""
         self.clear_children()
         width, height = self.logical_maze.width, self.logical_maze.height

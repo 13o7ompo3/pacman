@@ -182,7 +182,7 @@ class Draw:
         start_angle: float,
         end_angle: float,
         filled: bool,
-    ):
+    ) -> None:
         """Draws a sector on the given surface.
 
         Args:
@@ -252,7 +252,7 @@ class Draw:
         | tuple[int, int, int]
         | None = None,
         border_width: int = 0,
-    ):
+    ) -> None:
         """Draws a circle on the given surface.
 
         Args:

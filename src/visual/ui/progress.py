@@ -78,7 +78,7 @@ class ProgressBar(Node):
         self.border_width = border_width
         self.border_radius = border_radius
         self.on_finish = on_finish
-        self._progress = 0
+        self._progress = 0.0
         self._animated_progress = 0
 
     @property
@@ -92,7 +92,7 @@ class ProgressBar(Node):
         return self._progress
 
     @progress.setter
-    def progress(self, value: float):
+    def progress(self, value: float) -> None:
         """Set the current progress value.
 
         Args:

@@ -33,7 +33,7 @@ class Particle(Node):
         """
         super().__init__(context)
         if isinstance(particle_object, Sprite):
-            self.particle_object = Sprite(
+            self.particle_object: Sprite | Surface = Sprite(
                 context,
                 particle_object.surface,
                 particle_object.rows,
