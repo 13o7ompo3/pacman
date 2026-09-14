@@ -100,9 +100,6 @@ class RootScene(Node):
                 self.context.assets.image("robots-are-cool-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("roserust-1x"),
-            ),
-            ColorPalette.load_from_surface(
                 self.context.assets.image("sandy-06-1x"),
             ),
             ColorPalette.load_from_surface(

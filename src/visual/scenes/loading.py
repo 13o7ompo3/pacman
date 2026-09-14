@@ -277,9 +277,6 @@ class LoadingScene(Node):
             "robots-are-cool-1x", "assets/palettes/robots-are-cool-1x.png"
         )
         self.context.assets.register_image(
-            "roserust-1x", "assets/palettes/roserust-1x.png"
-        )
-        self.context.assets.register_image(
             "sandy-06-1x", "assets/palettes/sandy-06-1x.png"
         )
         self.context.assets.register_image(
