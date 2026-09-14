@@ -1,10 +1,11 @@
 """A module that defines a Label class."""
 
 import pygame
-from src.visual import Context, Node
 from pygame import Color, Surface, Vector2, transform
-from src.visual.draw import Draw
 from pygame.font import Font
+
+from src.visual import Context, Node
+from src.visual.draw import Draw
 
 
 class Label(Node):
@@ -31,7 +32,18 @@ class Label(Node):
         border_radius: int = 0,
         font: Font | None = None,
     ) -> None:
-        """Initialize a Label instance."""
+        """Initialize a Label instance.
+
+        Args:
+            context (Context): The context in which the label exists.
+            box_size (Vector2): The size of the label box.
+            texts (list[tuple[str, Color]]): A list of tuples of (text, color).
+            scale (int): The scale factor for the text.
+            background_color (Color | None): The background color of the label.
+            border_color (Color | None): The border color of the label.
+            border_radius (int): The radius of the label's border corners.
+            font (Font | None): The font to use for the label text.
+        """
         super().__init__(context)
         self.box_size = box_size
         self.texts = texts

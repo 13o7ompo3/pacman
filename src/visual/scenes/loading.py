@@ -1,7 +1,8 @@
 """The loading scene is responsible for loading all the assets."""
 
 from pygame import Vector2
-from src.visual import Node, Context
+
+from src.visual import Context, Node
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
@@ -20,11 +21,19 @@ class LoadingScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a LoadingScene instance."""
+        """Initialize a LoadingScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
 
         def on_finish(_: ProgressBar) -> None:
-            """Handle the completion of asset loading."""
+            """Handle the completion of asset loading.
+
+            Args:
+                _: ProgressBar: The progress bar that finished loading.
+            """
             self.free_from_scene()
             self.context.root_scene.finish_loading()
             title_scene = TitleScene(context)
@@ -80,8 +89,12 @@ class LoadingScene(Node):
             ret = next(self.loading_iter)
             if isinstance(ret, Exception):
 
-                def on_accept(_) -> None:
-                    """Handle the acceptance of the error prompt."""
+                def on_accept(prompt) -> None:
+                    """Handle the acceptance of the error prompt.
+
+                    Args:
+                        prompt: The prompt that was accepted.
+                    """
                     self.context.game_running = False
 
                 prompt = Prompt(self.context, "Error", str(ret), on_accept)

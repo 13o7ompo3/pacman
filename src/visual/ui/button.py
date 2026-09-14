@@ -19,30 +19,7 @@ from src.visual.draw import Draw
 
 
 class Button(Node):
-    """A class that represents a button.
-
-    Attributes:
-        context (Context): The context of the button.
-        fg_color (Color): The foreground color of the button.
-        bg_color (Color): The background color of the button.
-        border_color (Color): The border color of the button.
-        padding (int): The padding around the content of the button.
-        content (Surface): The content of the button.
-        original_content (Surface): The original content of the button.
-        size (Vector2): The size of the button.
-        thickness (int): The thickness of the button's border.
-        border_radius (int): The radius of the button's border corners.
-        bg_rect (Rect): The rectangle representing the button's background.
-        fg_rect (Rect): The rectangle representing the button's foreground.
-        pressed_rect (Rect): The rectangle representing if the button pressed.
-        content_position (Vector2): The position of the content on the button.
-        pressed_content_position (Vector2): The position when pressed.
-        is_hovered (bool): A flag indicating if the button is hovered.
-        is_pressed (bool): A flag indicating if the button is pressed.
-        is_shortcut_down (bool): A flag indicating if a shortcut key pressed.
-        callback (Callable): The callback function to be called when pressed.
-
-    """
+    """A class that represents a button."""
 
     def __init__(
         self,
@@ -58,7 +35,21 @@ class Button(Node):
         highlight_color: Color | None = None,
         padding: int = 3,
     ) -> None:
-        """Initialize a Button instance."""
+        """Initialize a Button instance.
+
+        Args:
+            context (Context): The context in which the button exists.
+            content (str | Surface | list[Surface | str]): The content.
+            size (Vector2): The size of the button.
+            color (Color): The color of the button.
+            callback (Callable): The callback when the button is pressed.
+            shortcuts (set[int]): A set of key codes that trigger the button.
+            thickness (int): The thickness of the button's border.
+            border_radius (int): The radius of the button's border corners.
+            shadow_color (Color | None): The color of the button's shadow.
+            highlight_color (Color | None): The color of the highlight.
+            padding (int): The padding around the button's content.
+        """
         self.context = context
         self.fg_color = color
         self.bg_color = (

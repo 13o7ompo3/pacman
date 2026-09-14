@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple
 
 
 class Direction(Enum):
@@ -60,8 +59,8 @@ class RenderState:
     player_lives: int
     player_score: int
     ghosts: tuple[tuple[int, int, GhostState, int], ...]
-    pacgums: frozenset[Tuple[int, int]]
-    super_pacgums: frozenset[Tuple[int, int]]
+    pacgums: frozenset[tuple[int, int]]
+    super_pacgums: frozenset[tuple[int, int]]
     ticks_remaining: int
     is_level_complete: bool
     is_game_over: bool

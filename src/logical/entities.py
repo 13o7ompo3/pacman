@@ -1,4 +1,3 @@
-from typing import Tuple, Optional
 from src.logical.core_types import Direction, GhostState, PlayerState
 
 
@@ -17,9 +16,9 @@ class Entity:
         """
         self.x: int = start_x
         self.y: int = start_y
-        self.spawn_point: Tuple[int, int] = (start_x, start_y)
+        self.spawn_point: tuple[int, int] = (start_x, start_y)
 
-    def get_grid_position(self) -> Tuple[int, int]:
+    def get_grid_position(self) -> tuple[int, int]:
         """Get the current grid position of the entity.
 
         Args:
@@ -69,5 +68,5 @@ class Ghost(Entity):
         super().__init__(start_x, start_y)
         self.ghost_id: int = ghost_id
         self.state: GhostState = GhostState.CHASE
-        self.last_direction: Optional[Direction] = None
-        self.next_move: Optional[Direction] = None
+        self.last_direction: Direction | None = None
+        self.next_move: Direction | None = None

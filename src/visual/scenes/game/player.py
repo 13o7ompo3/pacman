@@ -36,7 +36,14 @@ class Player(Node):
         step_size: int,
         speed: float = 80,
     ) -> None:
-        """Initialize the Player object."""
+        """Initialize the Player object.
+
+        Args:
+            context (Context): The context in which the player exists.
+            maze (LogicalMaze): The logical representation of the maze.
+            step_size (int): The size of each step.
+            speed (float): The speed at which the player moves.
+        """
         super().__init__(context)
         self.direction = None
         self.next_direction = None
@@ -114,10 +121,20 @@ class Player(Node):
         )
         death_particles.playing = False
 
-        def on_death_particles_timer_start(_) -> None:
+        def on_death_particles_timer_start(timer: Timer) -> None:
+            """Start the death particles when the timer starts.
+
+            Args:
+                timer (Timer): The timer that started.
+            """
             death_particles.play()
 
-        def on_death_particles_timer_finished(_) -> None:
+        def on_death_particles_timer_finished(timer: Timer) -> None:
+            """Stop the particles and hide the player when the timer finishes.
+
+            Args:
+                timer (Timer): The timer that finished.
+            """
             death_particles.stop()
             self.hidden = True
 
@@ -145,6 +162,13 @@ class Player(Node):
         )
 
     def _set_surface_alpha(self, surface: Surface, alpha: int) -> None:
+        """Set the alpha value of a Pygame Surface.
+
+        Args:
+            surface (Surface): The Pygame Surface to modify.
+            alpha (int): The alpha value to set (0-255).
+
+        """
         with PixelArray(surface) as array:
             w, h = surface.get_size()
             for x in range(w):
@@ -233,6 +257,7 @@ class Player(Node):
                 ) * self.step_size + Vector2(self.step_size) / 2
 
     def die(self) -> None:
+        """Handle the player's death."""
         self.dead = True
         self.death_particles_timer.start()
         self.direction = None

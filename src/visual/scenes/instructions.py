@@ -1,17 +1,35 @@
+from typing import Any
+
 from pygame import Vector2
 from pygame.event import Event
-from src.visual import Node, Context
+
+from src.visual import Context, Node
 from src.visual.draw import Draw
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.utils.sprite import Sprite
-from typing import Any
 
 
 class InstructionPage(Node):
+    """A class representing a single instruction page in the game.
+
+    Attributes:
+        sprite (Sprite): The sprite associated with the instruction page.
+        breaking_text (Label): The label for the "BREAKING" text.
+        text (Label): The label for the instruction description.
+    """
+
     def __init__(
         self, context: Context, sprite: Sprite, heading: str, description: str
     ) -> None:
+        """Initialize an InstructionPage instance.
+
+        Args:
+            context (Context): The context of the game.
+            sprite (Sprite): The sprite associated with the instruction page.
+            heading (str): The heading text for the instruction page.
+            description (str): The description text for the instruction page.
+        """
         super().__init__(context)
 
         self.sprite = sprite
@@ -58,13 +76,23 @@ class InstructionPage(Node):
         self.add_child(self.breaking_text)
 
     def __setattr__(self, name: str, value: Any, /) -> None:
+        """Reset frames when the page is shown.
+
+        Args:
+            name (str): The name of the attribute to set.
+            value (Any): The value to assign to the attribute.
+        """
         ret = super().__setattr__(name, value)
-        if name == "hidden" and hasattr(self, "sprite"):
-            if not self.hidden:
-                self.sprite.current_frame_index = 0
+        if name == "hidden" and hasattr(self, "sprite") and not self.hidden:
+            self.sprite.current_frame_index = 0
         return ret
 
     def _on_update(self, delta: float) -> None:
+        """Update the instruction page.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+        """
         self.text.local_position.x -= 100 * delta
         if (
             -self.text.local_position.x + self.breaking_text.size.x
@@ -73,6 +101,7 @@ class InstructionPage(Node):
             self.text.local_position.x = self.context.width
 
     def _on_draw(self) -> None:
+        """Draw the instruction page."""
         Draw.rect(
             self.context.screen,
             self.breaking_text.local_position,
@@ -82,7 +111,19 @@ class InstructionPage(Node):
 
 
 class InstructionsScene(Node):
+    """A class that represents the instructions scene in the game.
+
+    Attributes:
+        pages (list[InstructionPage]): A list of instruction pages.
+        current_page_idx (int): The index of the currently displayed instruction page.
+    """
+
     def __init__(self, context: Context) -> None:
+        """Initialize an InstructionsScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
 
         self.pages = [
@@ -154,7 +195,12 @@ class InstructionsScene(Node):
         self.current_page_idx = 0
         self.pages[self.current_page_idx].hidden = False
 
-        def go_next(_):
+        def go_next(button: Button):
+            """Go to the next instruction page.
+
+            Args:
+                button (Button): The button that triggered the action.
+            """
             self.pages[self.current_page_idx].hidden = True
             if self.current_page_idx < len(self.pages) - 1:
                 self.current_page_idx += 1
@@ -172,7 +218,12 @@ class InstructionsScene(Node):
             Vector2(context.width - 10, context.height - 10) - next_button.size
         )
 
-        def go_prev(_):
+        def go_prev(button: Button) -> None:
+            """Go to the previous instruction page.
+
+            Args:
+                button (Button): The button that triggered the action.
+            """
             self.pages[self.current_page_idx].hidden = True
             if self.current_page_idx > 0:
                 self.current_page_idx -= 1
@@ -190,7 +241,12 @@ class InstructionsScene(Node):
             10, context.height - previous_button.size.y - 10
         )
 
-        def go_back(_):
+        def go_back(button: Button) -> None:
+            """Go back to the previous scene.
+
+            Args:
+                button (Button): The button that triggered the action.
+            """
             self.free_from_scene()
 
         return_button = Button(
@@ -208,7 +264,16 @@ class InstructionsScene(Node):
         self.add_child(return_button)
 
     def _on_input(self, event: Event) -> Event | None:
+        """Handle input events for the instructions scene.
+
+        Args:
+            event (Event): The input event to handle.
+
+        Returns:
+            Event | None: The event if it was not handled, otherwise None.
+        """
         return
 
     def _on_draw(self) -> None:
+        """Draw the instructions scene."""
         self.context.screen.fill(self.context.colors.darker)

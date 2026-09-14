@@ -7,6 +7,7 @@ logging.basicConfig(
 
 
 def set_icon() -> None:
+    """Set the game icon for the Pygame window."""
     import pygame
 
     try:
@@ -27,6 +28,7 @@ def set_icon() -> None:
 
 
 def main() -> None:
+    """Main function to run the game."""
     import os
 
     # hide pygame hello message

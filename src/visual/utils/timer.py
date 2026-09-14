@@ -1,6 +1,7 @@
 """Define a timer component."""
 
 from collections.abc import Callable
+
 from src.visual import GameComponent
 
 
@@ -23,7 +24,14 @@ class Timer(GameComponent):
         on_start: Callable = lambda _: None,
         repeating: bool = False,
     ) -> None:
-        """Initialize the timer component."""
+        """Initialize the timer component.
+
+        Args:
+            time (float): The time in seconds to run the callback.
+            on_finish (Callable): Callback function to call when timer finishes.
+            on_start (Callable): Callback function to call when timer starts.
+            repeating (bool): Whether the timer should repeat after finishing.
+        """
         super().__init__()
         self.time = time
         self.on_start = on_start

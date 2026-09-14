@@ -1,12 +1,8 @@
 """A module for visualizing a maze in a game."""
 
-from src.visual.draw import Draw
-from src.visual.utils.particle import ParticleSystem
-from src.visual.utils.shake import Shake
-from pygame import Surface
-from pygame import Vector2
 from typing import Callable
-from src.visual.utils.timer import Timer
+
+from pygame import Surface, Vector2
 
 from src.logical.game_event import (
     AteGhostEvent,
@@ -18,11 +14,15 @@ from src.logical.game_event import (
     PlayerRespawnedEvent,
     WinEvent,
 )
-from src.visual import Context, Node
 from src.logical.maze import LogicalMaze
+from src.visual import Context, Node
+from src.visual.draw import Draw
 from src.visual.scenes.game.ghost import VisualGhost
 from src.visual.scenes.game.player import Player
 from src.visual.scenes.game_over import GameOverScene, TerminalState
+from src.visual.utils.particle import ParticleSystem
+from src.visual.utils.shake import Shake
+from src.visual.utils.timer import Timer
 
 
 class Corner(Node):
@@ -38,7 +38,12 @@ class Corner(Node):
         context: Context,
         surface: tuple[Surface, Surface, Surface, Surface],
     ) -> None:
-        """Initialize the Corner object."""
+        """Initialize the Corner object.
+
+        Args:
+            context (Context): The context of the game.
+            surface (tuple): A tuple containing the surfaces for the corner.
+        """
         super().__init__(context)
         self.surface = surface
 
@@ -194,11 +199,21 @@ class VisualMaze(Node):
         self.refresh()
 
         def on_freeze_timer_started(timer: Timer) -> None:
+            """Freeze all compnents except the timer a short duration.
+
+            Args:
+                timer (Timer): The timer that started.
+            """
             for component in context.root_scene.children:
                 if component is not timer:
                     component.paused = True
 
         def on_freeze_timer_finished(timer: Timer) -> None:
+            """Unfreeze all components except the timer after a short duration.
+
+            Args:
+                timer (Timer): The timer that finished.
+            """
             for component in context.root_scene.children:
                 if component is not timer:
                     component.paused = False
@@ -230,10 +245,20 @@ class VisualMaze(Node):
         )
         self.supergum_particles.playing = False
 
-        def on_supergum_particles_timer_start(_) -> None:
+        def on_supergum_particles_timer_start(timer: Timer) -> None:
+            """Start the supergum particles effect.
+
+            Args:
+                timer (Timer): The timer that started.
+            """
             self.supergum_particles.play()
 
-        def on_supergum_particles_timer_finished(_) -> None:
+        def on_supergum_particles_timer_finished(timer: Timer) -> None:
+            """Stop the supergum particles effect.
+
+            Args:
+                timer (Timer): The timer that finished.
+            """
             self.supergum_particles.stop()
 
         self.supergum_particles_timer = Timer(
@@ -272,7 +297,15 @@ class VisualMaze(Node):
         self.size = Vector2(width, height) * self.cell_size
 
         def sample_cell(x: int, y: int) -> int:
-            """Sample a cell in the logical maze, 0 if out of bounds."""
+            """Sample a cell in the logical maze, 0 if out of bounds.
+
+            Args:
+                x (int): The x-coordinate of the cell.
+                y (int): The y-coordinate of the cell.
+
+            Returns:
+                int: The value of the cell, or 0 if out of bounds.
+            """
             if x < 0 and y < 0:
                 return 0
             if x < 0 and y >= height:

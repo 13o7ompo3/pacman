@@ -37,7 +37,16 @@ class VisualGhost(Node):
         step_size: int,
         speed: float,
     ) -> None:
-        """Initialize the VisualGhost object."""
+        """Initialize the VisualGhost object.
+
+        Args:
+            context (Context): The context of the game.
+            id (int): The unique identifier for the ghost.
+            maze (LogicalMaze): The logical representation of the maze.
+            ghost (Ghost): The logical representation of the ghost.
+            step_size (int): The size of each step the ghost takes in the maze.
+            speed (float): The speed at which the ghost moves.
+        """
         super().__init__(context)
         self.id = id
         self.logical_maze = maze

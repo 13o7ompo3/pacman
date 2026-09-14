@@ -1,11 +1,13 @@
 """Defines a text box UI element for user input."""
 
-from pygame import Vector2
-from src.visual.draw import Draw
-from src.visual import Node, Context
-from pygame.event import Event
-import pygame
 from typing import Callable
+
+import pygame
+from pygame import Vector2
+from pygame.event import Event
+
+from src.visual import Context, Node
+from src.visual.draw import Draw
 
 
 class TextBox(Node):
@@ -28,7 +30,14 @@ class TextBox(Node):
         on_submit: Callable,
         is_password: bool = False,
     ) -> None:
-        """Initialize a TextBox instance."""
+        """Initialize a TextBox instance.
+
+        Args:
+            context (Context): The context in which the text box exists.
+            length (int): The maximum length of the text box.
+            on_submit (Callable): A callback function when the user submits.
+            is_password (bool): A flag for password box.
+        """
         super().__init__(context)
         self.is_password = is_password
         self.content = ""

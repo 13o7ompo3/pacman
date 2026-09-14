@@ -1,10 +1,11 @@
 """A module that defines the LeaderBoardScene class."""
 
-from src.visual import Node, Context
+from pygame import MOUSEBUTTONDOWN, Vector2
+from pygame.event import Event
+
+from src.visual import Context, Node
 from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
-from pygame import Vector2, MOUSEBUTTONDOWN
-from pygame.event import Event
 
 
 class LeaderBoardScene(Node):
@@ -16,7 +17,11 @@ class LeaderBoardScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a LeaderBoardScene instance."""
+        """Initialize a LeaderBoardScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
         width, height = context.width, context.height
         panel = Panel(

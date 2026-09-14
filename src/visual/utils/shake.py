@@ -24,7 +24,14 @@ class Shake(Node):
         magnitude: Vector2,
         acceleration: Vector2,
     ) -> None:
-        """Initialize the Shake effect."""
+        """Initialize the Shake effect.
+
+        Args:
+            context (Context): The game context.
+            total_time (float): Total duration of the shake effect.
+            magnitude (Vector2): Initial magnitude of the shake effect.
+            acceleration (Vector2): Acceleration of the shake effect over time.
+        """
         super().__init__(context)
         self.total_time = total_time
         self.magnitude = magnitude

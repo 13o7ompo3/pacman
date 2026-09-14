@@ -25,7 +25,7 @@ class Particle(Node):
 
         Args:
             context (Context): The context in which the particle exists.
-            surface (Surface): The surface representing the particle's image.
+            particle_object (Surface | Sprite): The image of one particle.
             position (Vector2): The initial position of the particle.
             velocity (Vector2): The initial velocity of the particle.
             acceleration (Vector2): The acceleration of the particle.
@@ -53,7 +53,7 @@ class Particle(Node):
         """Update the particle's position and age.
 
         Args:
-            delta_time (float): The time elapsed since the last update,
+            delta (float): The time elapsed since the last update,
               in seconds.
         """
         self.age += delta
@@ -115,6 +115,11 @@ class ParticleSystem(Node):
         self.playing = True
 
     def _on_update(self, delta: float) -> None:
+        """Update the particle system and emit new particles as needed.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+        """
         if not self.playing:
             return
         self.time_since_last_emission += delta
@@ -146,11 +151,10 @@ class ParticleSystem(Node):
             )
             self.add_child(new_particle)
 
-    def _on_draw(self) -> None:
-        pass
-
     def play(self) -> None:
+        """Start emitting particles."""
         self.playing = True
 
     def stop(self) -> None:
+        """Stop emitting particles."""
         self.playing = False

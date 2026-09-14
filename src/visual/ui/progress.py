@@ -4,7 +4,8 @@ from enum import Enum
 from typing import Callable
 
 from pygame import Color, Rect, Vector2
-from src.visual import Node, Context
+
+from src.visual import Context, Node
 from src.visual.draw import Draw
 
 
@@ -50,7 +51,20 @@ class ProgressBar(Node):
         border_radius: int = 7,
         on_finish: Callable = lambda _: None,
     ) -> None:
-        """Initialize a ProgressBar instance."""
+        """Initialize a ProgressBar instance.
+
+        Args:
+            context (Context): The context in which the progress bar exists.
+            size (Vector2): The size of the progress bar.
+            orientation (ProgressBarOrientation): The orientation.
+            progress_color (Color): The color of the progress indicator.
+            total (float): The total value for the progress bar.
+            reversed (bool): Whether the progress bar is reversed.
+            border_color (Color | None): The color of the border.
+            border_width (int): The width of the border.
+            border_radius (int): The radius of the border corners.
+            on_finish (Callable): A callback function when reaching total.
+        """
         super().__init__(context)
 
         self.size = size

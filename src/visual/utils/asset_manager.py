@@ -1,12 +1,12 @@
 """A module for managing game assets."""
 
-from pathlib import Path
-from typing import Iterator
-from pygame import Surface, image
-import pygame
-from pygame.font import Font
 import logging
+from collections.abc import Iterator
+from pathlib import Path
 
+import pygame
+from pygame import Surface, image
+from pygame.font import Font
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +143,8 @@ class AssetManager:
         Args:
             key (str): The key of the image to retrieve.
 
+        Returns:
+            Surface: The loaded image surface.
         """
         return self._loaded_images[key]
 
@@ -152,5 +154,7 @@ class AssetManager:
         Args:
             key (str): The key of the font to retrieve.
 
+        Returns:
+            Font: The loaded font object.
         """
         return self._loaded_fonts[key]
