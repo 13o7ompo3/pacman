@@ -1,4 +1,4 @@
-from pygame import Color, Vector2
+from pygame import Vector2
 from pygame.event import Event
 from src.visual import Node, Context
 from src.visual.draw import Draw
@@ -97,7 +97,8 @@ class InstructionsScene(Node):
                     True,
                 ),
                 "Movements",
-                "To move around you can use arrow keys. vim motions are also supported alongside WASD.",
+                "To move around you can use arrow keys."
+                " vim motions are also supported alongside WASD.",
             ),
             InstructionPage(
                 context,

@@ -2,12 +2,11 @@
 
 from src.logical.core_types import GhostState
 from src.visual.utils.particle import ParticleSystem
-import pygame
 from src.logical.entities import Ghost
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
-from pygame import PixelArray, Surface, Color, Vector2
+from pygame import PixelArray, Color, Vector2
 
 
 class VisualGhost(Node):

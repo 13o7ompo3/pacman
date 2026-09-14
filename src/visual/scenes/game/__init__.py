@@ -1,7 +1,6 @@
 """A module that contains the GameScene class and related UI components."""
 
 from src.logical.core_types import GhostState, PlayerState
-from parser import LevelConfig
 from src.visual import Node, Context
 from src.logical.maze import LogicalMaze
 from src.visual.scenes.game.maze import VisualMaze

@@ -48,7 +48,10 @@ class Image:
             pygame.PixelArray(surface) as parent_array,
             pygame.PixelArray(child_surface) as child_array,
         ):
-            child_array[:] = parent_array[x : x + width, y : y + height]  # type: ignore[index]
+            child_array[:] = parent_array[
+                x:x + width,
+                y:y + height
+            ]  # type: ignore[index]
         return child_surface
 
     @staticmethod
@@ -71,13 +74,13 @@ class Image:
             depth=surface.get_bitsize(),
         )
         with (
-            pygame.PixelArray(surface) as original_array,
-            pygame.PixelArray(flipped_surface) as flipped_array,
+            pygame.PixelArray(surface) as original,
+            pygame.PixelArray(flipped_surface) as flipped,
         ):
             x_slice = slice(None, None, -1) if flip_x else slice(None)
             y_slice = slice(None, None, -1) if flip_y else slice(None)
 
-            flipped_array[:] = original_array[x_slice, y_slice]  # type: ignore[index]
+            flipped[:] = original[x_slice, y_slice]  # type: ignore[index]
         return flipped_surface
 
     @staticmethod

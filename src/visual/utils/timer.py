@@ -1,6 +1,6 @@
 """Define a timer component."""
 
-from typing import Callable
+from collections.abc import Callable
 from src.visual import GameComponent
 
 
@@ -8,8 +8,8 @@ class Timer(GameComponent):
     """A timer component that triggers a callback after a specified time.
 
     Attributes:
-        time (float): The time in seconds after which the callback is triggered.
-        on_finish (Callable): The callback function to be called when the timer finishes.
+        time (float): The time in seconds to run the callback.
+        on_finish (Callable): Callback function to call when timer finishes.
         repeating (bool): Whether the timer should repeat after finishing.
         counting (bool): Whether the timer is currently counting down.
         elapsed (float): The elapsed time since the timer started.

@@ -1,9 +1,9 @@
 """This module provides utility classes for implementing parallax
 scrolling effects in Pygame."""
 
-from src.visual import Node, Context
-from typing import List, Tuple
-from pygame import Vector2, Surface
+from pygame import Surface, Vector2
+
+from src.visual import Context, Node
 
 
 class ParallaxLayer(Node):
@@ -46,12 +46,12 @@ class ParallaxLayer(Node):
 
 
 class Parallax(Node):
-    """A class representing a parallax scrolling effect with multiple layers."""
+    """A class representing a parallax scrolling effect with layers."""
 
     def __init__(
         self,
         context: Context,
-        layers: List[Tuple[Surface, float]],
+        layers: list[tuple[Surface, float]],
         velocity: float,
     ) -> None:
         """Initialize a Parallax instance.

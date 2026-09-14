@@ -1,12 +1,12 @@
 """This module provides utility classes
 for implementing particle systems in Pygame."""
 
-from posixpath import splitdrive
-from src.visual.utils.sprite import Sprite
-from src.visual import Node, Context
-from pygame import Surface, Vector2
 import random
-from typing import Tuple
+
+from pygame import Surface, Vector2
+
+from src.visual import Context, Node
+from src.visual.utils.sprite import Sprite
 
 
 class Particle(Node):
@@ -86,8 +86,8 @@ class ParticleSystem(Node):
         self,
         context: Context,
         particle_object: Surface | Sprite,
-        velocity_range: Tuple[Vector2, Vector2],
-        acceleration_range: Tuple[Vector2, Vector2],
+        velocity_range: tuple[Vector2, Vector2],
+        acceleration_range: tuple[Vector2, Vector2],
         lifetime: float,
         amount: int,
     ) -> None:
