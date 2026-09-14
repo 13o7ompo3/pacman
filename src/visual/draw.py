@@ -135,7 +135,7 @@ class Draw:
         array = PixelArray(surface)
         for x in range(position[0], size[0] + position[0]):
             for y in range(position[1], size[1] + position[1]):
-                array[x, y] = color
+                array[x, y] = color  # type: ignore[index]
         array.close()
 
     @staticmethod
@@ -169,7 +169,7 @@ class Draw:
                     or (min_y_bound <= y < min_y_bound + border_width)
                     or (max_y_bound - border_width < y <= max_y_bound)
                 ):
-                    array[x, y] = color
+                    array[x, y] = color  # type: ignore[index]
         array.close()
 
     @staticmethod
@@ -225,11 +225,17 @@ class Draw:
                     angle = math.atan2(y, -x)
                     in_sector = start_angle <= angle + math.pi <= end_angle
                     if filled and (length <= radius) and in_sector:
-                        array[x + radius, y + radius] = color
+                        array[
+                            x + radius,
+                            y + radius
+                        ] = color  # type: ignore[index]
                     elif (
                         radius - border_width < length <= radius
                     ) and in_sector:
-                        array[x + radius, y + radius] = color
+                        array[
+                            x + radius,
+                            y + radius
+                        ] = color  # type: ignore[index]
 
             array.close()
             Draw.cache[cache_key] = sector
@@ -300,13 +306,19 @@ class Draw:
                 for y in range(-radius, radius + 1):
                     length = math.sqrt((x) ** 2 + (y) ** 2)
                     if fill_color and (length < radius):
-                        array[x + radius, y + radius] = fill_color
+                        array[
+                            x + radius,
+                            y + radius
+                        ] = fill_color  # type: ignore[index]
                     if (
                         border_color
                         and border_width > 0
                         and radius - border_width <= length < radius
                     ):
-                        array[x + radius, y + radius] = border_color
+                        array[
+                            x + radius,
+                            y + radius
+                        ] = border_color  # type: ignore[index]
 
             array.close()
             Draw.cache[cache_key] = circle
@@ -382,7 +394,7 @@ class Draw:
                             in_bottom_border,
                         )
                     ):
-                        array[x, y] = color
+                        array[x, y] = color  # type: ignore[index]
             array.close()
 
         Draw.sector(

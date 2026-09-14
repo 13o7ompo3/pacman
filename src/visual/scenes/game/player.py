@@ -172,9 +172,9 @@ class Player(Node):
             w, h = surface.get_size()
             for x in range(w):
                 for y in range(h):
-                    color = Color(array[x, y])
+                    color = Color(array[x, y])  # type: ignore[index]
                     color.a = alpha
-                    array[x, y] = color
+                    array[x, y] = color  # type: ignore[index]
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the player.

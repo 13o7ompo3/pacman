@@ -80,9 +80,9 @@ class VisualGhost(Node):
             w, h = particle_img.get_size()
             for x in range(w):
                 for y in range(h):
-                    color = Color(array[x, y])
+                    color = Color(array[x, y])  # type: ignore[index]
                     color.a = 100
-                    array[x, y] = color
+                    array[x, y] = color  # type: ignore[index]
         self.particles = ParticleSystem(
             context,
             particle_img,

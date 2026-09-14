@@ -121,22 +121,25 @@ class Button(Node):
         elif isinstance(content, list):
             size = Vector2()
             for i in range(len(content)):
-                if isinstance(content[i], str):
+                text = content[i]
+                if isinstance(text, str):
                     content[i] = (
                         self.context.assets.font("ui")
                         .render(
-                            content[i],
+                            text,
                             False,
                             Color("white"),
                         )
                         .convert_alpha()
                     )
-                elif isinstance(content[i], Surface):
-                    content[i] = content[i]
-                w, h = content[i].get_size()
-                size.x += w
-                if h > size.y:
-                    size.y = h
+                elif isinstance(text, Surface):
+                    content[i] = text
+                surf = content[i]
+                if isinstance(surf, Surface):
+                    w, h = surf.get_size()
+                    size.x += w
+                    if h > size.y:
+                        size.y = h
 
             size += Vector2(
                 self.padding * (len(content) + 1), self.padding * 2
@@ -144,9 +147,11 @@ class Button(Node):
             surface = Surface(size, flags=pygame.SRCALPHA)
             x = self.padding
             for i in range(len(content)):
-                w, h = content[i].get_size()
-                surface.blit(content[i], (x, size.y / 2 - h / 2))
-                x += w + self.padding
+                surf = content[i]
+                if isinstance(surf, Surface):
+                    w, h = surf.get_size()
+                    surface.blit(surf, (x, size.y / 2 - h / 2))
+                    x += w + self.padding
             content = surface
         elif isinstance(content, Surface):
             content = content.convert_alpha()

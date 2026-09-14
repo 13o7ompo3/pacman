@@ -45,13 +45,10 @@ class Image:
             depth=surface.get_bitsize(),
         )
         with (
-            pygame.PixelArray(surface) as parent_array,
-            pygame.PixelArray(child_surface) as child_array,
+            pygame.PixelArray(surface) as parent,
+            pygame.PixelArray(child_surface) as child,
         ):
-            child_array[:] = parent_array[
-                x:x + width,
-                y:y + height
-            ]  # type: ignore[index]
+            child[:] = parent[x:x + width, y:y + height]  # type: ignore[index]
         return child_surface
 
     @staticmethod
