@@ -6,7 +6,27 @@ logging.basicConfig(
 )
 
 
-def main():
+def set_icon() -> None:
+    import pygame
+
+    try:
+        icon_surface = pygame.image.load("assets/icons/icon.png")
+        pygame.display.set_icon(icon_surface)
+    except FileNotFoundError:
+        logging.error("game icon was not found")
+        exit(1)
+    except PermissionError:
+        logging.error("Could not read icon image")
+        exit(1)
+    except IsADirectoryError:
+        logging.error("Icon path was a directory")
+        exit(1)
+    except pygame.error | Exception:
+        logging.error("Could not load game icon")
+        exit(1)
+
+
+def main() -> None:
     import os
 
     # hide pygame hello message
@@ -26,6 +46,8 @@ def main():
 
     WIDTH, HEIGHT = 640, 480
     surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
+
+    set_icon()
 
     user_manager = UserManager()
 
