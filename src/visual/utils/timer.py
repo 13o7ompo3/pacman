@@ -28,7 +28,7 @@ class Timer(GameComponent):
 
         Args:
             time (float): The time in seconds to run the callback.
-            on_finish (Callable): Callback function to call when timer finishes.
+            on_finish (Callable): Callback function to call when timer finishe.
             on_start (Callable): Callback function to call when timer starts.
             repeating (bool): Whether the timer should repeat after finishing.
         """

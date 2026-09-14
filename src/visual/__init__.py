@@ -215,7 +215,7 @@ class Context:
             width (int): The width of the game window.
             height (int): The height of the game window.
             assets (AssetManager): The asset manager for managing assets.
-            user_manager (UserManager): The user manager for handling user data.
+            user_manager (UserManager): The user manager for handling data.
             config (Config): The configuration settings for the game.
         """
         from src.visual.scenes.root import RootScene

@@ -48,7 +48,10 @@ class Image:
             pygame.PixelArray(surface) as parent_array,
             pygame.PixelArray(child_surface) as child_array,
         ):
-            child_array[:] = parent_array[x : x + width, y : y + height]  # type: ignore[index]
+            child_array[:] = parent_array[
+                x:x + width,
+                y:y + height
+            ]  # type: ignore[index]
         return child_surface
 
     @staticmethod

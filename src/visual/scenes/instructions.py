@@ -115,7 +115,7 @@ class InstructionsScene(Node):
 
     Attributes:
         pages (list[InstructionPage]): A list of instruction pages.
-        current_page_idx (int): The index of the currently displayed instruction page.
+        current_page_idx (int): The index of the currently displayed page.
     """
 
     def __init__(self, context: Context) -> None:
