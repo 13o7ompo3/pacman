@@ -37,9 +37,11 @@ lint:
 		   --ignore-missing-imports \
 		   --disallow-untyped-defs \
 		   --check-untyped-defs
+	@printf "\e[34m%s\e[0m\n" "All files passed linting"
 
 lint-strict:
 	@printf "\e[33m%s\e[0m\n" "checking flake8.."
 	@$(PACKAGE_MANAGER) run flake8 src/ pac-man.py
 	@printf "\e[33m%s\e[0m\n" "checking mypy strict.."
 	@$(PACKAGE_MANAGER) run mypy src/ pac-man.py --strict
+	@printf "\e[34m%s\e[0m\n" "All files passed linting"
