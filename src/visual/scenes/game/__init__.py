@@ -29,7 +29,13 @@ class GumTimer(Node):
     def __init__(
         self, context: Context, logical_maze: LogicalMaze, radius: int
     ) -> None:
-        """Initialize a GumTimer instance."""
+        """Initialize a GumTimer instance.
+
+        Args:
+            context (Context): The context of the game.
+            logical_maze (LogicalMaze): The logical maze instance.
+            radius (int): The radius of the timer circle.
+        """
         super().__init__(context)
         self.logical_maze = logical_maze
         self.radius = radius
@@ -315,7 +321,12 @@ class LivesLeft(Node):
     """
 
     def __init__(self, context: "Context", logical_maze: LogicalMaze) -> None:
-        """Initialize a LivesLeft instance."""
+        """Initialize a LivesLeft instance.
+
+        Args:
+            context (Context): The context of the game.
+            logical_maze (LogicalMaze): The logical maze instance.
+        """
         super().__init__(context)
 
         self.logical_maze = logical_maze

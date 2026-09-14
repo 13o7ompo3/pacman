@@ -90,7 +90,14 @@ class VisualMaze(Node):
         cell_size: int = 16,
         level_up_callback: Callable = lambda: None,
     ) -> None:
-        """Initialize the VisualMaze object."""
+        """Initialize the VisualMaze object.
+
+        Args:
+            context (Context): The context of the game.
+            logical_maze (LogicalMaze): The logical representation of the maze.
+            cell_size (int): The size of each cell in the maze.
+            level_up_callback (Callable): A callback function on level up.
+        """
         super().__init__(context)
         self.level_up_callback = level_up_callback
         self.logical_maze = logical_maze

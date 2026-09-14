@@ -4,12 +4,13 @@ in a Pacman game.
 It includes the User class for representing individual users
 and the UserManager class for handling user-related operations
 """
+
 import hashlib
 import json
-from pathlib import Path
-from typing import Dict
-from pydantic import BaseModel, Field, ValidationError, model_validator
 import logging
+from pathlib import Path
+
+from pydantic import BaseModel, Field, ValidationError, model_validator
 
 logger = logging.getLogger(__name__)
 
@@ -23,18 +24,26 @@ class User(BaseModel):
         password (str): The hashed password of the user.
         highscore (int): The highscore of the user.
     """
+
     username: str = Field(..., min_length=1, max_length=10)
     password: str
     highscore: int = Field(default=0, ge=0)
 
     @model_validator(mode="after")
-    def validate_user(self):
+    def validate_user(self) -> "User":
+        """Validates the user data after model initialization.
+
+        Returns:
+            User: The validated user instance.
+        """
         if not self.username.replace(" ", "").isalnum():
             raise ValueError("Username must be alphanumeric and spaces only.")
         return self
 
 
 class UserManager:
+    """Class for managing user data."""
+
     def __init__(self, db_dir: str = "./database") -> None:
         """
         Initializes the UserManager with a specified database directory.
@@ -45,7 +54,7 @@ class UserManager:
         self.loged_in_user: User | None = None
         self.db_dir = Path(db_dir)
         self.db_dir.mkdir(parents=True, exist_ok=True)
-        self.users: Dict[str, User] = {}
+        self.users: dict[str, User] = {}
         self.load_all_users()
 
     def load_all_users(self) -> None:
