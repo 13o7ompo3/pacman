@@ -3,7 +3,8 @@
 		{
 			"width": 14,
 			"height": 14,
-			"seed": 42
+			"seed": 42,
+			"level_max_timer": 12
 		},
 		{
 			"width": 15,

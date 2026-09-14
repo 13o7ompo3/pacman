@@ -1,9 +1,10 @@
 """The pause scene module."""
 
-from src.visual import GameComponent, Node, Context
+from pygame import Vector2
+
+from src.visual import Context, GameComponent, Node
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
-from pygame import Vector2
 from src.visual.ui.panel import Panel
 
 
@@ -18,15 +19,24 @@ class PauseScene(Node):
     def __init__(
         self, context: Context, scene_to_pause: GameComponent
     ) -> None:
-        """Initialize a PauseScene instance."""
+        """Initialize a PauseScene instance.
+
+        Args:
+            context (Context): The context in which the pause scene exists.
+            scene_to_pause (GameComponent): The game component to pause.
+        """
         from src.visual.scenes.title import TitleScene
 
         super().__init__(context)
 
         width, height = context.width, context.height
 
-        def resume_game(_):
-            """Resume the game by removing the pause scene."""
+        def resume_game(button: Button):
+            """Resume the game by removing the pause scene.
+
+            Args:
+                button (Button): The button that was pressed.
+            """
             self.free_from_scene()
             scene_to_pause.paused = False
 
@@ -60,8 +70,12 @@ class PauseScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def go_to_title(_):
-            """Go to the title scene by clearing the root scene."""
+        def go_to_title(button: Button):
+            """Go to the title scene by clearing the root scene.
+
+            Args:
+                button (Button): The button that was pressed.
+            """
             context.root_scene.clear_children()
             context.root_scene.add_child(TitleScene(context))
 

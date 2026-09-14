@@ -2,12 +2,11 @@
 
 from src.logical.core_types import GhostState
 from src.visual.utils.particle import ParticleSystem
-import pygame
 from src.logical.entities import Ghost
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
-from pygame import Surface, Color, Vector2
+from pygame import PixelArray, Color, Vector2
 
 
 class VisualGhost(Node):
@@ -38,7 +37,16 @@ class VisualGhost(Node):
         step_size: int,
         speed: float,
     ) -> None:
-        """Initialize the VisualGhost object."""
+        """Initialize the VisualGhost object.
+
+        Args:
+            context (Context): The context of the game.
+            id (int): The unique identifier for the ghost.
+            maze (LogicalMaze): The logical representation of the maze.
+            ghost (Ghost): The logical representation of the ghost.
+            step_size (int): The size of each step the ghost takes in the maze.
+            speed (float): The speed at which the ghost moves.
+        """
         super().__init__(context)
         self.id = id
         self.logical_maze = maze
@@ -67,10 +75,14 @@ class VisualGhost(Node):
             17,
             True,
         )
-        particle_img = Surface((1, 1), flags=pygame.SRCALPHA)
-        particle_color = Color("white")
-        particle_color.a = 100
-        particle_img.fill(particle_color)
+        particle_img = context.assets.image("particle_1x1")
+        with PixelArray(particle_img) as array:
+            w, h = particle_img.get_size()
+            for x in range(w):
+                for y in range(h):
+                    color = Color(array[x, y])
+                    color.a = 100
+                    array[x, y] = color
         self.particles = ParticleSystem(
             context,
             particle_img,

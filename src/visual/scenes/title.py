@@ -1,13 +1,14 @@
 """The title scene of the game."""
 
 import pygame
-from src.visual import Node, Context
+from pygame import Vector2
+
+from src.visual import Context, Node
 from src.visual.scenes.game import GameScene
-from src.visual.scenes.leaderboard import LeaderBoardScene
 from src.visual.scenes.instructions import InstructionsScene
+from src.visual.scenes.leaderboard import LeaderBoardScene
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
-from pygame import Vector2
 
 
 class TitleScene(Node):
@@ -19,7 +20,11 @@ class TitleScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a TitleScene instance."""
+        """Initialize a TitleScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
         context.root_scene.parallax_background.velocity = 60
         button_size = Vector2(130, 38)
@@ -28,10 +33,15 @@ class TitleScene(Node):
             Vector2(300, 200),
             [("Spo", context.colors.dark), ("oks", context.colors.light)],
             4,
+            font=context.assets.font("title"),
         )
 
-        def start_game(_):
-            """Start the game by removing the title scene."""
+        def start_game(button: Button):
+            """Start the game by removing the title scene.
+
+            Args:
+                button (Button): The button that was pressed.
+            """
             context.root_scene.remove_child(self)
             context.root_scene.add_child(GameScene(context))
 
@@ -45,8 +55,12 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def open_leader_board(_):
-            """Open the leaderboard scene by removing the title scene."""
+        def open_leader_board(button: Button):
+            """Open the leaderboard scene by removing the title scene.
+
+            Args:
+                button (Button): The button that was pressed.
+            """
             context.root_scene.add_child(LeaderBoardScene(context))
 
         leaderboard_button = Button(
@@ -58,7 +72,12 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def open_instructions(_):
+        def open_instructions(button: Button):
+            """Open the instructions scene by removing the title scene.
+
+            Args:
+                button (Button): The button that was pressed.
+            """
             instruction_scene = InstructionsScene(context)
             context.root_scene.add_child(instruction_scene)
 
@@ -74,8 +93,12 @@ class TitleScene(Node):
             shadow_color=context.colors.dark,
         )
 
-        def quit_game(_):
-            """Quit the game by setting the game_running flag to False."""
+        def quit_game(button: Button):
+            """Quit the game by setting the game_running flag to False.
+
+            Args:
+                button (Button): The button that was pressed.
+            """
             context.game_running = False
 
         exit_button = Button(
@@ -85,6 +108,15 @@ class TitleScene(Node):
             context.colors.dark,
             quit_game,
             shadow_color=context.colors.darker,
+        )
+
+        theme_button = Button(
+            context,
+            context.assets.image("theme_icon"),
+            Vector2(32, 32),
+            context.colors.light,
+            lambda _: context.root_scene.change_theme(),
+            shadow_color=context.colors.dark,
         )
 
         width, height = context.width, context.height
@@ -103,9 +135,13 @@ class TitleScene(Node):
         exit_button.local_position = (
             Vector2(width / 2, height * 5 / 6) - exit_button.size / 2
         )
+        theme_button.local_position = (
+            Vector2(width, height) - theme_button.size - Vector2(10, 10)
+        )
 
         self.add_child(title_text)
         self.add_child(start_button)
         self.add_child(leaderboard_button)
         self.add_child(instructions_button)
         self.add_child(exit_button)
+        self.add_child(theme_button)

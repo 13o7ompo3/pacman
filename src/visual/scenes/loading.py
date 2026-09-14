@@ -1,7 +1,8 @@
 """The loading scene is responsible for loading all the assets."""
 
 from pygame import Vector2
-from src.visual import Node, Context
+
+from src.visual import Context, Node
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
@@ -20,11 +21,19 @@ class LoadingScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a LoadingScene instance."""
+        """Initialize a LoadingScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
 
         def on_finish(_: ProgressBar) -> None:
-            """Handle the completion of asset loading."""
+            """Handle the completion of asset loading.
+
+            Args:
+                _: ProgressBar: The progress bar that finished loading.
+            """
             self.free_from_scene()
             self.context.root_scene.finish_loading()
             title_scene = TitleScene(context)
@@ -32,7 +41,7 @@ class LoadingScene(Node):
 
         # only load the font for the loading screen
         context.assets.register_font(
-            "ui", "assets/perfect_dos_vga_437.ttf", 16
+            "ui", "assets/fonts/perfect_dos_vga_437.ttf", 16
         )
         context.assets.load()
         self._register_assets()
@@ -65,8 +74,6 @@ class LoadingScene(Node):
         )
 
         self.loading_iter = self.context.assets.load_progress()
-        self.time = 0
-        self.load_time_per_item = 0
 
         self.add_child(label)
         self.add_child(self.progress_bar)
@@ -78,28 +85,33 @@ class LoadingScene(Node):
             delta (float): The time elapsed since the last update.
 
         """
-        if self.time >= self.load_time_per_item:
-            try:
-                ret = next(self.loading_iter)
-                if isinstance(ret, Exception):
+        try:
+            ret = next(self.loading_iter)
+            if isinstance(ret, Exception):
 
-                    def on_accept(_) -> None:
-                        """Handle the acceptance of the error prompt."""
-                        self.context.game_running = False
+                def on_accept(prompt) -> None:
+                    """Handle the acceptance of the error prompt.
 
-                    prompt = Prompt(self.context, "Error", str(ret), on_accept)
-                    self.add_child(prompt)
-                else:
-                    self.progress_bar.progress += 1
-            except StopIteration:
-                pass
+                    Args:
+                        prompt: The prompt that was accepted.
+                    """
+                    self.context.game_running = False
 
-            self.time = 0
-
-        self.time += delta
+                prompt = Prompt(self.context, "Error", str(ret), on_accept)
+                self.add_child(prompt)
+            else:
+                self.progress_bar.progress += 1
+        except StopIteration:
+            pass
 
     def _register_assets(self) -> None:
         """Register all the assets to be loaded."""
+
+        # load fonts
+        self.context.assets.register_font(
+            "title", "assets/fonts/alagard.ttf", 16
+        )
+
         # load animations
         self.context.assets.register_image("player_up", "assets/player/up.png")
         self.context.assets.register_image(
@@ -168,7 +180,7 @@ class LoadingScene(Node):
             "tile_full_rect", "assets/tiles/full_rect.png"
         )
 
-        # load tiles
+        # load icons
         self.context.assets.register_image(
             "clock_icon", "assets/icons/clock.png"
         )
@@ -204,35 +216,93 @@ class LoadingScene(Node):
         self.context.assets.register_image(
             "previous_icon", "assets/icons/previous.png"
         )
+        self.context.assets.register_image(
+            "theme_icon", "assets/icons/theme.png"
+        )
 
         # load palettes
+        # self.context.assets.register_image(
+        #     "oil-6_palette", "assets/palettes/oil-6-1x.png"
+        # )
         self.context.assets.register_image(
-            "oil-6_palette", "assets/palettes/oil-6-1x.png"
+            "6353yh4-redux-1x", "assets/palettes/6353yh4-redux-1x.png"
         )
         self.context.assets.register_image(
-            "cryptic-ocean_palette", "assets/palettes/cryptic-ocean-1x.png"
+            "6-violets-1x", "assets/palettes/6-violets-1x.png"
         )
         self.context.assets.register_image(
-            "robots-are-cool_palette", "assets/palettes/robots-are-cool-1x.png"
+            "ash-persimmon-6-1x", "assets/palettes/ash-persimmon-6-1x.png"
         )
         self.context.assets.register_image(
-            "molten_palette", "assets/palettes/molten-1x.png"
+            "black-and-white-6-1x", "assets/palettes/black-and-white-6-1x.png"
         )
         self.context.assets.register_image(
-            "enbydiade6_palette", "assets/palettes/enbydiade6-1x.png"
+            "blackhole6-1x", "assets/palettes/blackhole6-1x.png"
         )
         self.context.assets.register_image(
-            "vintage-voltage_palette", "assets/palettes/vintage-voltage-1x.png"
+            "bluberry-6-1x", "assets/palettes/bluberry-6-1x.png"
         )
         self.context.assets.register_image(
-            "bluberry-6_palette", "assets/palettes/bluberry-6-1x.png"
+            "blue-screen-of-palette-1x",
+            "assets/palettes/blue-screen-of-palette-1x.png",
         )
         self.context.assets.register_image(
-            "grape-soda-arcade_palette",
-            "assets/palettes/grape-soda-arcade-1x.png",
+            "cave6-1x", "assets/palettes/cave6-1x.png"
         )
         self.context.assets.register_image(
-            "fistat6_palette", "assets/palettes/fistat6-1x.png"
+            "cryptic-ocean-1x", "assets/palettes/cryptic-ocean-1x.png"
+        )
+        self.context.assets.register_image(
+            "depths-1x", "assets/palettes/depths-1x.png"
+        )
+        self.context.assets.register_image(
+            "enbydiade6-1x", "assets/palettes/enbydiade6-1x.png"
+        )
+        self.context.assets.register_image(
+            "fistat6-1x", "assets/palettes/fistat6-1x.png"
+        )
+        self.context.assets.register_image(
+            "grape-soda-arcade-1x", "assets/palettes/grape-soda-arcade-1x.png"
+        )
+        self.context.assets.register_image(
+            "ice-cream-land-1x", "assets/palettes/ice-cream-land-1x.png"
+        )
+        self.context.assets.register_image(
+            "icywitch-1x", "assets/palettes/icywitch-1x.png"
+        )
+        self.context.assets.register_image(
+            "inkpink-1x", "assets/palettes/inkpink-1x.png"
+        )
+        self.context.assets.register_image(
+            "lavendertown-1x", "assets/palettes/lavendertown-1x.png"
+        )
+        self.context.assets.register_image(
+            "midnight-epipelagic-1x",
+            "assets/palettes/midnight-epipelagic-1x.png",
+        )
+        self.context.assets.register_image(
+            "monometalic-1x", "assets/palettes/monometalic-1x.png"
+        )
+        self.context.assets.register_image(
+            "noelles-room-1x", "assets/palettes/noelles-room-1x.png"
+        )
+        self.context.assets.register_image(
+            "robots-are-cool-1x", "assets/palettes/robots-are-cool-1x.png"
+        )
+        self.context.assets.register_image(
+            "sandy-06-1x", "assets/palettes/sandy-06-1x.png"
+        )
+        self.context.assets.register_image(
+            "sepia6-1x", "assets/palettes/sepia6-1x.png"
+        )
+        self.context.assets.register_image(
+            "spooky6-1x", "assets/palettes/spooky6-1x.png"
+        )
+        self.context.assets.register_image(
+            "teaviie-1x", "assets/palettes/teaviie-1x.png"
+        )
+        self.context.assets.register_image(
+            "vintage-voltage-1x", "assets/palettes/vintage-voltage-1x.png"
         )
 
         # load instructions
@@ -261,4 +331,24 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "background_layer4", "assets/parallax/layer_4.png"
+        )
+
+        # load items
+        self.context.assets.register_image("gum_item", "assets/items/gum.png")
+        self.context.assets.register_image(
+            "supergum_item", "assets/items/supergum.png"
+        )
+
+        # load particles
+        self.context.assets.register_image(
+            "particle_1x1", "assets/particles/particle_1x1.png"
+        )
+        self.context.assets.register_image(
+            "particle_2x2", "assets/particles/particle_2x2.png"
+        )
+        self.context.assets.register_image(
+            "particle_3x3", "assets/particles/particle_3x3.png"
+        )
+        self.context.assets.register_image(
+            "particle_4x4", "assets/particles/particle_4x4.png"
         )

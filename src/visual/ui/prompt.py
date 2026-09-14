@@ -33,7 +33,14 @@ class Prompt(Node):
         message: str,
         on_accept: Callable,
     ) -> None:
-        """Initialize a Prompt instance."""
+        """Initialize a Prompt instance.
+
+        Args:
+            context (Context): The context in which the prompt exists.
+            title (str): The title of the prompt.
+            message (str): The message of the prompt.
+            on_accept (Callable): The function called when accepted.
+        """
         super().__init__(context)
         self.title = self.context.assets.font("ui").render(
             title, False, context.colors.lightest
@@ -86,7 +93,12 @@ class Prompt(Node):
             (padding.x, padding.y * 3 + self.title.get_size()[1]),
         )
 
-        def on_accept_fn(_):
+        def on_accept_fn(button: Button) -> None:
+            """Handle the acceptance of the prompt.
+
+            Args:
+                button (Button): The button that was clicked.
+            """
             on_accept(self)
             self.free_from_scene()
 

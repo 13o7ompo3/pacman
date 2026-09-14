@@ -11,7 +11,6 @@ __all__ = [
     "PowerUpExpiredEvent",
     "LevelCompleteEvent",
     "GameOverEvent",
-    "TimeUpEvent",
 ]
 
 
@@ -29,6 +28,7 @@ class AtePacgumEvent(GameEvent):
         y: Row of the eaten pellet.
         score_gained: Points added this event.
     """
+
     x: int
     y: int
     score_gained: int
@@ -43,6 +43,7 @@ class AteSuperPacgumEvent(GameEvent):
         y: Row of the eaten pellet.
         score_gained: Points added this event.
     """
+
     x: int
     y: int
     score_gained: int
@@ -58,6 +59,7 @@ class AteGhostEvent(GameEvent):
         y: Row where the ghost was eaten.
         score_gained: Points added this event.
     """
+
     ghost_id: int
     x: int
     y: int
@@ -72,6 +74,7 @@ class PlayerDiedEvent(GameEvent):
         lives_remaining: Lives left after this death (always > 0 here;
             use GameOverEvent when lives reach zero).
     """
+
     lives_remaining: int
 
 
@@ -83,6 +86,7 @@ class PlayerRespawnedEvent(GameEvent):
         x: Column of the respawn position.
         y: Row of the respawn position.
     """
+
     x: int
     y: int
 
@@ -96,6 +100,7 @@ class GhostRespawnedEvent(GameEvent):
         x: Column of the ghost's spawn corner.
         y: Row of the ghost's spawn corner.
     """
+
     ghost_id: int
     x: int
     y: int
@@ -119,6 +124,7 @@ class GameOverEvent(GameEvent):
     Attributes:
         final_score: Total score at the moment of game over.
     """
+
     final_score: int
 
 
@@ -129,9 +135,5 @@ class WinEvent(GameEvent):
     Attributes:
         final_score: Total score at the moment of winning.
     """
+
     final_score: int
-
-
-@dataclass(frozen=True)
-class TimeUpEvent(GameEvent):
-    """Level time limit reached."""

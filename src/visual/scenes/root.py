@@ -1,15 +1,21 @@
 """Root scene for the game."""
 
+import logging
+from copy import deepcopy
+from random import shuffle
 from typing import Iterator
-from pygame import K_t, KEYUP, Vector2
+
+from pygame import KEYUP, K_t, Vector2
 from pygame.event import Event
-from src.visual import Node, Context
+
+from src.visual import Context, Node
+from src.visual.palette import ColorPalette
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.prompt import Prompt
 from src.visual.utils.image import Image
-from src.visual.palette import ColorPalette
-from copy import deepcopy
 from src.visual.utils.parallax import Parallax
+
+logger = logging.getLogger(__name__)
 
 
 class RootScene(Node):
@@ -22,7 +28,11 @@ class RootScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a RootScene instance."""
+        """Initialize a RootScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
         self.current_theme_index = 0
         self.themes = None
@@ -32,30 +42,85 @@ class RootScene(Node):
         """Load color themes from assets."""
         self.themes = [
             ColorPalette.load_from_surface(
-                self.context.assets.image("cryptic-ocean_palette")
+                self.context.assets.image("6353yh4-redux-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("robots-are-cool_palette")
+                self.context.assets.image("6-violets-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("molten_palette")
+                self.context.assets.image("ash-persimmon-6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("enbydiade6_palette")
+                self.context.assets.image("black-and-white-6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("vintage-voltage_palette")
+                self.context.assets.image("blackhole6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("bluberry-6_palette")
+                self.context.assets.image("bluberry-6-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("grape-soda-arcade_palette")
+                self.context.assets.image("blue-screen-of-palette-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("fistat6_palette")
+                self.context.assets.image("cave6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("cryptic-ocean-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("depths-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("enbydiade6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("fistat6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("grape-soda-arcade-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("ice-cream-land-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("icywitch-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("inkpink-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("lavendertown-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("midnight-epipelagic-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("monometalic-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("noelles-room-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("robots-are-cool-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("sandy-06-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("sepia6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("spooky6-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("teaviie-1x"),
+            ),
+            ColorPalette.load_from_surface(
+                self.context.assets.image("vintage-voltage-1x"),
             ),
         ]
+        shuffle(self.themes)
         self.parallax_background = Parallax(
             self.context,
             [
@@ -86,9 +151,19 @@ class RootScene(Node):
 
         """
         if event.type == KEYUP and event.key == K_t:
-            self.loading_iter = self.cycle_theme()
+            self.change_theme()
+
+    def change_theme(self) -> None:
+        """Change the color theme of the game."""
+        self.loading_iter = self.cycle_theme()
 
     def cycle_theme(self) -> Iterator:
+        """Cycle through the available color themes.
+
+        Yields:
+            Iterator: An iterator for the theme cycling process.
+
+        """
         loading_alert = Prompt(
             self.context,
             "Loading new theme..",
@@ -137,6 +212,7 @@ class RootScene(Node):
 
         loading_alert.free_from_scene()
         loading_bar.free_from_scene()
+        logger.info("color palette changed successfully")
         self.redraw()
 
     def _copy_color(self, color1, color2) -> None:
@@ -153,6 +229,12 @@ class RootScene(Node):
         color1.a = color2.a
 
     def _on_update(self, delta: float) -> None:
+        """Update the root scene.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         if self.loading_iter is not None:
             try:
                 next(self.loading_iter)

@@ -1,14 +1,16 @@
 """A module representing the game over scene and related UI components."""
 
 from enum import Enum
-from pygame import Vector2
-from src.visual import Node, Context
-from src.visual.ui.label import Label
-from src.visual.ui.button import Button
-from src.visual.ui.panel import Panel
-from src.visual.ui.text_box import TextBox
-from src.visual.ui.prompt import Prompt
 from typing import Callable
+
+from pygame import Vector2
+
+from src.visual import Context, Node
+from src.visual.ui.button import Button
+from src.visual.ui.label import Label
+from src.visual.ui.panel import Panel
+from src.visual.ui.prompt import Prompt
+from src.visual.ui.text_box import TextBox
 
 
 class TerminalState(Enum):
@@ -39,7 +41,14 @@ class InputForm(Node):
         is_password: bool,
         on_submit: Callable,
     ) -> None:
-        """Initialize the InputForm object."""
+        """Initialize the InputForm object.
+
+        Args:
+            context (Context): The context of the game.
+            label_text (str): The text to show as the label for the input form.
+            is_password (bool): A flag indicating if the input is a password.
+            on_submit (Callable): Function to call when the input is submitted.
+        """
         from src.visual.scenes.title import TitleScene
 
         super().__init__(context)
@@ -61,8 +70,12 @@ class InputForm(Node):
             - self.text_box.size / 2
         )
 
-        def go_to_title(_):
-            """Handle the transition to the title scene."""
+        def go_to_title(button: Button) -> None:
+            """Handle the transition to the title scene.
+
+            Args:
+                button (Button): The button that triggered the transition.
+            """
             context.root_scene.clear_children()
             context.root_scene.add_child(TitleScene(context))
 
@@ -103,8 +116,13 @@ class LoginForms(Node):
 
     """
 
-    def __init__(self, context: "Context", final_score: int) -> None:
-        """Initialize the LoginForms object."""
+    def __init__(self, context: Context, final_score: int) -> None:
+        """Initialize the LoginForms object.
+
+        Args:
+            context (Context): The context of the game.
+            final_score (int): The final score of the player.
+        """
         super().__init__(context)
 
         user_manager = self.context.user_manager
@@ -112,13 +130,21 @@ class LoginForms(Node):
         username_form: InputForm
         password_form: InputForm
 
-        def on_username_submit(_):
-            """Handle the submission of the username form."""
+        def on_username_submit(input_form: InputForm):
+            """Handle the submission of the username form.
+
+            Args:
+                input_form (InputForm): The input form that was submitted.
+            """
             username_form.hidden = True
             password_form.hidden = False
 
-        def on_password_submit(_):
-            """Handle the submission of the password form."""
+        def on_password_submit(input_form: InputForm):
+            """Handle the submission of the password form.
+
+            Args:
+                input_form (InputForm): The input form that was submitted.
+            """
             try:
                 if user_manager.is_existing_user(username_form.value):
                     user_manager.authenticate_user(
@@ -132,8 +158,12 @@ class LoginForms(Node):
 
                 from src.visual.scenes.title import TitleScene
 
-                def go_to_title(_):
-                    """Handle the transition to the title scene."""
+                def go_to_title(button: Button):
+                    """Handle the transition to the title scene.
+
+                    Args:
+                        button (Button): The button that was pressed.
+                    """
                     context.root_scene.clear_children()
                     context.root_scene.add_child(TitleScene(context))
 
@@ -175,9 +205,15 @@ class LogoutForm(Node):
     """
 
     def __init__(
-        self, context: "Context", username: str, on_logout: Callable
+        self, context: Context, username: str, on_logout: Callable
     ) -> None:
-        """Initialize the LogoutForm object."""
+        """Initialize the LogoutForm object.
+
+        Args:
+            context (Context): The context of the game.
+            username (str): The username of the logged-in user.
+            on_logout (Callable): Function to call when the user logs out.
+        """
         super().__init__(context)
         score = Label(
             context,
@@ -191,12 +227,20 @@ class LogoutForm(Node):
             Vector2(context.width / 2, context.height * 4 / 8) - score.size / 2
         )
 
-        def on_update(_):
-            """Handle the update of the user's high score."""
+        def on_update(button: Button):
+            """Handle the update of the user's high score.
+
+            Args:
+                button (Button): The button that triggered the update.
+            """
             from src.visual.scenes.title import TitleScene
 
-            def on_accept(_):
-                """Handle the transition to the title scene."""
+            def on_accept(prompt: Prompt):
+                """Handle the transition to the title scene.
+
+                Args:
+                    prompt (Prompt): The prompt that was accepted.
+                """
                 context.root_scene.clear_children()
                 context.root_scene.add_child(TitleScene(context))
 
@@ -250,7 +294,13 @@ class GameOverScene(Node):
     def __init__(
         self, context: Context, final_score: int, state: TerminalState
     ) -> None:
-        """Initialize the GameOverScene object."""
+        """Initialize the GameOverScene object.
+
+        Args:
+            context (Context): The context of the game.
+            final_score (int): The final score of the player.
+            state (TerminalState): The terminal state of the game.
+        """
         super().__init__(context)
         panel = Panel(
             context,
@@ -294,8 +344,12 @@ class GameOverScene(Node):
         self.add_child(title)
         self.add_child(score)
 
-        def show_login(button):
-            """Handle the transition to the login forms."""
+        def show_login(button: Button):
+            """Handle the transition to the login forms.
+
+            Args:
+                button (Button): The button that triggered the transition.
+            """
             button.parent.free_from_scene()
             login_forms = LoginForms(context, final_score)
             self.add_child(login_forms)
