@@ -1,13 +1,12 @@
 import logging
 import random
 
-from mazegenerator import MazeGenerator  # type: ignore[import-not-found]
+from mazegenerator import MazeGenerator
 from parser import LevelConfig
 from src.logical.core_types import (
     Direction,
     GhostState,
     PlayerState,
-    RenderState,
 )
 from src.logical.entities import Ghost, Player
 from src.logical.game_event import (
@@ -71,7 +70,7 @@ class LogicalMaze:
         self.current_level = levels[0]
         self.width: int = self.current_level.width
         self.height: int = self.current_level.height
-        self.base_seed: int = self.current_level.seed
+        self.base_seed: int = int(self.current_level.seed)
         self.points_pacgum: int = points_pacgum
         self.points_super_pacgum: int = points_super_pacgum
         self.points_ghost: int = points_ghost
@@ -107,7 +106,7 @@ class LogicalMaze:
         self.current_level = self.levels[level_idx]
         self.width = self.current_level.width
         self.height = self.current_level.height
-        self.base_seed = self.current_level.seed
+        self.base_seed = int(self.current_level.seed)
         self.max_ticks = self.current_level.level_max_time * 60
 
         seed = self.base_seed
@@ -428,39 +427,6 @@ class LogicalMaze:
             ghost.x, ghost.y = ghost.spawn_point
             ghost.state = GhostState.CHASE
             ghost.last_direction = None
-
-    def get_render_state(self) -> RenderState:
-        """Return a read-only snapshot of the current render state.
-
-        Returns:
-            RenderState: A snapshot of the current render state.
-        """
-        return RenderState(
-            player_x=self.player.x,
-            player_y=self.player.y,
-            player_state=self.player.state,
-            player_facing=self.player.facing,
-            player_lives=self.player.lives,
-            player_score=self.player.score,
-            player_invulnerable=self.is_player_invulnerable,
-            ghosts=tuple(
-                (
-                    ghost.x,
-                    ghost.y,
-                    ghost.state,
-                    ghost.ghost_id,
-                    ghost.respawn_timer,
-                )
-                for ghost in self.ghosts
-            ),
-            pacgums=frozenset(self.pacgums),
-            super_pacgums=frozenset(self.super_pacgums),
-            ticks_remaining=self.ticks_remaining,
-            death_countdown=self._death_countdown,
-            is_level_complete=self.is_level_complete,
-            is_game_over=self.is_game_over,
-            time_up=self.is_time_up,
-        )
 
     def _resolve_item_collisions(self) -> set[GameEvent]:
         """Check if the player landed on a pacgum.

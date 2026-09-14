@@ -48,6 +48,7 @@ class Player(Entity):
         self.score: int = 0
         self.state: PlayerState = PlayerState.NORMAL
         self.gum_timer: int = 0
+        self.invulnerability_timer: int = 0
         self.facing: Direction = Direction.RIGHT
 
 
@@ -70,3 +71,4 @@ class Ghost(Entity):
         self.state: GhostState = GhostState.CHASE
         self.last_direction: Direction | None = None
         self.next_move: Direction | None = None
+        self.respawn_timer: int = 0
