@@ -352,6 +352,15 @@ class VisualMaze(Node):
                 self.add_child(corner)
 
         self.ghosts = []
+
+        self.player = Player(
+            self.context,
+            self.logical_maze,
+            self.cell_size,
+            self.ghosts,
+            self.logical_maze.current_level.speed,
+        )
+
         for i, logical_ghost in enumerate(self.logical_maze.ghosts):
             ghost = VisualGhost(
                 self.context,
@@ -360,17 +369,11 @@ class VisualMaze(Node):
                 logical_ghost,
                 self.cell_size,
                 self.logical_maze.current_level.speed * 0.4,
+                self.player,
             )
             ghost.local_position = Vector2(self.cell_size) / 2
             self.ghosts.append(ghost)
             self.add_child(ghost)
-
-        self.player = Player(
-            self.context,
-            self.logical_maze,
-            self.cell_size,
-            self.logical_maze.current_level.speed,
-        )
 
         self.add_child(self.player)
 
@@ -392,6 +395,8 @@ class VisualMaze(Node):
             if isinstance(event, PlayerDiedEvent):
                 self.player.die()
                 self.shake.apply()
+                for ghost in self.ghosts:
+                    ghost.paused = True
             if isinstance(event, PlayerRespawnedEvent):
                 self.player.respawn(event.x, event.y)
                 for ghost in self.ghosts:

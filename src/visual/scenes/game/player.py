@@ -1,9 +1,10 @@
 """A module containing the Player class for the game."""
 
 import pygame
-from pygame import KEYDOWN, Color, PixelArray, Surface, Vector2
+from pygame import KEYDOWN, Color, PixelArray, Surface, Vector2, draw
 from pygame.event import Event
 
+from src.logical.entities import Ghost
 from src.logical.maze import Direction, LogicalMaze
 from src.visual import Context, Node
 from src.visual.utils.particle import ParticleSystem
@@ -34,6 +35,7 @@ class Player(Node):
         context: Context,
         maze: LogicalMaze,
         step_size: int,
+        ghosts: list,
         speed: float = 80,
     ) -> None:
         """Initialize the Player object.
@@ -55,6 +57,7 @@ class Player(Node):
         self.step_size = step_size
         self.maze = maze
         self.speed = speed
+        self.ghosts = ghosts
         self.dead = False
         self.sprites = {
             Direction.UP: Sprite(
@@ -238,7 +241,8 @@ class Player(Node):
     def _step_target_position(self) -> None:
         """Update the target position of the player based the direction."""
         if self.direction is not None:
-            self.maze.tick_player(self.direction)
+            ghost_collided = self.get_collided_ghost()
+            self.maze.tick_player(self.direction, ghost_collided)
             player_pos = self.maze.player.get_grid_position()
             if self.next_direction and self.maze.can_move_player(
                 self.next_direction
@@ -254,6 +258,17 @@ class Player(Node):
                 self.target_position = (
                     Vector2(player_pos) + self.direction.value
                 ) * self.step_size + Vector2(self.step_size) / 2
+
+    def get_collided_ghost(self) -> Ghost | None:
+        for ghost in self.ghosts:
+            if (
+                self.world_position.distance_to(
+                    ghost.world_position + ghost.animated_position
+                )
+                < self.step_size / 4
+            ):
+                return ghost.logical_ghost
+        return None
 
     def die(self) -> None:
         """Handle the player's death."""

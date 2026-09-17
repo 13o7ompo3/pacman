@@ -477,44 +477,45 @@ class LogicalMaze:
         """
         events: set[GameEvent] = set()
 
-        if ghost.get_grid_position() == self.player.get_grid_position():
-            if (
-                ghost.state == GhostState.CHASE
-                and not self.cheat_invincible
-                and not self.is_player_invulnerable
-            ):
-                self.player.lives -= 1
-                self.player.state = PlayerState.DEAD
+        if (
+            ghost.state == GhostState.CHASE
+            and not self.cheat_invincible
+            and not self.is_player_invulnerable
+        ):
+            self.player.lives -= 1
+            self.player.state = PlayerState.DEAD
 
-                if self.player.lives <= 0:
-                    events.add(GameOverEvent(final_score=self.player.score))
-                else:
-                    self._death_countdown = self.respawn_delay
-                    events.add(PlayerDiedEvent(self.player.lives))
+            if self.player.lives <= 0:
+                events.add(GameOverEvent(final_score=self.player.score))
+            else:
+                self._death_countdown = self.respawn_delay
+                events.add(PlayerDiedEvent(self.player.lives))
 
-                for g in self.ghosts:
-                    g.next_move = None
-                    g.last_direction = None
+            for g in self.ghosts:
+                g.next_move = None
+                g.last_direction = None
 
-            elif ghost.state == GhostState.FRIGHTENED:
-                ghost.state = GhostState.DEAD
-                ghost.last_direction = None
-                ghost.next_move = None
-                ghost.respawn_timer = self.ghost_respawn_delay
-                self.player.score += self.points_ghost
+        elif ghost.state == GhostState.FRIGHTENED:
+            ghost.state = GhostState.DEAD
+            ghost.last_direction = None
+            ghost.next_move = None
+            ghost.respawn_timer = self.ghost_respawn_delay
+            self.player.score += self.points_ghost
 
-                events.add(
-                    AteGhostEvent(
-                        ghost_id=ghost.ghost_id,
-                        x=ghost.x,
-                        y=ghost.y,
-                        score_gained=self.points_ghost,
-                    )
+            events.add(
+                AteGhostEvent(
+                    ghost_id=ghost.ghost_id,
+                    x=ghost.x,
+                    y=ghost.y,
+                    score_gained=self.points_ghost,
                 )
+            )
 
         return events
 
-    def tick_player(self, player_dir: Direction) -> None:
+    def tick_player(
+        self, player_dir: Direction, collided_with_ghost: Ghost | None
+    ) -> None:
         """Move the player one step and resolve all collisions.
 
         Args:
@@ -541,10 +542,8 @@ class LogicalMaze:
         events.update(self._resolve_item_collisions())
 
         # 3. Check All Ghosts
-        for ghost in self.ghosts:
-            events.update(self._resolve_ghost_collision(ghost))
-            if self.player.state == PlayerState.DEAD:
-                break
+        if collided_with_ghost:
+            events.update(self._resolve_ghost_collision(collided_with_ghost))
 
         self._pending_events.update(events)
         return
@@ -569,7 +568,7 @@ class LogicalMaze:
 
         return Direction.NONE
 
-    def tick_ghost(self, ghost_id: int) -> None:
+    def tick_ghost(self, ghost_id: int, collided_with_player: bool) -> None:
         """Move a single ghost one step and check if it caught the player.
 
         Args:
@@ -609,7 +608,7 @@ class LogicalMaze:
         ghost.next_move = self._move_ghost(ghost)
 
         # 2. Check Collision with Player ONLY
-        events.update(self._resolve_ghost_collision(ghost))
+        # events.update(self._resolve_ghost_collision(ghost))
 
         self._pending_events.update(events)
         return
