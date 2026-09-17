@@ -64,49 +64,158 @@ The AI was not used to write actual code, but rather it was used for boilerplate
 * Making the readme more readable and structured.
 * rethinking the architecture of the project and generating ideas for the implementation.
 
-• A Configuration section explaining the config file structure and default values.
 ## Configuration:
 
-| Field                   | Description                                     | Type |
-|-------------------------|-------------------------------------------------|------|
-| LEVELS                  | List of levels to be played                     | list |
-| POINTS_PER_PACGUM       | Points awarded for each pac-gum consumed        | int  |
-| POINTS_PER_SUPER_PACGUM | Points awarded for each super pac-gum consumed  | int  |
-| POINTS_PER_GHOST        | Points awarded for each ghost consumed          | int  |
-| SUPERGUM_DURATION       | Duration of the super pac-gum effect in seconds | int  |
-| NUM_HEARTS              | Number of lives the player has                  | int  |
 
-Fields of the levels:
-width height
-seed of the maze
-time limit
-speed
-number of pacgums
+Config is JSON (`config.json`, passed as a CLI arg) parsed and validated by
+Pydantic models in `parser.py` (`Config`, `LevelConfig`). Unknown **root** keys
+are ignored; level entries are validated strictly. On any error it falls back to
+safe defaults.
 
-===TODO===: OSSAMA 3MER HAD SECTION!!!
+```json
+{
+  "levels": [
+    { "width": 14, "height": 14, "seed": 42, "level_max_time": 12 },
+    { "width": 15, "height": 20, "seed": 42 }
+  ],
+  "lives": 3,
+  "points_per_pacgum": 10,
+  "points_per_super_pacgum": 50,
+  "points_per_ghost": 200,
+  "super_pacgum_duration": 500
+}
+```
 
-• A Highscore section explaining how the highscore system works and why you
-decided to implement it this way.
-## Highscore:
+**Top-level (`Config`) defaults**
 
-WE ADDED A PASSWORD ALONGSIDE THE USERNAME, BECAUSE IDK LIFE IS TOO EASY I GUESS (PLS KILL ME)
-===TODO===: OSSAMA 3MER HAD SECTION!!!
+| Field | Default | Notes |
+|---|---|---|
+| `levels` | 10 default level | played in order |
+| `lives` | `3` | `1–5` |
+| `points_per_pacgum` | `10` | |
+| `points_per_super_pacgum` | `50` | |
+| `points_per_ghost` | `200` | |
+| `super_pacgum_duration` | `500` | FRIGHTENED ticks |
 
-• A Maze Generation section explaining how the assigned A-Maze-ing package is
-used to generate mazes.
-## Maze Generation:
+**Per-level (`LevelConfig`) defaults**
 
+| Field | Default | Notes |
+|---|---|---|
+| `width` / `height` | `28` / `31` | `≥ 10` |
+| `seed` | `1337` | RNG seed → reproducible maze |
+| `level_max_time` | `90` | seconds (`ticks = time × 60`) |
+| `speed` | `100` | `1–100`; ghosts use `speed × 0.4` |
+| `pacgum` | `1337` | declared, not consumed |
 
-- the visual engine
-- the logical engine:
-===TODO===: OSSAMA 3MER HAD SECTION!!!
+> **Caveat:** the shipped `config.json` uses `level_max_timer` (typo) instead of
+> `level_max_time`. Since `LevelConfig` rejects extra keys, this silently drops
+> the whole `levels` array and falls back to one default level.
 
-• A General Software Architecture section, with high-level overview of the software architecture (modules, classes, and their relationships).
-## General Software Architecture:
+---
 
-### Code Structure:
+## Highscore
 
-The sctucture of the files in this project is as follows:
+Implemented in `src/db_manager/user.py` via two classes:
+
+- **`User`** (Pydantic): `username` (1–10 alnum), `password` (**SHA-256 hashed**, never plaintext), `highscore` (`≥ 0`).
+- **`UserManager`**: stores one JSON file per user in `./database/`.
+  - `load_all_users()` / `save_user_data()` — load & persist users.
+  - `create_new_user()` / `authenticate_user()` — register or log in (sets active `loged_in_user`).
+  - `update_highscore(score)` — **only if logged in and only when the new score is higher** (monotonic best-run rule); persists on change.
+  - `get_leaderboard()` — users sorted by `highscore` desc.
+  - `logout_user()`.
+
+**Flow:** on game over, `GameOverScene` shows login forms — existing users are
+authenticated, new ones are created, then `update_highscore(final_score)` runs.
+If already logged in it offers an **Update** button. `LeaderBoardScene` shows
+the top 10 via `get_leaderboard()[:10]`.
+
+**Why this way:** file-per-user JSON keeps it dependency-light (no DB/server,
+easy to inspect/back up); passwords are hashed; the "max only" rule preserves a
+true best score; the model is validated (safe filenames, non-negative scores);
+and the UI only calls high-level `UserManager` methods, so the storage backend
+can be swapped without touching scenes.
+
+---
+
+## Maze Generation
+
+Mazes come from the assigned **A-Maze-ing** package, vendored here as
+`mazegenerator` (`MazeGenerator` in `mazegenerator/mazegenerator.py`), imported
+by `src/logical/maze.py` via `from mazegenerator import MazeGenerator`.
+
+- **Wall encoding:** each cell is an int whose bits are walls — `1=N, 2=E, 4=S,
+  8=W`. `15` = fully solid (impassable), `0` = open.
+- **`generate(seed)`** seeds RNG, builds a bordered maze with a decorative "42"
+  obstacle, carves passages with a **recursive-backtracker (DFS)** (randomly
+  adding loops when not `perfect`), then BFS-computes the shortest path.
+- **Used by `LogicalMaze.load_level()`:**
+  ```python
+  self.maze_generator = MazeGenerator((self.width, self.height), seed=int(level.seed))
+  self.grid = self.maze_generator.maze
+  ```
+  The grid is the single source of truth: `can_move()` checks wall bits per
+  direction, and pellets/ghosts skip cells equal to `15`. Each level's `seed`
+  makes its layout deterministic and reproducible.
+
+---
+
+## Implementation
+
+- **Stack:** Python ≥3.13, Pygame (640×480, scaled), Pydantic, NumPy. Built with
+  `uv` + `Makefile` (`make run`/`debug`/`lint`/`deploy` → PyInstaller "Spooks").
+- **Boot/loop (`pac-man.py`):** init Pygame → `UserManager` + `AssetManager` +
+  `parse_config` → `Context` → `LoadingScene` → main loop (input → `update(delta)`
+  → clear → `render` → flip). Quit on `QUIT`/`Esc`/`Q`.
+- **Scene graph:** `GameComponent` (tree + update/input) → `Node` (+ position/
+  render). Maze drawn tile-by-tile via a 2×2 neighborhood corner lookup.
+- **Logic/view split:** `src/logical` is pure Python (no Pygame). `LogicalMaze`
+  advances state via `tick_player`/`tick_ghost`/`tick_timers` and **emits
+  immutable `GameEvent`s** (e.g. `AtePacgum`, `PlayerDied`, `LevelComplete`)
+  collected and returned by `flush_events()`. `VisualMaze` calls `tick_timers()`
+  at a fixed **60 Hz** and translates events into animation (death, freeze,
+  particles, shake, level refresh). Player/ghosts interpolate between cells using
+  level `speed`.
+- **Frame-rate independence:** render uses `delta`; logic ticks fixed at 60 Hz;
+  respawn/invuln/ghost-respawn/power-up timers count in ticks.
+- **Ghost AI:** greedy chase (minimize distance, no reversing) in `CHASE`,
+  flee in `FRIGHTENED`. Deterministic given the grid.
+
+---
+
+## General Software Architecture
+
+Clear one-directional layers:
+
+```
+pac-man.py → parser.py ─┐
+                        ▼
+                     Context (shared state)
+        ┌───────────────┼────────────────┐
+        ▼               ▼                ▼
+   Visual layer    Data layer       Logical layer      ──uses──▶ MazeGenerator
+   src/visual/*    db_manager        src/logical/*                 (A-Maze-ing)
+   (scenes, ui,    (UserManager,     (LogicalMaze,
+    draw, assets)   User)             entities, events)
+```
+
+- **`Context`** — singleton-ish shared state (surface, size, assets,
+  `user_manager`, `config`, palette, `root_scene`, `game_running`); passed to
+  every `Node`.
+- **Scenes** (all `Node`s): `RootScene` (background + themes) → `LoadingScene` →
+  `TitleScene` → `GameScene` (+ `Pause`, `Instructions`, `LeaderBoard`,
+  `GameOver`). `GameScene` is the bridge: it owns a `LogicalMaze` and a
+  `VisualMaze` plus HUD widgets.
+- **Logical layer:** `LogicalMaze`, `entities` (`Player`/`Ghost`), `core_types`
+  (enums), `game_event` (frozen dataclasses). **Never imports Pygame.**
+- **Maze package:** `mazegenerator.MazeGenerator` → `LogicalMaze.grid`.
+- **Data layer:** `UserManager`/`User`, reached from scenes via
+  `Context.user_manager`.
+- **Key rule:** `visual → logical → mazegenerator`; Pygame is confined to
+  `pac-man.py` and `src/visual`. The logical layer is fully decoupled from
+  rendering, so simulation/scoring/AI can be reasoned about independently.
+
+**File structure**
 
 ```
 src/
@@ -150,20 +259,3 @@ src/
     ├── draw.py
     └── palette.py
 ```
-
-The project was puposefully split into three main sections:
-
-* **Visual**: which conatains the visual game engine and anything front-end related.
-* **Logical**: the back-end engine handeling the generation and collisions.
-* **Database Manager**: high-score tracking system using json.
-
-• an Implementation section with a technical summary of your implementation.
-## Implementation:
-
-- The project is implemented in Python using the Pygame library for the visual aspects of the game. The logical engine is responsible for handling the game mechanics, including player movement, ghost AI, and collision detection and pending events. The visual engine handles rendering the game elements on the screen.
-- Logic and visual engines are separated into different modules, allowing for better organization and maintainability of the codebase. Communication between the two engines is done through events and shared data structures, allowing for a clear separation of concerns and easier debugging.
-
-• A Project Management section, with a brief overview of how you managed the
-project and a link to the dedicated project management directory.
-## Project Management:
-
