@@ -3,7 +3,7 @@
 import math
 
 import pygame
-from pygame import Color, Surface, Vector2
+from pygame import Color, Surface, Vector2, event
 from pygame.event import Event
 
 from src.logical.core_types import GhostState, PlayerState
@@ -342,11 +342,19 @@ class LivesLeft(Node):
             self.lives_text,
             self.world_position,
         )
-        for i in range(self.logical_maze.player.lives):
-            self.context.screen.blit(
-                self.context.assets.image("life_icon"),
-                self.world_position + (32 * i + 25, 30),
-            )
+        lives = self.logical_maze.player.lives
+        if lives <= 3:
+            x_offset = 25
+        else:
+            x_offset = 25 - 14 * (min(lives, 5) - 3)
+
+        for y in range(lives // 5 + 1):
+            for x in range(min(lives, 5)):
+                self.context.screen.blit(
+                    self.context.assets.image("life_icon"),
+                    self.world_position + (32 * x + x_offset, 30 + 20 * y),
+                )
+                lives -= 1
 
     def _on_redraw(self) -> None:
         """Redraw the lives left text."""
