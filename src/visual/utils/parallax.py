@@ -1,6 +1,7 @@
 """This module provides utility classes for implementing parallax
 scrolling effects in Pygame."""
 
+from typing import cast
 from pygame import Surface
 
 from src.visual import Context, Node
@@ -39,10 +40,15 @@ class ParallaxLayer(Node):
         """Draw the layer on the screen,
         handling wrapping for continuous scrolling.
         """
-        self.context.screen.blit(self.surface, self.local_position)
+        self.context.screen.blit(
+            self.surface, cast(tuple[float, float], self.local_position)
+        )
         self.context.screen.blit(
             self.surface,
-            self.local_position - Vec2(self.surface.get_width(), 0),
+            cast(
+                tuple[float, float],
+                self.local_position - Vec2(self.surface.get_width(), 0),
+            ),
         )
 
 

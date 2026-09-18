@@ -6,7 +6,7 @@ class Vec2:
     def __init__(self, *args) -> None:
         match len(args):
             case 0:
-                x, y = 0, 0
+                x, y = 0.0, 0.0
             case 1:
                 if isinstance(args[0], (float, int)):
                     x, y = (args[0],) * 2
@@ -15,7 +15,7 @@ class Vec2:
             case _:
                 x, y = args
 
-        self.array = np.array([x, y])
+        self.array = np.array([float(x), float(y)])
 
     @classmethod
     def from_array(cls, array: npt.NDArray) -> "Vec2":
