@@ -1,6 +1,6 @@
 """A button UI element for the game."""
 
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import pygame
 from pygame import (
@@ -8,14 +8,13 @@ from pygame import (
     MOUSEBUTTONDOWN,
     MOUSEBUTTONUP,
     Color,
-    Rect,
     Surface,
 )
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
-from src.visual.utils.primitives import Vec2
+from src.visual.utils.primitives import Vec2, Rect
 
 
 class Button(Node):
@@ -142,7 +141,9 @@ class Button(Node):
                         size.y = h
 
             size += Vec2(self.padding * (len(content) + 1), self.padding * 2)
-            surface = Surface(size, flags=pygame.SRCALPHA)
+            surface = Surface(
+                cast(tuple[int, int], size), flags=pygame.SRCALPHA
+            )
             x = self.padding
             for i in range(len(content)):
                 surf = content[i]
@@ -171,7 +172,7 @@ class Button(Node):
             self.fg_rect.topleft = (int(x), int(y))
             self.pressed_rect.topleft = (int(x), int(y) + self.thickness)
             self.content_position = (
-                Vec2(self.fg_rect.center)
+                self.fg_rect.center
                 - Vec2(self.content.get_size()) / 2
                 + Vec2(1)
             )
@@ -225,7 +226,8 @@ class Button(Node):
                 border_width=1,
             )
             self.context.screen.blit(
-                self.content, self.pressed_content_position
+                self.content,
+                cast(tuple[float, float], self.pressed_content_position),
             )
         else:
             Draw.rect(
@@ -252,7 +254,9 @@ class Button(Node):
                 border_width=1,
                 border_radius=self.border_radius,
             )
-            self.context.screen.blit(self.content, self.content_position)
+            self.context.screen.blit(
+                self.content, cast(tuple[float, float], self.content_position)
+            )
 
     def _on_redraw(self) -> None:
         """Redraw the button."""

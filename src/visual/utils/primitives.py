@@ -25,19 +25,19 @@ class Vec2:
 
     @property
     def x(self) -> float:
-        return float(self.array[0])
+        return self.array[0]
 
     @property
     def y(self) -> float:
-        return float(self.array[1])
+        return self.array[1]
 
     @x.setter
-    def x(self, value: float | float) -> None:
-        self.array[0] = float(value)
+    def x(self, value: float) -> None:
+        self.array[0] = value
 
     @y.setter
-    def y(self, value: float | float) -> None:
-        self.array[1] = float(value)
+    def y(self, value: float) -> None:
+        self.array[1] = value
 
     def __add__(self, other: "Vec2 | tuple[float, float]") -> "Vec2":
         if isinstance(other, tuple):
@@ -91,3 +91,70 @@ class Vec2:
             self.y + (other.y - self.y) * ratio,
         )
         return result
+
+
+class Rect:
+    def __init__(
+        self, pos: Vec2 | tuple[float, float], size: Vec2 | tuple[float, float]
+    ) -> None:
+        if isinstance(pos, tuple):
+            pos = Vec2(pos)
+        self.pos = pos.copy()
+        if isinstance(size, tuple):
+            size = Vec2(size)
+        self.size = size.copy()
+
+    @property
+    def x(self) -> float:
+        return self.pos.x
+
+    @x.setter
+    def x(self, value: float) -> None:
+        self.pos.x = value
+
+    @property
+    def y(self) -> float:
+        return self.pos.y
+
+    @y.setter
+    def y(self, value: float) -> None:
+        self.pos.y = value
+
+    @property
+    def height(self) -> float:
+        return self.size.y
+
+    @height.setter
+    def height(self, value: float) -> None:
+        self.size.y = value
+
+    @property
+    def width(self) -> float:
+        return self.size.x
+
+    @width.setter
+    def width(self, value: float) -> None:
+        self.size.x = value
+
+    @property
+    def topleft(self) -> Vec2:
+        return self.pos
+
+    @topleft.setter
+    def topleft(self, value: Vec2 | tuple[float, float]) -> None:
+        if isinstance(value, tuple):
+            value = Vec2(value)
+        self.pos = value
+
+    @property
+    def center(self) -> Vec2:
+        return self.pos + self.size / 2
+
+    def collidepoint(self, x: float, y: float) -> bool:
+        return (
+            self.pos.x <= x <= self.pos.x + self.size.x
+            and self.pos.y <= y <= self.pos.y + self.size.y
+        )
+
+    def inflate(self, x: float, y: float) -> "Rect":
+        return Rect(self.pos - (x / 2, y / 2), self.size + (x, y))

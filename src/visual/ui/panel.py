@@ -7,14 +7,13 @@ from pygame import (
     MOUSEBUTTONDOWN,
     MOUSEBUTTONUP,
     Color,
-    Rect,
     Surface,
 )
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
-from src.visual.utils.primitives import Vec2
+from src.visual.utils.primitives import Vec2, Rect
 
 
 class Panel(Node):

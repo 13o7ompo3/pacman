@@ -3,11 +3,11 @@
 from enum import Enum
 from typing import Callable
 
-from pygame import Color, Rect
+from pygame import Color
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
-from src.visual.utils.primitives import Vec2
+from src.visual.utils.primitives import Vec2, Rect
 
 
 class ProgressBarOrientation(Enum):
