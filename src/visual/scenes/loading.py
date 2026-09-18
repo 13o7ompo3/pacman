@@ -1,12 +1,11 @@
 """The loading scene is responsible for loading all the assets."""
 
-from pygame import Vector2
-
 from src.visual import Context, Node
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.prompt import Prompt
+from src.visual.utils.primitives import Vec2
 
 
 class LoadingScene(Node):
@@ -48,19 +47,19 @@ class LoadingScene(Node):
 
         label = Label(
             context,
-            Vector2(256, 32),
+            Vec2(256, 32),
             [("Loading..", context.colors.lightest)],
             2,
         )
         label.local_position = (
-            Vector2(context.width, context.height) / 2
+            Vec2(context.width, context.height) / 2
             - label.size / 2
-            - Vector2(0, 64)
+            - Vec2(0, 64)
         )
 
         self.progress_bar = ProgressBar(
             context,
-            Vector2(256, 32),
+            Vec2(256, 32),
             ProgressBarOrientation.HORIZONTAL,
             context.colors.light,
             context.assets.total_assets,
@@ -68,9 +67,9 @@ class LoadingScene(Node):
             on_finish=on_finish,
         )
         self.progress_bar.local_position = (
-            Vector2(context.width, context.height) / 2
+            Vec2(context.width, context.height) / 2
             - self.progress_bar.size / 2
-            + Vector2(0, 64)
+            + Vec2(0, 64)
         )
 
         self.loading_iter = self.context.assets.load_progress()

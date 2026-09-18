@@ -9,19 +9,19 @@ from pygame import (
     Color,
     Rect,
     Surface,
-    Vector2,
 )
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2
 
 
 class Panel(Node):
     """A class that represents a panel.
 
     Attributes:
-        size (Vector2): The size of the panel.
+        size (Vec2): The size of the panel.
         rect (Rect): The rectangle representing the panel's position and size.
         on_inside_press (Callable): A callback when pressed inside.
         on_outside_press (Callable): A callback when pressed outside.
@@ -32,7 +32,7 @@ class Panel(Node):
     def __init__(
         self,
         context: Context,
-        size: Vector2,
+        size: Vec2,
         color: Color,
         on_inside_press: Callable = lambda _: None,
         on_outside_press: Callable = lambda _: None,
@@ -45,7 +45,7 @@ class Panel(Node):
 
         Args:
             context (Context): The context in which the panel exists.
-            size (Vector2): The size of the panel.
+            size (Vec2): The size of the panel.
             color (Color): The fill color of the panel.
             on_inside_press (Callable): A callback when pressed inside.
             on_outside_press (Callable): A callback when pressed outside.

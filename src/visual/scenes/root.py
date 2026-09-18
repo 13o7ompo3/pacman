@@ -5,7 +5,7 @@ from copy import deepcopy
 from random import shuffle
 from typing import Iterator
 
-from pygame import KEYUP, Color, K_t, Vector2
+from pygame import KEYUP, Color, K_t
 from pygame.event import Event
 
 from src.visual import Context, Node
@@ -14,6 +14,7 @@ from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.prompt import Prompt
 from src.visual.utils.image import Image
 from src.visual.utils.parallax import Parallax
+from src.visual.utils.primitives import Vec2
 
 logger = logging.getLogger(__name__)
 
@@ -174,15 +175,14 @@ class RootScene(Node):
         )
         loading_bar = ProgressBar(
             self.context,
-            Vector2(loading_alert.content.get_size()[0] - 30, 20),
+            Vec2(loading_alert.content.get_size()[0] - 30, 20),
             ProgressBarOrientation.HORIZONTAL,
             self.context.colors.light,
             total=len(self.context.assets.images),
         )
         loading_alert.add_child(loading_bar)
         loading_bar.local_position = (
-            Vector2(loading_alert.content.get_size()) / 2
-            - loading_bar.size / 2
+            Vec2(loading_alert.content.get_size()) / 2 - loading_bar.size / 2
         )
 
         self.context.root_scene.add_child(loading_alert)

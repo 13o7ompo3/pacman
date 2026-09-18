@@ -2,7 +2,7 @@
 
 from typing import Callable
 
-from pygame import Surface, Vector2
+from pygame import Surface
 
 from src.logical.game_event import (
     AteGhostEvent,
@@ -23,6 +23,7 @@ from src.visual.scenes.game_over import GameOverScene, TerminalState
 from src.visual.utils.particle import ParticleSystem
 from src.visual.utils.shake import Shake
 from src.visual.utils.timer import Timer
+from src.visual.utils.primitives import Vec2
 
 
 class Corner(Node):
@@ -55,18 +56,16 @@ class Corner(Node):
         )
         self.context.screen.blit(
             self.surface[1],
-            self.world_position + Vector2(self.surface[0].get_width(), 0),
+            self.world_position + Vec2(self.surface[0].get_width(), 0),
         )
         self.context.screen.blit(
             self.surface[2],
-            self.world_position + Vector2(0, self.surface[0].get_height()),
+            self.world_position + Vec2(0, self.surface[0].get_height()),
         )
         self.context.screen.blit(
             self.surface[3],
             self.world_position
-            + Vector2(
-                self.surface[0].get_width(), self.surface[0].get_height()
-            ),
+            + Vec2(self.surface[0].get_width(), self.surface[0].get_height()),
         )
 
 
@@ -233,7 +232,7 @@ class VisualMaze(Node):
         # add the timer to the root and only freeze the game scene
         context.root_scene.add_child(self.freeze_timer)
 
-        self.shake = Shake(context, 0.5, Vector2(6, 0), Vector2())
+        self.shake = Shake(context, 0.5, Vec2(6, 0), Vec2())
         context.root_scene.add_child(self.shake)
 
         particle_img = context.assets.image("particle_3x3")
@@ -243,10 +242,10 @@ class VisualMaze(Node):
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.2,
             12,
         )
@@ -301,7 +300,7 @@ class VisualMaze(Node):
         """Refresh the visual representation of the maze."""
         self.clear_children()
         width, height = self.logical_maze.width, self.logical_maze.height
-        self.size = Vector2(width, height) * self.cell_size
+        self.size = Vec2(width, height) * self.cell_size
 
         def sample_cell(x: int, y: int) -> int:
             """Sample a cell in the logical maze, 0 if out of bounds.
@@ -344,7 +343,7 @@ class VisualMaze(Node):
                     self.context, self.get_surface_for_corner(cells)
                 )
 
-                corner.local_position = Vector2(
+                corner.local_position = Vec2(
                     self.cell_size * (x + 0.5),
                     self.cell_size * (y + 0.5),
                 )
@@ -361,7 +360,7 @@ class VisualMaze(Node):
                 self.cell_size,
                 self.logical_maze.current_level.speed * 0.4,
             )
-            ghost.local_position = Vector2(self.cell_size) / 2
+            ghost.local_position = Vec2(self.cell_size) / 2
             self.ghosts.append(ghost)
             self.add_child(ghost)
 
@@ -401,8 +400,8 @@ class VisualMaze(Node):
                 self.ghosts[event.ghost_id].hidden = True
             if isinstance(event, AteSuperPacgumEvent):
                 self.supergum_particles.local_position = (
-                    Vector2(event.x, event.y) * self.cell_size
-                    + Vector2(self.cell_size, self.cell_size) / 2
+                    Vec2(event.x, event.y) * self.cell_size
+                    + Vec2(self.cell_size, self.cell_size) / 2
                 )
                 self.supergum_particles_timer.start()
                 self.freeze_timer.start()
@@ -443,18 +442,18 @@ class VisualMaze(Node):
             self.context.screen.blit(
                 gum_img,
                 self.world_position
-                + Vector2(self.cell_size) / 2
-                + Vector2(x, y) * self.cell_size
-                - Vector2(gum_img.get_size()) / 2,
+                + Vec2(self.cell_size) / 2
+                + Vec2(x, y) * self.cell_size
+                - Vec2(gum_img.get_size()) / 2,
             )
         for x, y in self.logical_maze.super_pacgums:
             supergum_img = self.context.assets.image("supergum_item")
             self.context.screen.blit(
                 supergum_img,
                 self.world_position
-                + Vector2(self.cell_size) / 2
-                + Vector2(x, y) * self.cell_size
-                - Vector2(supergum_img.get_size()) / 2,
+                + Vec2(self.cell_size) / 2
+                + Vec2(x, y) * self.cell_size
+                - Vec2(supergum_img.get_size()) / 2,
             )
 
         ft_small = [
@@ -477,7 +476,7 @@ class VisualMaze(Node):
                     Draw.rect(
                         self.context.screen,
                         self.world_position
-                        + Vector2(posx + x, posy + y) * self.cell_size,
-                        Vector2(self.cell_size, self.cell_size),
+                        + Vec2(posx + x, posy + y) * self.cell_size,
+                        Vec2(self.cell_size, self.cell_size),
                         self.context.colors.light,
                     )

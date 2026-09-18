@@ -1,9 +1,10 @@
 """This module provides utility classes for implementing parallax
 scrolling effects in Pygame."""
 
-from pygame import Surface, Vector2
+from pygame import Surface
 
 from src.visual import Context, Node
+from src.visual.utils.primitives import Vec2
 
 
 class ParallaxLayer(Node):
@@ -41,7 +42,7 @@ class ParallaxLayer(Node):
         self.context.screen.blit(self.surface, self.local_position)
         self.context.screen.blit(
             self.surface,
-            self.local_position - Vector2(self.surface.get_width(), 0),
+            self.local_position - Vec2(self.surface.get_width(), 0),
         )
 
 

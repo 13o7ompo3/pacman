@@ -1,11 +1,10 @@
 """The pause scene module."""
 
-from pygame import Vector2
-
 from src.visual import Context, GameComponent, Node
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
+from src.visual.utils.primitives import Vec2
 
 
 class PauseScene(Node):
@@ -42,21 +41,19 @@ class PauseScene(Node):
 
         panel = Panel(
             context,
-            Vector2(300, 300),
+            Vec2(300, 300),
             context.colors.darker,
             border_color=context.colors.darkest,
             on_outside_press=resume_game,
         )
-        panel.local_position = Vector2(
-            width / 2 - panel.size.x / 2, height / 7
-        )
+        panel.local_position = Vec2(width / 2 - panel.size.x / 2, height / 7)
 
         self.scene_to_pause = scene_to_pause
         scene_to_pause.paused = True
 
         title_text = Label(
             context,
-            Vector2(300, 200),
+            Vec2(300, 200),
             [("Pause", context.colors.lightest)],
             2,
         )
@@ -64,7 +61,7 @@ class PauseScene(Node):
         resume_button = Button(
             context,
             [context.assets.image("play_icon"), "Resume".center(14)],
-            Vector2(150, 30),
+            Vec2(150, 30),
             context.colors.light,
             resume_game,
             shadow_color=context.colors.dark,
@@ -82,7 +79,7 @@ class PauseScene(Node):
         title_button = Button(
             context,
             [context.assets.image("return_icon"), "Quit To Tittle".center(14)],
-            Vector2(150, 30),
+            Vec2(150, 30),
             context.colors.dark,
             go_to_title,
             shadow_color=context.colors.darker,
@@ -90,13 +87,13 @@ class PauseScene(Node):
 
         width, height = context.width, context.height
         title_text.local_position = (
-            Vector2(width / 2, 50 + height * 1 / 6) - title_text.size / 2
+            Vec2(width / 2, 50 + height * 1 / 6) - title_text.size / 2
         )
         resume_button.local_position = (
-            Vector2(width / 2, 50 + height * 2 / 6) - resume_button.size / 2
+            Vec2(width / 2, 50 + height * 2 / 6) - resume_button.size / 2
         )
         title_button.local_position = (
-            Vector2(width / 2, 50 + height * 3 / 6) - title_button.size / 2
+            Vec2(width / 2, 50 + height * 3 / 6) - title_button.size / 2
         )
 
         self.add_child(panel)

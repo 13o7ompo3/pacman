@@ -10,12 +10,12 @@ from pygame import (
     Color,
     Rect,
     Surface,
-    Vector2,
 )
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2
 
 
 class Button(Node):
@@ -25,7 +25,7 @@ class Button(Node):
         self,
         context: Context,
         content: str | Surface | list[Surface | str],
-        size: Vector2,
+        size: Vec2,
         color: Color,
         callback: Callable,
         shortcuts: set[int] = set(),
@@ -40,7 +40,7 @@ class Button(Node):
         Args:
             context (Context): The context in which the button exists.
             content (str | Surface | list[Surface | str]): The content.
-            size (Vector2): The size of the button.
+            size (Vec2): The size of the button.
             color (Color): The color of the button.
             callback (Callable): The callback when the button is pressed.
             shortcuts (set[int]): A set of key codes that trigger the button.
@@ -67,7 +67,7 @@ class Button(Node):
         self.content = self._prepare_content(content)
         self.original_content = self.content.copy()
         self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
-        size = Vector2(
+        size = Vec2(
             max(size.x, self.content.get_size()[0]),
             max(size.y, self.content.get_size()[1]),
         )
@@ -76,15 +76,15 @@ class Button(Node):
         self.thickness = thickness
         self.border_radius = border_radius
 
-        self.bg_rect = Rect(Vector2(0), size)
+        self.bg_rect = Rect(Vec2(0), size)
         self.bg_rect.height += thickness
-        self.fg_rect = Rect(Vector2(0), size)
+        self.fg_rect = Rect(Vec2(0), size)
 
-        self.pressed_rect = Rect(Vector2(0), size)
+        self.pressed_rect = Rect(Vec2(0), size)
         self.pressed_rect.y += thickness
 
-        self.content_position = Vector2()
-        self.pressed_content_position = Vector2()
+        self.content_position = Vec2()
+        self.pressed_content_position = Vec2()
 
         self.is_hovered = False
         self.is_pressed = False
@@ -119,7 +119,7 @@ class Button(Node):
                 .convert_alpha()
             )
         elif isinstance(content, list):
-            size = Vector2()
+            size = Vec2()
             for i in range(len(content)):
                 text = content[i]
                 if isinstance(text, str):
@@ -141,9 +141,7 @@ class Button(Node):
                     if h > size.y:
                         size.y = h
 
-            size += Vector2(
-                self.padding * (len(content) + 1), self.padding * 2
-            )
+            size += Vec2(self.padding * (len(content) + 1), self.padding * 2)
             surface = Surface(size, flags=pygame.SRCALPHA)
             x = self.padding
             for i in range(len(content)):
@@ -173,9 +171,9 @@ class Button(Node):
             self.fg_rect.topleft = (int(x), int(y))
             self.pressed_rect.topleft = (int(x), int(y) + self.thickness)
             self.content_position = (
-                Vector2(self.fg_rect.center)
-                - Vector2(self.content.get_size()) / 2
-                + Vector2(1)
+                Vec2(self.fg_rect.center)
+                - Vec2(self.content.get_size()) / 2
+                + Vec2(1)
             )
             self.pressed_content_position = self.content_position.copy()
             self.pressed_content_position.y += self.thickness

@@ -1,7 +1,7 @@
 """A module containing the Player class for the game."""
 
 import pygame
-from pygame import KEYDOWN, Color, PixelArray, Surface, Vector2
+from pygame import KEYDOWN, Color, PixelArray, Surface
 from pygame.event import Event
 
 from src.logical.maze import Direction, LogicalMaze
@@ -9,6 +9,7 @@ from src.visual import Context, Node
 from src.visual.utils.particle import ParticleSystem
 from src.visual.utils.sprite import Sprite
 from src.visual.utils.timer import Timer
+from src.visual.utils.primitives import Vec2
 
 
 class Player(Node):
@@ -17,7 +18,7 @@ class Player(Node):
     Attributes:
         direction (Direction): The current direction of the player.
         next_direction (Direction): The next direction the player will move in.
-        target_position (Vector2): Target position of the player in the maze.
+        target_position (Vec2): Target position of the player in the maze.
         step_size (int): The size of each step the player takes in the maze.
         maze (LogicalMaze): The logical representation of the maze.
         speed (float): The speed at which the player moves.
@@ -48,8 +49,8 @@ class Player(Node):
         self.direction: Direction | None = None
         self.next_direction: Direction | None = None
         self.target_position = (
-            Vector2(maze.player.x, maze.player.y) * step_size
-            + Vector2(step_size, step_size) / 2
+            Vec2(maze.player.x, maze.player.y) * step_size
+            + Vec2(step_size, step_size) / 2
         )
         self.local_position = self.target_position.copy()
         self.step_size = step_size
@@ -98,10 +99,10 @@ class Player(Node):
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.4,
             20,
         )
@@ -111,10 +112,10 @@ class Player(Node):
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.2,
             20,
         )
@@ -154,8 +155,8 @@ class Player(Node):
                 10,
                 False,
             ),
-            (Vector2(), Vector2()),
-            (Vector2(), Vector2()),
+            (Vec2(), Vec2()),
+            (Vec2(), Vec2()),
             0.4,
             4,
         )
@@ -208,8 +209,8 @@ class Player(Node):
                     ),
                 ):
                     self.target_position = (
-                        Vector2(player_pos) + self.direction.value
-                    ) * self.step_size + Vector2(
+                        Vec2(player_pos) + self.direction.value
+                    ) * self.step_size + Vec2(
                         self.step_size, self.step_size
                     ) / 2
         return event
@@ -252,8 +253,8 @@ class Player(Node):
                 ),
             ):
                 self.target_position = (
-                    Vector2(player_pos) + self.direction.value
-                ) * self.step_size + Vector2(self.step_size) / 2
+                    Vec2(player_pos) + self.direction.value
+                ) * self.step_size + Vec2(self.step_size) / 2
 
     def die(self) -> None:
         """Handle the player's death."""
@@ -273,8 +274,8 @@ class Player(Node):
         self.dead = False
         self.hidden = False
         self.target_position = (
-            Vector2(x, y) * self.step_size
-            + Vector2(self.step_size, self.step_size) / 2
+            Vec2(x, y) * self.step_size
+            + Vec2(self.step_size, self.step_size) / 2
         )
         self.local_position = self.target_position.copy()
 
@@ -299,7 +300,7 @@ class Player(Node):
         else:
             self.context.screen.blit(
                 self.idle_img,
-                self.world_position - Vector2(self.idle_img.get_size()) / 2,
+                self.world_position - Vec2(self.idle_img.get_size()) / 2,
             )
 
     def _on_redraw(self) -> None:

@@ -3,10 +3,11 @@
 from enum import Enum
 from typing import Callable
 
-from pygame import Color, Rect, Vector2
+from pygame import Color, Rect
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2
 
 
 class ProgressBarOrientation(Enum):
@@ -26,7 +27,7 @@ class ProgressBar(Node):
     """A class that represents a progress bar.
 
     Attributes:
-        size (Vector2): The size of the progress bar.
+        size (Vec2): The size of the progress bar.
         orientation (ProgressBarOrientation): The orientation of the progress.
         progress_color (Color): The color of the progress indicator.
         total (float): The total value for the progress bar.
@@ -41,7 +42,7 @@ class ProgressBar(Node):
     def __init__(
         self,
         context: Context,
-        size: Vector2,
+        size: Vec2,
         orientation: ProgressBarOrientation,
         progress_color: Color,
         total: float = 1.0,
@@ -55,7 +56,7 @@ class ProgressBar(Node):
 
         Args:
             context (Context): The context in which the progress bar exists.
-            size (Vector2): The size of the progress bar.
+            size (Vec2): The size of the progress bar.
             orientation (ProgressBarOrientation): The orientation.
             progress_color (Color): The color of the progress indicator.
             total (float): The total value for the progress bar.
@@ -114,16 +115,16 @@ class ProgressBar(Node):
 
     def _on_draw(self) -> None:
         """Draw the progress bar on the screen."""
-        inflate = Vector2()
+        inflate = Vec2()
         if self.orientation is ProgressBarOrientation.VERTICAL:
-            progress = Vector2(
+            progress = Vec2(
                 self.size.x,
                 self.size.y * self._progress / self.total if self.total else 0,
             )
             if progress.y < (self.border_radius * 2 + 2):
                 inflate.x = (self.border_radius * 2 + 2) - progress.y
         else:
-            progress = Vector2(
+            progress = Vec2(
                 self.size.x * self._progress / self.total if self.total else 0,
                 self.size.y,
             )
