@@ -106,9 +106,9 @@ class LoadingScene(Node):
     def _register_assets(self) -> None:
         """Register all the assets to be loaded."""
 
-        # load fonts
-        self.context.assets.register_font(
-            "title", "assets/fonts/alagard.ttf", 16
+        # load title banner
+        self.context.assets.register_image(
+            "banner", "assets/banners/title.png"
         )
 
         # load animations

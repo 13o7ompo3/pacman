@@ -28,13 +28,7 @@ class TitleScene(Node):
         super().__init__(context)
         context.root_scene.parallax_background.velocity = 60
         button_size = Vec2(130, 38)
-        title_text = Label(
-            context,
-            Vec2(300, 200),
-            [("Spo", context.colors.dark), ("oks", context.colors.light)],
-            4,
-            font=context.assets.font("title"),
-        )
+        self.title_text = context.assets.image("banner")
 
         def start_game(button: Button) -> None:
             """Start the game by removing the title scene.
@@ -120,9 +114,6 @@ class TitleScene(Node):
         )
 
         width, height = context.width, context.height
-        title_text.local_position = (
-            Vec2(width / 2, height / 6) - title_text.size / 2
-        )
         start_button.local_position = (
             Vec2(width / 2, height * 2 / 6) - start_button.size / 2
         )
@@ -139,9 +130,17 @@ class TitleScene(Node):
             Vec2(width, height) - theme_button.size - Vec2(10, 10)
         )
 
-        self.add_child(title_text)
         self.add_child(start_button)
         self.add_child(leaderboard_button)
         self.add_child(instructions_button)
         self.add_child(exit_button)
         self.add_child(theme_button)
+
+    def _on_draw(self) -> None:
+        self.context.screen.blit(
+            self.title_text,
+            (
+                Vec2(self.context.width / 2, self.context.height / 6)
+                - Vec2(self.title_text.get_size()) / 2
+            ).as_tuple(),
+        )
