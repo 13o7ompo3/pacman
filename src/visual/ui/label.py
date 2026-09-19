@@ -2,11 +2,12 @@
 
 import pygame
 from pygame import Color, Surface, transform
-from pygame.font import Font
+
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
 from src.visual.utils.primitives import Vec2
+from src.visual.utils.font import Font
 
 
 class Label(Node):

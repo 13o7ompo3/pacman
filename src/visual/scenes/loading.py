@@ -39,9 +39,7 @@ class LoadingScene(Node):
             context.root_scene.add_child(title_scene)
 
         # only load the font for the loading screen
-        context.assets.register_font(
-            "ui", "assets/fonts/perfect_dos_vga_437.ttf", 16
-        )
+        context.assets.register_font("ui", "assets/fonts/font.png", (9, 16))
         context.assets.load()
         self._register_assets()
 

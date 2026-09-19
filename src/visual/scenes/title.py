@@ -7,7 +7,6 @@ from src.visual.scenes.game import GameScene
 from src.visual.scenes.instructions import InstructionsScene
 from src.visual.scenes.leaderboard import LeaderBoardScene
 from src.visual.ui.button import Button
-from src.visual.ui.label import Label
 from src.visual.utils.primitives import Vec2
 
 

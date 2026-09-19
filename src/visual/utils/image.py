@@ -48,7 +48,7 @@ class Image:
             pygame.PixelArray(surface) as parent,
             pygame.PixelArray(child_surface) as child,
         ):
-            child[:] = parent[x:x + width, y:y + height]  # type: ignore[index]
+            child[:] = parent[x : x + width, y : y + height]  # type: ignore[index]
         return child_surface
 
     @staticmethod
@@ -109,7 +109,7 @@ class Image:
         return frames
 
     @staticmethod
-    def fill(surface: Surface, color: tuple[int, int, int]) -> None:
+    def fill(surface: Surface, color: Color | tuple[int, int, int]) -> None:
         """
         Fill a surface with a solid color.
 
@@ -120,6 +120,8 @@ class Image:
         Returns:
             None
         """
+        if isinstance(color, Color):
+            color = Image.rgb(color)
         pixel_array = pygame.surfarray.pixels3d(surface)
         pixel_array[:, :] = color
 
