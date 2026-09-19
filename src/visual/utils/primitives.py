@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Any
+from typing import Iterator, Tuple, Union, Any
 
 import numpy as np
 import numpy.typing as npt
@@ -74,6 +74,9 @@ class Vec2:
     def __setitem__(self, i: int, value: float) -> None:
         self.array[i] = value
 
+    def __delitem__(self, i: int) -> None:
+        self.array[i] = 0
+
     def __len__(self) -> int:
         return 2
 
@@ -84,6 +87,10 @@ class Vec2:
         return (
             isinstance(other, Vec2) and self.x == other.x and self.y == other.y
         )
+
+    def __iter__(self) -> Iterator[float]:
+        yield self.x
+        yield self.y
 
     def copy(self) -> "Vec2":
         return Vec2(self.x, self.y)
@@ -97,6 +104,9 @@ class Vec2:
             self.y + (other.y - self.y) * ratio,
         )
         return result
+
+    def as_tuple(self) -> tuple[float, float]:
+        return (self.x, self.y)
 
 
 class Rect:
@@ -118,7 +128,7 @@ class Rect:
 
     @x.setter
     def x(self, value: float) -> None:
-        self.pos.x = value
+        self.pos[0] = value
 
     @property
     def y(self) -> float:
@@ -126,15 +136,7 @@ class Rect:
 
     @y.setter
     def y(self, value: float) -> None:
-        self.pos.y = value
-
-    @property
-    def height(self) -> float:
-        return self.size.y
-
-    @height.setter
-    def height(self, value: float) -> None:
-        self.size.y = value
+        self.pos[1] = value
 
     @property
     def width(self) -> float:
@@ -142,7 +144,15 @@ class Rect:
 
     @width.setter
     def width(self, value: float) -> None:
-        self.size.x = value
+        self.size[0] = value
+
+    @property
+    def height(self) -> float:
+        return self.size.y
+
+    @height.setter
+    def height(self, value: float) -> None:
+        self.size[1] = value
 
     @property
     def topleft(self) -> Vec2:

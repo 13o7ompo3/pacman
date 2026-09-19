@@ -300,7 +300,9 @@ class Player(Node):
         else:
             self.context.screen.blit(
                 self.idle_img,
-                self.world_position - Vec2(self.idle_img.get_size()) / 2,
+                (
+                    self.world_position - Vec2(self.idle_img.get_size()) / 2
+                ).as_tuple(),
             )
 
     def _on_redraw(self) -> None:

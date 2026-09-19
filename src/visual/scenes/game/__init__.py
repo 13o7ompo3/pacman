@@ -290,15 +290,15 @@ class InfoBar(Node):
         """Draw the information bar elements."""
         self.context.screen.blit(
             self.static_label,
-            self.static_text_pos,
+            self.static_text_pos.as_tuple(),
         )
         self.context.screen.blit(
             self.icon,
-            self.icon_pos,
+            self.icon_pos.as_tuple(),
         )
         self.context.screen.blit(
             self.dynamic_label,
-            self.dynamic_text_pos,
+            self.dynamic_text_pos.as_tuple(),
         )
 
     def _on_redraw(self) -> None:
@@ -341,7 +341,7 @@ class LivesLeft(Node):
         """Draw the lives left text and life icons."""
         self.context.screen.blit(
             self.lives_text,
-            self.world_position,
+            self.world_position.as_tuple(),
         )
         lives = self.logical_maze.player.lives
         if lives <= 3:
@@ -353,7 +353,9 @@ class LivesLeft(Node):
             for x in range(min(lives, 5)):
                 self.context.screen.blit(
                     self.context.assets.image("life_icon"),
-                    self.world_position + (32 * x + x_offset, 30 + 20 * y),
+                    (
+                        self.world_position + (32 * x + x_offset, 30 + 20 * y)
+                    ).as_tuple(),
                 )
                 lives -= 1
 

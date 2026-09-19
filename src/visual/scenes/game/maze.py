@@ -52,20 +52,28 @@ class Corner(Node):
         """Draw the corner surfaces on the screen."""
         self.context.screen.blit(
             self.surface[0],
-            self.world_position,
+            self.world_position.as_tuple(),
         )
         self.context.screen.blit(
             self.surface[1],
-            self.world_position + Vec2(self.surface[0].get_width(), 0),
+            (
+                self.world_position + Vec2(self.surface[0].get_width(), 0)
+            ).as_tuple(),
         )
         self.context.screen.blit(
             self.surface[2],
-            self.world_position + Vec2(0, self.surface[0].get_height()),
+            (
+                self.world_position + Vec2(0, self.surface[0].get_height())
+            ).as_tuple(),
         )
         self.context.screen.blit(
             self.surface[3],
-            self.world_position
-            + Vec2(self.surface[0].get_width(), self.surface[0].get_height()),
+            (
+                self.world_position
+                + Vec2(
+                    self.surface[0].get_width(), self.surface[0].get_height()
+                )
+            ).as_tuple(),
         )
 
 
@@ -441,19 +449,23 @@ class VisualMaze(Node):
             gum_img = self.context.assets.image("gum_item")
             self.context.screen.blit(
                 gum_img,
-                self.world_position
-                + Vec2(self.cell_size) / 2
-                + Vec2(x, y) * self.cell_size
-                - Vec2(gum_img.get_size()) / 2,
+                (
+                    self.world_position
+                    + Vec2(self.cell_size) / 2
+                    + Vec2(x, y) * self.cell_size
+                    - Vec2(gum_img.get_size()) / 2
+                ).as_tuple(),
             )
         for x, y in self.logical_maze.super_pacgums:
             supergum_img = self.context.assets.image("supergum_item")
             self.context.screen.blit(
                 supergum_img,
-                self.world_position
-                + Vec2(self.cell_size) / 2
-                + Vec2(x, y) * self.cell_size
-                - Vec2(supergum_img.get_size()) / 2,
+                (
+                    self.world_position
+                    + Vec2(self.cell_size) / 2
+                    + Vec2(x, y) * self.cell_size
+                    - Vec2(supergum_img.get_size()) / 2
+                ).as_tuple(),
             )
 
         ft_small = [
