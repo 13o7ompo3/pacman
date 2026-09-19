@@ -179,7 +179,7 @@ class Draw:
         color: Color | tuple[int, int, int, int],
         position: Vec2 | tuple[int, int],
         border_width: int,
-        radius: int,
+        r: int,
         start_angle: float,
         end_angle: float,
         filled: bool,
@@ -198,7 +198,7 @@ class Draw:
 
         """
         if isinstance(position, Vec2):
-            position = (int(position.x) - radius, int(position.y) - radius)
+            position = (int(position.x) - r, int(position.y) - r)
         if isinstance(color, Color):
             color = (color.r, color.g, color.b, color.a)
         if len(color) == 3:
@@ -208,7 +208,7 @@ class Draw:
             "sector",
             color,
             position,
-            radius,
+            r,
             border_width,
             start_angle,
             end_angle,
@@ -216,23 +216,21 @@ class Draw:
         )
 
         if cache_key not in Draw.cache:
-            size = (radius * 2 + 1, radius * 2 + 1)
+            size = (r * 2 + 1, r * 2 + 1)
             sector = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(sector)
+            arr = PixelArray(sector)
 
-            for x in range(-radius, radius + 1):
-                for y in range(-radius, radius + 1):
+            for x in range(-r, r + 1):
+                for y in range(-r, r + 1):
                     length = math.sqrt((x) ** 2 + (y) ** 2)
                     angle = math.atan2(y, -x)
                     in_sector = start_angle <= angle + math.pi <= end_angle
-                    if filled and (length <= radius) and in_sector:
-                        array[x + radius, y + radius] = color  # type: ignore[index]
-                    elif (
-                        radius - border_width < length <= radius
-                    ) and in_sector:
-                        array[x + radius, y + radius] = color  # type: ignore[index]
+                    if filled and (length <= r) and in_sector:
+                        arr[x + r, y + r] = color  # type: ignore[index]
+                    elif (r - border_width < length <= r) and in_sector:
+                        arr[x + r, y + r] = color  # type: ignore[index]
 
-            array.close()
+            arr.close()
             Draw.cache[cache_key] = sector
         else:
             sector = Draw.cache[cache_key]
@@ -243,7 +241,7 @@ class Draw:
     def circle(
         surface: Surface,
         position: Vec2 | tuple[int, int],
-        radius: int,
+        r: int,
         fill_color: Color
         | tuple[int, int, int, int]
         | tuple[int, int, int]
@@ -268,7 +266,7 @@ class Draw:
 
         """
         if isinstance(position, Vec2):
-            position = (int(position.x) - radius, int(position.y) - radius)
+            position = (int(position.x) - r, int(position.y) - r)
         if isinstance(fill_color, Color):
             fill_color = (
                 fill_color.r,
@@ -286,30 +284,30 @@ class Draw:
 
         cache_key = (
             "circle",
-            radius,
+            r,
             fill_color,
             border_color,
             border_width,
         )
 
         if cache_key not in Draw.cache:
-            size = (radius * 2 + 1, radius * 2 + 1)
+            size = (r * 2 + 1, r * 2 + 1)
             circle = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(circle)
+            arr = PixelArray(circle)
 
-            for x in range(-radius, radius + 1):
-                for y in range(-radius, radius + 1):
+            for x in range(-r, r + 1):
+                for y in range(-r, r + 1):
                     length = math.sqrt((x) ** 2 + (y) ** 2)
-                    if fill_color and (length < radius):
-                        array[x + radius, y + radius] = fill_color  # type: ignore[index]
+                    if fill_color and (length < r):
+                        arr[x + r, y + r] = fill_color  # type: ignore[index]
                     if (
                         border_color
                         and border_width > 0
-                        and radius - border_width <= length < radius
+                        and r - border_width <= length < r
                     ):
-                        array[x + radius, y + radius] = border_color  # type: ignore[index]
+                        arr[x + r, y + r] = border_color  # type: ignore[index]
 
-            array.close()
+            arr.close()
             Draw.cache[cache_key] = circle
         else:
             circle = Draw.cache[cache_key]

@@ -1,9 +1,13 @@
+from typing import Tuple, Union, Any
+
 import numpy as np
 import numpy.typing as npt
 
 
 class Vec2:
-    def __init__(self, *args) -> None:
+    def __init__(
+        self, *args: Union[float, int, Tuple[float, float], "Vec2"]
+    ) -> None:
         match len(args):
             case 0:
                 x, y = 0.0, 0.0
@@ -15,21 +19,23 @@ class Vec2:
             case _:
                 x, y = args
 
-        self.array = np.array([float(x), float(y)])
+        self.array: npt.NDArray[np.floating[Any]] = np.array(
+            [float(x), float(y)]
+        )
 
     @classmethod
-    def from_array(cls, array: npt.NDArray) -> "Vec2":
+    def from_array(cls, array: npt.NDArray[np.floating[Any]]) -> "Vec2":
         new = cls()
         new.array = array
         return new
 
     @property
     def x(self) -> float:
-        return self.array[0]
+        return float(self.array[0])
 
     @property
     def y(self) -> float:
-        return self.array[1]
+        return float(self.array[1])
 
     @x.setter
     def x(self, value: float) -> None:
@@ -39,13 +45,13 @@ class Vec2:
     def y(self, value: float) -> None:
         self.array[1] = value
 
-    def __add__(self, other: "Vec2 | tuple[float, float]") -> "Vec2":
+    def __add__(self, other: Union["Vec2", Tuple[float, float]]) -> "Vec2":
         if isinstance(other, tuple):
             x, y = other
             return Vec2(self.x + x, self.y + y)
         return Vec2.from_array(self.array + other.array)
 
-    def __sub__(self, other: "Vec2 | tuple[float, float]") -> "Vec2":
+    def __sub__(self, other: Union["Vec2", Tuple[float, float]]) -> "Vec2":
         if isinstance(other, tuple):
             x, y = other
             return Vec2(self.x - x, self.y - y)
@@ -63,12 +69,12 @@ class Vec2:
     __repr__ = __str__
 
     def __getitem__(self, i: int) -> float:
-        return self.array[i]
+        return float(self.array[i])
 
     def __setitem__(self, i: int, value: float) -> None:
         self.array[i] = value
 
-    def __len__(self) -> float:
+    def __len__(self) -> int:
         return 2
 
     def __hash__(self) -> int:
@@ -83,9 +89,9 @@ class Vec2:
         return Vec2(self.x, self.y)
 
     def move_towards(self, other: "Vec2", distance: float) -> "Vec2":
-        mag = np.linalg.norm(self.array - other.array)
+        mag = float(np.linalg.norm(self.array - other.array))
         distance = min(distance, mag)
-        ratio = distance / mag if mag else 0
+        ratio = distance / mag if mag else 0.0
         result = Vec2(
             self.x + (other.x - self.x) * ratio,
             self.y + (other.y - self.y) * ratio,
@@ -95,14 +101,16 @@ class Vec2:
 
 class Rect:
     def __init__(
-        self, pos: Vec2 | tuple[float, float], size: Vec2 | tuple[float, float]
+        self,
+        pos: Union[Vec2, Tuple[float, float]],
+        size: Union[Vec2, Tuple[float, float]],
     ) -> None:
         if isinstance(pos, tuple):
             pos = Vec2(pos)
-        self.pos = pos.copy()
+        self.pos: Vec2 = pos.copy()
         if isinstance(size, tuple):
             size = Vec2(size)
-        self.size = size.copy()
+        self.size: Vec2 = size.copy()
 
     @property
     def x(self) -> float:
@@ -141,7 +149,7 @@ class Rect:
         return self.pos
 
     @topleft.setter
-    def topleft(self, value: Vec2 | tuple[float, float]) -> None:
+    def topleft(self, value: Union[Vec2, Tuple[float, float]]) -> None:
         if isinstance(value, tuple):
             value = Vec2(value)
         self.pos = value
@@ -152,8 +160,8 @@ class Rect:
 
     def collidepoint(self, x: float, y: float) -> bool:
         return (
-            self.pos.x <= x <= self.pos.x + self.size.x
-            and self.pos.y <= y <= self.pos.y + self.size.y
+            self.pos.x <= x < self.pos.x + self.size.x
+            and self.pos.y <= y < self.pos.y + self.size.y
         )
 
     def inflate(self, x: float, y: float) -> "Rect":
