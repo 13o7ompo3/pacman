@@ -360,7 +360,6 @@ class VisualMaze(Node):
             self.ghosts,
             self.logical_maze.current_level.speed,
         )
-
         for i, logical_ghost in enumerate(self.logical_maze.ghosts):
             ghost = VisualGhost(
                 self.context,

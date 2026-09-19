@@ -36,7 +36,7 @@ class Player(Node):
         maze: LogicalMaze,
         step_size: int,
         ghosts: list,
-        speed: float = 80,
+        speed: float,
     ) -> None:
         """Initialize the Player object.
 
@@ -162,6 +162,7 @@ class Player(Node):
             0.4,
             4,
         )
+        self.last_positions = [self.world_position] * int(1 + speed / 10)
 
     def _set_surface_alpha(self, surface: Surface, alpha: int) -> None:
         """Set the alpha value of a Pygame Surface.
@@ -230,6 +231,8 @@ class Player(Node):
             self.local_position = self.local_position.move_towards(
                 self.target_position, delta * self.speed
             )
+            self.last_positions.pop(0)
+            self.last_positions.append(self.world_position)
             self.particles.local_position = self.world_position
             self.super_pacgum_silhouette.local_position = self.world_position
 
@@ -261,13 +264,14 @@ class Player(Node):
 
     def get_collided_ghost(self) -> Ghost | None:
         for ghost in self.ghosts:
-            if (
-                self.world_position.distance_to(
-                    ghost.world_position + ghost.animated_position
-                )
-                < self.step_size / 4
-            ):
-                return ghost.logical_ghost
+            for position in self.last_positions:
+                if (
+                    position.distance_to(
+                        ghost.world_position + ghost.animated_position
+                    )
+                    < self.step_size / 4
+                ):
+                    return ghost.logical_ghost
         return None
 
     def die(self) -> None:

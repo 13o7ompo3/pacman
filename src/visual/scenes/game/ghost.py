@@ -130,7 +130,6 @@ class VisualGhost(Node):
         )
 
     def collided_with_player(self) -> bool:
-        print(self.step_size)
         return (
             self.player.world_position.distance_to(
                 self.world_position + self.animated_position
