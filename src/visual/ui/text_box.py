@@ -3,11 +3,11 @@
 from typing import Callable
 
 import pygame
-from pygame import Vector2
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2
 
 
 class TextBox(Node):
@@ -18,8 +18,8 @@ class TextBox(Node):
         length (int): The maximum length of the text box.
         on_submit (Callable): A callback function when the user submits.
         is_password (bool): A flag indicating if the text box is for password.
-        size (Vector2): The size of the text box.
-        text_pos (Vector2): The position of the text within the text box.
+        size (Vec2): The size of the text box.
+        text_pos (Vec2): The position of the text within the text box.
 
     """
 
@@ -43,15 +43,15 @@ class TextBox(Node):
         self.content = ""
         self.length = length
         self.on_submit = on_submit
-        box_size = Vector2(
+        box_size = Vec2(
             self.context.assets.font("ui").size(" ")[0] * length,
             self.context.assets.font("ui").size(" ")[1],
         )
-        self.size = Vector2(
+        self.size = Vec2(
             box_size.y * 0.4 + box_size.x,
             box_size.y * 1.4,
         )
-        self.text_pos = Vector2(
+        self.text_pos = Vec2(
             box_size.y * 0.2,
             self.size.y / 2 - box_size.y / 2,
         )

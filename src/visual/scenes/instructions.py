@@ -1,6 +1,5 @@
 from typing import Any
 
-from pygame import Vector2
 from pygame.event import Event
 
 from src.visual import Context, Node
@@ -8,6 +7,7 @@ from src.visual.draw import Draw
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.utils.sprite import Sprite
+from src.visual.utils.primitives import Vec2
 
 
 class InstructionPage(Node):
@@ -35,20 +35,20 @@ class InstructionPage(Node):
         self.sprite = sprite
         title_text = Label(
             context,
-            Vector2(0, 0),
+            Vec2(0, 0),
             [(f" {heading} ", context.colors.light)],
             background_color=context.colors.dark,
             scale=2,
             border_color=context.colors.lightest,
             border_radius=8,
         )
-        title_text.local_position = Vector2(
+        title_text.local_position = Vec2(
             context.width / 2 - title_text.size.x / 2, 50
         )
-        sprite.local_position = Vector2(context.width, context.height) / 2
+        sprite.local_position = Vec2(context.width, context.height) / 2
         self.breaking_text = Label(
             context,
-            Vector2(100, 0),
+            Vec2(100, 0),
             [(" BREAKING ", context.colors.light)],
             background_color=context.colors.dark,
             scale=2,
@@ -58,7 +58,7 @@ class InstructionPage(Node):
         )
         self.text = Label(
             context,
-            Vector2(0, self.breaking_text.size.y),
+            Vec2(0, self.breaking_text.size.y),
             [
                 (
                     description,
@@ -66,7 +66,7 @@ class InstructionPage(Node):
                 )
             ],
         )
-        self.text.local_position = self.breaking_text.local_position + Vector2(
+        self.text.local_position = self.breaking_text.local_position + Vec2(
             self.breaking_text.size.x, 0
         )
 
@@ -209,13 +209,13 @@ class InstructionsScene(Node):
         next_button = Button(
             context,
             ["Next".center(8), context.assets.image("next_icon")],
-            Vector2(50, 25),
+            Vec2(50, 25),
             context.colors.light,
             go_next,
             shadow_color=context.colors.dark,
         )
         next_button.local_position = (
-            Vector2(context.width - 10, context.height - 10) - next_button.size
+            Vec2(context.width - 10, context.height - 10) - next_button.size
         )
 
         def go_prev(button: Button) -> None:
@@ -232,12 +232,12 @@ class InstructionsScene(Node):
         previous_button = Button(
             context,
             [context.assets.image("previous_icon"), "Previous".center(8)],
-            Vector2(50, 25),
+            Vec2(50, 25),
             context.colors.light,
             go_prev,
             shadow_color=context.colors.dark,
         )
-        previous_button.local_position = Vector2(
+        previous_button.local_position = Vec2(
             10, context.height - previous_button.size.y - 10
         )
 
@@ -252,12 +252,12 @@ class InstructionsScene(Node):
         return_button = Button(
             context,
             [context.assets.image("return_icon"), "Back".center(8)],
-            Vector2(50, 25),
+            Vec2(50, 25),
             context.colors.dark,
             go_back,
             shadow_color=context.colors.darker,
         )
-        return_button.local_position = Vector2(10, 10)
+        return_button.local_position = Vec2(10, 10)
 
         self.add_child(next_button)
         self.add_child(previous_button)
