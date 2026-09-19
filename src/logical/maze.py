@@ -2,7 +2,7 @@ import logging
 import random
 
 from mazegenerator import MazeGenerator
-from parser import LevelConfig
+from src.parser import LevelConfig
 from src.logical.core_types import (
     Direction,
     GhostState,
@@ -178,10 +178,10 @@ class LogicalMaze:
         """
         positions: set[tuple[int, int]] = set()
         corners = [
-            (1, 1),
-            (self.width - 2, 1),
-            (1, self.height - 2),
-            (self.width - 2, self.height - 2),
+            (0, 0),
+            (self.width - 1, 0),
+            (0, self.height - 1),
+            (self.width - 1, self.height - 1),
         ]
         for cx, cy in corners:
             if self.grid[cy][cx] != 15:

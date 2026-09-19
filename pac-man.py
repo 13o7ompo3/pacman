@@ -41,7 +41,7 @@ def main() -> None:
     from src.visual import Context
     from src.visual.scenes.loading import LoadingScene
     from src.visual.utils.asset_manager import AssetManager
-    from parser import parse_config
+    from src.parser import parse_config
 
     pygame.init()
     pygame.font.init()
