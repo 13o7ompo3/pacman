@@ -5,7 +5,7 @@ from typing import final
 from pygame import Surface, Vector2
 from pygame.event import Event
 
-from parser import Config
+from src.parser import Config
 from src.db_manager.user import UserManager
 from src.visual.palette import DEFAULT_PALETTE
 from src.visual.utils.asset_manager import AssetManager

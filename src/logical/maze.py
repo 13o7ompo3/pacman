@@ -2,7 +2,7 @@ import logging
 import random
 
 from mazegenerator import MazeGenerator
-from parser import LevelConfig
+from src.parser import LevelConfig
 from src.logical.core_types import (
     Direction,
     GhostState,
