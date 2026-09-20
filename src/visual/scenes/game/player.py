@@ -237,7 +237,7 @@ class Player(Node):
 
         if not self.is_collided:
             self.is_collided = self.get_collided_ghost()
-        if self.local_position == self.target_position or self.is_collided:
+        if self.local_position == self.target_position:
             self._step_target_position()
         elif self.direction is not None:
             self.sprites[self.direction].update(delta)

@@ -121,7 +121,7 @@ class VisualGhost(Node):
         self.ghost_step_timer += delta
         if not self.is_collided:
             self.is_collided = self.collided_with_player()
-        if self.ghost_step_timer > self.ghost_step_duration or self.is_collided:
+        if self.ghost_step_timer > self.ghost_step_duration:
             self.logical_maze.tick_ghost(self.id, self.is_collided)
             self.is_collided = False
             self.ghost_step_timer = 0
