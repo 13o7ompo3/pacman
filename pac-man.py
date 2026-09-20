@@ -6,7 +6,29 @@ logging.basicConfig(
 )
 
 
-def main():
+def set_icon() -> None:
+    """Set the game icon for the Pygame window."""
+    import pygame
+
+    try:
+        icon_surface = pygame.image.load("assets/icons/icon.png")
+        pygame.display.set_icon(icon_surface)
+    except FileNotFoundError:
+        logging.error("game icon was not found")
+        exit(1)
+    except PermissionError:
+        logging.error("Could not read icon image")
+        exit(1)
+    except IsADirectoryError:
+        logging.error("Icon path was a directory")
+        exit(1)
+    except (RuntimeError, Exception):
+        logging.error("Could not load game icon")
+        exit(1)
+
+
+def main() -> None:
+    """Main function to run the game."""
     import os
 
     # hide pygame hello message
@@ -19,13 +41,15 @@ def main():
     from src.visual import Context
     from src.visual.scenes.loading import LoadingScene
     from src.visual.utils.asset_manager import AssetManager
-    from parser import parse_config
+    from src.parser import parse_config
 
     pygame.init()
     pygame.font.init()
 
     WIDTH, HEIGHT = 640, 480
     surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
+
+    set_icon()
 
     user_manager = UserManager()
 

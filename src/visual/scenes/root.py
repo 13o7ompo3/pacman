@@ -1,18 +1,20 @@
 """Root scene for the game."""
 
+import logging
+from copy import deepcopy
+from random import shuffle
 from typing import Iterator
-from pygame import K_t, KEYUP, Vector2
+
+from pygame import KEYUP, Color, K_t
 from pygame.event import Event
-from src.visual import Node, Context
+
+from src.visual import Context, Node
+from src.visual.palette import ColorPalette
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.prompt import Prompt
 from src.visual.utils.image import Image
-from src.visual.palette import ColorPalette
-from copy import deepcopy
 from src.visual.utils.parallax import Parallax
-from random import shuffle
-import logging
-
+from src.visual.utils.primitives import Vec2
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +29,17 @@ class RootScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a RootScene instance."""
+        """Initialize a RootScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
         self.current_theme_index = 0
-        self.themes = None
+        self.themes: list[ColorPalette] | None = None
         self.loading_iter: Iterator | None = None
 
-    def finish_loading(self):
+    def finish_loading(self) -> None:
         """Load color themes from assets."""
         self.themes = [
             ColorPalette.load_from_surface(
@@ -100,9 +106,6 @@ class RootScene(Node):
                 self.context.assets.image("robots-are-cool-1x"),
             ),
             ColorPalette.load_from_surface(
-                self.context.assets.image("roserust-1x"),
-            ),
-            ColorPalette.load_from_surface(
                 self.context.assets.image("sandy-06-1x"),
             ),
             ColorPalette.load_from_surface(
@@ -118,7 +121,8 @@ class RootScene(Node):
                 self.context.assets.image("vintage-voltage-1x"),
             ),
         ]
-        shuffle(self.themes)
+        if self.themes:
+            shuffle(self.themes)
         self.parallax_background = Parallax(
             self.context,
             [
@@ -150,11 +154,19 @@ class RootScene(Node):
         """
         if event.type == KEYUP and event.key == K_t:
             self.change_theme()
+        return None
 
     def change_theme(self) -> None:
+        """Change the color theme of the game."""
         self.loading_iter = self.cycle_theme()
 
     def cycle_theme(self) -> Iterator:
+        """Cycle through the available color themes.
+
+        Yields:
+            Iterator: An iterator for the theme cycling process.
+
+        """
         loading_alert = Prompt(
             self.context,
             "Loading new theme..",
@@ -163,15 +175,14 @@ class RootScene(Node):
         )
         loading_bar = ProgressBar(
             self.context,
-            Vector2(loading_alert.content.get_size()[0] - 30, 20),
+            Vec2(loading_alert.content.get_size()[0] - 30, 20),
             ProgressBarOrientation.HORIZONTAL,
             self.context.colors.light,
             total=len(self.context.assets.images),
         )
         loading_alert.add_child(loading_bar)
         loading_bar.local_position = (
-            Vector2(loading_alert.content.get_size()) / 2
-            - loading_bar.size / 2
+            Vec2(loading_alert.content.get_size()) / 2 - loading_bar.size / 2
         )
 
         self.context.root_scene.add_child(loading_alert)
@@ -206,7 +217,7 @@ class RootScene(Node):
         logger.info("color palette changed successfully")
         self.redraw()
 
-    def _copy_color(self, color1, color2) -> None:
+    def _copy_color(self, color1: Color, color2: Color) -> None:
         """Copy the RGBA values from one color to another.
 
         Args:
@@ -220,6 +231,12 @@ class RootScene(Node):
         color1.a = color2.a
 
     def _on_update(self, delta: float) -> None:
+        """Update the root scene.
+
+        Args:
+            delta (float): The time elapsed since the last update.
+
+        """
         if self.loading_iter is not None:
             try:
                 next(self.loading_iter)

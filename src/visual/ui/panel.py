@@ -1,25 +1,26 @@
 """Define a panel UI element."""
 
-from src.visual import Node, Context
-from src.visual.draw import Draw
+from typing import Any, Callable
+
+import pygame
 from pygame import (
-    Color,
-    Surface,
-    Vector2,
-    Rect,
     MOUSEBUTTONDOWN,
     MOUSEBUTTONUP,
+    Color,
+    Surface,
 )
 from pygame.event import Event
-from typing import Any, Callable
-import pygame
+
+from src.visual import Context, Node
+from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2, Rect
 
 
 class Panel(Node):
     """A class that represents a panel.
 
     Attributes:
-        size (Vector2): The size of the panel.
+        size (Vec2): The size of the panel.
         rect (Rect): The rectangle representing the panel's position and size.
         on_inside_press (Callable): A callback when pressed inside.
         on_outside_press (Callable): A callback when pressed outside.
@@ -30,7 +31,7 @@ class Panel(Node):
     def __init__(
         self,
         context: Context,
-        size: Vector2,
+        size: Vec2,
         color: Color,
         on_inside_press: Callable = lambda _: None,
         on_outside_press: Callable = lambda _: None,
@@ -39,7 +40,19 @@ class Panel(Node):
         outer_border_color: Color | None = None,
         border_radius: int = 8,
     ) -> None:
-        """Initialize a Panel instance."""
+        """Initialize a Panel instance.
+
+        Args:
+            context (Context): The context in which the panel exists.
+            size (Vec2): The size of the panel.
+            color (Color): The fill color of the panel.
+            on_inside_press (Callable): A callback when pressed inside.
+            on_outside_press (Callable): A callback when pressed outside.
+            border_color (Color | None): The color of the border.
+            border_width (int): The width of the border.
+            outer_border_color (Color | None): The color of the outer border.
+            border_radius (int): The radius of the border corners.
+        """
         self.size = size
         self.rect = Rect((0, 0), self.size)
         self.on_inside_press = on_inside_press
@@ -117,3 +130,4 @@ class Panel(Node):
                     self.on_inside_press(self)
             elif event.type == MOUSEBUTTONUP:
                 self.on_outside_press(self)
+        return None

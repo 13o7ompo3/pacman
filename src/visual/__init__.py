@@ -2,13 +2,14 @@
 
 from typing import final
 
-from pygame import Surface, Vector2
+from pygame import Surface
 from pygame.event import Event
 
-from parser import Config
+from src.parser import Config
 from src.db_manager.user import UserManager
 from src.visual.palette import DEFAULT_PALETTE
 from src.visual.utils.asset_manager import AssetManager
+from src.visual.utils.primitives import Vec2
 
 
 class GameComponent:
@@ -72,10 +73,12 @@ class GameComponent:
         for child in self.children[::-1]:
             ret = child.handle_input(event)
             if ret is None:
-                return
+                return None
 
         if propagate_event:
             return self._on_input(event)
+        else:
+            return None
 
     def _on_input(self, event: Event) -> Event | None:
         """Override to handle input for component.
@@ -127,20 +130,28 @@ class Node(GameComponent):
     """A base class for all game nodes.
 
     Attributes:
-        local_position (Vector2): The position relative to its parent.
+        local_position (Vec2): The position relative to its parent.
         context (Context): The context of the game.
 
     """
 
     def __init__(self, context: "Context") -> None:
-        """Initialize a Node instance."""
+        """Initialize a Node instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__()
-        self.local_position: Vector2 = Vector2()
+        self.local_position: Vec2 = Vec2()
         self.context = context
 
     @property
-    def world_position(self) -> Vector2:
-        """Get the absolute world position from relative parent positions."""
+    def world_position(self) -> Vec2:
+        """Get the absolute world position from relative parent positions.
+
+        Returns:
+            Vec2: The absolute world position of the node.
+        """
         if isinstance(self.parent, Node):
             return self.parent.world_position + self.local_position
         else:
@@ -198,9 +209,18 @@ class Context:
         height: int,
         assets: AssetManager,
         user_manager: UserManager,
-        config: Config
+        config: Config,
     ) -> None:
-        """Initialize a Context instance."""
+        """Initialize a Context instance.
+
+        Args:
+            screen (Surface): The Pygame surface to draw on.
+            width (int): The width of the game window.
+            height (int): The height of the game window.
+            assets (AssetManager): The asset manager for managing assets.
+            user_manager (UserManager): The user manager for handling data.
+            config (Config): The configuration settings for the game.
+        """
         from src.visual.scenes.root import RootScene
 
         self.screen = screen

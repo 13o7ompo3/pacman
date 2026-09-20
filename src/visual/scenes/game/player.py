@@ -1,14 +1,16 @@
 """A module containing the Player class for the game."""
 
 import pygame
-from pygame import KEYDOWN, Color, PixelArray, Surface, Vector2
+from pygame import KEYDOWN, Color, PixelArray, Surface
 from pygame.event import Event
 
+from src.logical.entities import Ghost
 from src.logical.maze import Direction, LogicalMaze
 from src.visual import Context, Node
 from src.visual.utils.particle import ParticleSystem
 from src.visual.utils.sprite import Sprite
 from src.visual.utils.timer import Timer
+from src.visual.utils.primitives import Vec2
 
 
 class Player(Node):
@@ -17,7 +19,7 @@ class Player(Node):
     Attributes:
         direction (Direction): The current direction of the player.
         next_direction (Direction): The next direction the player will move in.
-        target_position (Vector2): Target position of the player in the maze.
+        target_position (Vec2): Target position of the player in the maze.
         step_size (int): The size of each step the player takes in the maze.
         maze (LogicalMaze): The logical representation of the maze.
         speed (float): The speed at which the player moves.
@@ -34,20 +36,29 @@ class Player(Node):
         context: Context,
         maze: LogicalMaze,
         step_size: int,
-        speed: float = 80,
+        ghosts: list,
+        speed: float,
     ) -> None:
-        """Initialize the Player object."""
+        """Initialize the Player object.
+
+        Args:
+            context (Context): The context in which the player exists.
+            maze (LogicalMaze): The logical representation of the maze.
+            step_size (int): The size of each step.
+            speed (float): The speed at which the player moves.
+        """
         super().__init__(context)
-        self.direction = None
-        self.next_direction = None
+        self.direction: Direction | None = None
+        self.next_direction: Direction | None = None
         self.target_position = (
-            Vector2(maze.player.x, maze.player.y) * step_size
-            + Vector2(step_size, step_size) / 2
+            Vec2(maze.player.x, maze.player.y) * step_size
+            + Vec2(step_size, step_size) / 2
         )
         self.local_position = self.target_position.copy()
         self.step_size = step_size
         self.maze = maze
         self.speed = speed
+        self.ghosts = ghosts
         self.dead = False
         self.sprites = {
             Direction.UP: Sprite(
@@ -91,33 +102,42 @@ class Player(Node):
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.4,
             20,
         )
         particle_img = context.assets.image("particle_4x4")
-        # self._set_surface_alpha(particle_img, 100)
         particle_scatter = 100
         death_particles = ParticleSystem(
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.2,
             20,
         )
         death_particles.playing = False
 
-        def on_death_particles_timer_start(_) -> None:
+        def on_death_particles_timer_start(timer: Timer) -> None:
+            """Start the death particles when the timer starts.
+
+            Args:
+                timer (Timer): The timer that started.
+            """
             death_particles.play()
 
-        def on_death_particles_timer_finished(_) -> None:
+        def on_death_particles_timer_finished(timer: Timer) -> None:
+            """Stop the particles and hide the player when the timer finishes.
+
+            Args:
+                timer (Timer): The timer that finished.
+            """
             death_particles.stop()
             self.hidden = True
 
@@ -138,20 +158,28 @@ class Player(Node):
                 10,
                 False,
             ),
-            (Vector2(), Vector2()),
-            (Vector2(), Vector2()),
+            (Vec2(), Vec2()),
+            (Vec2(), Vec2()),
             0.4,
             4,
         )
+        self.is_collided: Ghost | None = None
 
     def _set_surface_alpha(self, surface: Surface, alpha: int) -> None:
+        """Set the alpha value of a Pygame Surface.
+
+        Args:
+            surface (Surface): The Pygame Surface to modify.
+            alpha (int): The alpha value to set (0-255).
+
+        """
         with PixelArray(surface) as array:
             w, h = surface.get_size()
             for x in range(w):
                 for y in range(h):
-                    color = Color(array[x, y])
+                    color = Color(array[x, y])  # type: ignore[index]
                     color.a = alpha
-                    array[x, y] = color
+                    array[x, y] = color  # type: ignore[index]
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the player.
@@ -164,7 +192,7 @@ class Player(Node):
 
         """
         if self.hidden:
-            return
+            return None
         if event.type == KEYDOWN:
             if event.key in {pygame.K_UP, pygame.K_w, pygame.K_k}:
                 self.next_direction = Direction.UP
@@ -177,7 +205,7 @@ class Player(Node):
             if self.direction is None and self.next_direction is not None:
                 self.direction = self.next_direction
                 player_pos = self.maze.player.get_grid_position()
-                if self.maze.can_move(
+                if self.direction and self.maze.can_move(
                     player_pos,
                     (
                         player_pos[0] + self.direction.value[0],
@@ -185,8 +213,8 @@ class Player(Node):
                     ),
                 ):
                     self.target_position = (
-                        Vector2(player_pos) + self.direction.value
-                    ) * self.step_size + Vector2(
+                        Vec2(player_pos) + self.direction.value
+                    ) * self.step_size + Vec2(
                         self.step_size, self.step_size
                     ) / 2
         return event
@@ -207,15 +235,18 @@ class Player(Node):
             self.particles.local_position = self.world_position
             self.super_pacgum_silhouette.local_position = self.world_position
 
+        if not self.is_collided:
+            self.is_collided = self.get_collided_ghost()
         if self.local_position == self.target_position:
             self._step_target_position()
         elif self.direction is not None:
             self.sprites[self.direction].update(delta)
 
-    def _step_target_position(self):
+    def _step_target_position(self) -> None:
         """Update the target position of the player based the direction."""
         if self.direction is not None:
-            self.maze.tick_player(self.direction)
+            self.maze.tick_player(self.direction, self.is_collided)
+            self.is_collided = None
             player_pos = self.maze.player.get_grid_position()
             if self.next_direction and self.maze.can_move_player(
                 self.next_direction
@@ -229,16 +260,28 @@ class Player(Node):
                 ),
             ):
                 self.target_position = (
-                    Vector2(player_pos) + self.direction.value
-                ) * self.step_size + Vector2(self.step_size) / 2
+                    Vec2(player_pos) + self.direction.value
+                ) * self.step_size + Vec2(self.step_size) / 2
+
+    def get_collided_ghost(self) -> Ghost | None:
+        for ghost in self.ghosts:
+            if (
+                self.world_position.distance_to(
+                    ghost.world_position + ghost.animated_position
+                )
+                < self.step_size / 4
+            ):
+                return ghost.logical_ghost
+        return None
 
     def die(self) -> None:
+        """Handle the player's death."""
         self.dead = True
         self.death_particles_timer.start()
         self.direction = None
         self.next_direction = None
 
-    def respawn(self, x, y) -> None:
+    def respawn(self, x: int, y: int) -> None:
         """Respawn the player at the given grid coordinates (x, y).
 
         Args:
@@ -249,8 +292,8 @@ class Player(Node):
         self.dead = False
         self.hidden = False
         self.target_position = (
-            Vector2(x, y) * self.step_size
-            + Vector2(self.step_size, self.step_size) / 2
+            Vec2(x, y) * self.step_size
+            + Vec2(self.step_size, self.step_size) / 2
         )
         self.local_position = self.target_position.copy()
 
@@ -275,7 +318,9 @@ class Player(Node):
         else:
             self.context.screen.blit(
                 self.idle_img,
-                self.world_position - Vector2(self.idle_img.get_size()) / 2,
+                (
+                    self.world_position - Vec2(self.idle_img.get_size()) / 2
+                ).as_tuple(),
             )
 
     def _on_redraw(self) -> None:

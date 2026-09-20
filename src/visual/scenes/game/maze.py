@@ -1,12 +1,8 @@
 """A module for visualizing a maze in a game."""
 
-from src.visual.draw import Draw
-from src.visual.utils.particle import ParticleSystem
-from src.visual.utils.shake import Shake
-from pygame import Surface
-from pygame import Vector2
 from typing import Callable
-from src.visual.utils.timer import Timer
+
+from pygame import Surface
 
 from src.logical.game_event import (
     AteGhostEvent,
@@ -18,11 +14,16 @@ from src.logical.game_event import (
     PlayerRespawnedEvent,
     WinEvent,
 )
-from src.visual import Context, Node
 from src.logical.maze import LogicalMaze
+from src.visual import Context, Node
+from src.visual.draw import Draw
 from src.visual.scenes.game.ghost import VisualGhost
 from src.visual.scenes.game.player import Player
 from src.visual.scenes.game_over import GameOverScene, TerminalState
+from src.visual.utils.particle import ParticleSystem
+from src.visual.utils.shake import Shake
+from src.visual.utils.timer import Timer
+from src.visual.utils.primitives import Vec2
 
 
 class Corner(Node):
@@ -38,7 +39,12 @@ class Corner(Node):
         context: Context,
         surface: tuple[Surface, Surface, Surface, Surface],
     ) -> None:
-        """Initialize the Corner object."""
+        """Initialize the Corner object.
+
+        Args:
+            context (Context): The context of the game.
+            surface (tuple): A tuple containing the surfaces for the corner.
+        """
         super().__init__(context)
         self.surface = surface
 
@@ -46,22 +52,28 @@ class Corner(Node):
         """Draw the corner surfaces on the screen."""
         self.context.screen.blit(
             self.surface[0],
-            self.world_position,
+            self.world_position.as_tuple(),
         )
         self.context.screen.blit(
             self.surface[1],
-            self.world_position + Vector2(self.surface[0].get_width(), 0),
+            (
+                self.world_position + Vec2(self.surface[0].get_width(), 0)
+            ).as_tuple(),
         )
         self.context.screen.blit(
             self.surface[2],
-            self.world_position + Vector2(0, self.surface[0].get_height()),
+            (
+                self.world_position + Vec2(0, self.surface[0].get_height())
+            ).as_tuple(),
         )
         self.context.screen.blit(
             self.surface[3],
-            self.world_position
-            + Vector2(
-                self.surface[0].get_width(), self.surface[0].get_height()
-            ),
+            (
+                self.world_position
+                + Vec2(
+                    self.surface[0].get_width(), self.surface[0].get_height()
+                )
+            ).as_tuple(),
         )
 
 
@@ -85,12 +97,19 @@ class VisualMaze(Node):
         cell_size: int = 16,
         level_up_callback: Callable = lambda: None,
     ) -> None:
-        """Initialize the VisualMaze object."""
+        """Initialize the VisualMaze object.
+
+        Args:
+            context (Context): The context of the game.
+            logical_maze (LogicalMaze): The logical representation of the maze.
+            cell_size (int): The size of each cell in the maze.
+            level_up_callback (Callable): A callback function on level up.
+        """
         super().__init__(context)
         self.level_up_callback = level_up_callback
         self.logical_maze = logical_maze
         self.cell_size = cell_size
-        self.tick_timer = 0
+        self.tick_timer = 0.0
         self.time_per_tick = 1 / 60
 
         self.surfaces = {
@@ -194,11 +213,21 @@ class VisualMaze(Node):
         self.refresh()
 
         def on_freeze_timer_started(timer: Timer) -> None:
+            """Freeze all compnents except the timer a short duration.
+
+            Args:
+                timer (Timer): The timer that started.
+            """
             for component in context.root_scene.children:
                 if component is not timer:
                     component.paused = True
 
         def on_freeze_timer_finished(timer: Timer) -> None:
+            """Unfreeze all components except the timer after a short duration.
+
+            Args:
+                timer (Timer): The timer that finished.
+            """
             for component in context.root_scene.children:
                 if component is not timer:
                     component.paused = False
@@ -211,7 +240,7 @@ class VisualMaze(Node):
         # add the timer to the root and only freeze the game scene
         context.root_scene.add_child(self.freeze_timer)
 
-        self.shake = Shake(context, 0.5, Vector2(6, 0), Vector2())
+        self.shake = Shake(context, 0.5, Vec2(6, 0), Vec2())
         context.root_scene.add_child(self.shake)
 
         particle_img = context.assets.image("particle_3x3")
@@ -221,19 +250,29 @@ class VisualMaze(Node):
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.2,
             12,
         )
         self.supergum_particles.playing = False
 
-        def on_supergum_particles_timer_start(_) -> None:
+        def on_supergum_particles_timer_start(timer: Timer) -> None:
+            """Start the supergum particles effect.
+
+            Args:
+                timer (Timer): The timer that started.
+            """
             self.supergum_particles.play()
 
-        def on_supergum_particles_timer_finished(_) -> None:
+        def on_supergum_particles_timer_finished(timer: Timer) -> None:
+            """Stop the supergum particles effect.
+
+            Args:
+                timer (Timer): The timer that finished.
+            """
             self.supergum_particles.stop()
 
         self.supergum_particles_timer = Timer(
@@ -265,14 +304,22 @@ class VisualMaze(Node):
             (bool(top), bool(right), bool(bottom), bool(left))
         ]
 
-    def refresh(self):
+    def refresh(self) -> None:
         """Refresh the visual representation of the maze."""
         self.clear_children()
         width, height = self.logical_maze.width, self.logical_maze.height
-        self.size = Vector2(width, height) * self.cell_size
+        self.size = Vec2(width, height) * self.cell_size
 
         def sample_cell(x: int, y: int) -> int:
-            """Sample a cell in the logical maze, 0 if out of bounds."""
+            """Sample a cell in the logical maze, 0 if out of bounds.
+
+            Args:
+                x (int): The x-coordinate of the cell.
+                y (int): The y-coordinate of the cell.
+
+            Returns:
+                int: The value of the cell, or 0 if out of bounds.
+            """
             if x < 0 and y < 0:
                 return 0
             if x < 0 and y >= height:
@@ -304,7 +351,7 @@ class VisualMaze(Node):
                     self.context, self.get_surface_for_corner(cells)
                 )
 
-                corner.local_position = Vector2(
+                corner.local_position = Vec2(
                     self.cell_size * (x + 0.5),
                     self.cell_size * (y + 0.5),
                 )
@@ -312,6 +359,14 @@ class VisualMaze(Node):
                 self.add_child(corner)
 
         self.ghosts = []
+
+        self.player = Player(
+            self.context,
+            self.logical_maze,
+            self.cell_size,
+            self.ghosts,
+            self.logical_maze.current_level.speed,
+        )
         for i, logical_ghost in enumerate(self.logical_maze.ghosts):
             ghost = VisualGhost(
                 self.context,
@@ -320,17 +375,11 @@ class VisualMaze(Node):
                 logical_ghost,
                 self.cell_size,
                 self.logical_maze.current_level.speed * 0.4,
+                self.player,
             )
-            ghost.local_position = Vector2(self.cell_size) / 2
+            ghost.local_position = Vec2(self.cell_size) / 2
             self.ghosts.append(ghost)
             self.add_child(ghost)
-
-        self.player = Player(
-            self.context,
-            self.logical_maze,
-            self.cell_size,
-            self.logical_maze.current_level.speed,
-        )
 
         self.add_child(self.player)
 
@@ -352,6 +401,8 @@ class VisualMaze(Node):
             if isinstance(event, PlayerDiedEvent):
                 self.player.die()
                 self.shake.apply()
+                for ghost in self.ghosts:
+                    ghost.paused = True
             if isinstance(event, PlayerRespawnedEvent):
                 self.player.respawn(event.x, event.y)
                 for ghost in self.ghosts:
@@ -361,8 +412,8 @@ class VisualMaze(Node):
                 self.ghosts[event.ghost_id].hidden = True
             if isinstance(event, AteSuperPacgumEvent):
                 self.supergum_particles.local_position = (
-                    Vector2(event.x, event.y) * self.cell_size
-                    + Vector2(self.cell_size, self.cell_size) / 2
+                    Vec2(event.x, event.y) * self.cell_size
+                    + Vec2(self.cell_size, self.cell_size) / 2
                 )
                 self.supergum_particles_timer.start()
                 self.freeze_timer.start()
@@ -402,19 +453,23 @@ class VisualMaze(Node):
             gum_img = self.context.assets.image("gum_item")
             self.context.screen.blit(
                 gum_img,
-                self.world_position
-                + Vector2(self.cell_size) / 2
-                + Vector2(x, y) * self.cell_size
-                - Vector2(gum_img.get_size()) / 2,
+                (
+                    self.world_position
+                    + Vec2(self.cell_size) / 2
+                    + Vec2(x, y) * self.cell_size
+                    - Vec2(gum_img.get_size()) / 2
+                ).as_tuple(),
             )
         for x, y in self.logical_maze.super_pacgums:
             supergum_img = self.context.assets.image("supergum_item")
             self.context.screen.blit(
                 supergum_img,
-                self.world_position
-                + Vector2(self.cell_size) / 2
-                + Vector2(x, y) * self.cell_size
-                - Vector2(supergum_img.get_size()) / 2,
+                (
+                    self.world_position
+                    + Vec2(self.cell_size) / 2
+                    + Vec2(x, y) * self.cell_size
+                    - Vec2(supergum_img.get_size()) / 2
+                ).as_tuple(),
             )
 
         ft_small = [
@@ -437,7 +492,7 @@ class VisualMaze(Node):
                     Draw.rect(
                         self.context.screen,
                         self.world_position
-                        + Vector2(posx + x, posy + y) * self.cell_size,
-                        Vector2(self.cell_size, self.cell_size),
+                        + Vec2(posx + x, posy + y) * self.cell_size,
+                        Vec2(self.cell_size, self.cell_size),
                         self.context.colors.light,
                     )

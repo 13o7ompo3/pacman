@@ -1,10 +1,12 @@
 """A module that defines the LeaderBoardScene class."""
 
-from src.visual import Node, Context
+from pygame import MOUSEBUTTONDOWN
+from pygame.event import Event
+
+from src.visual import Context, Node
 from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
-from pygame import Vector2, MOUSEBUTTONDOWN
-from pygame.event import Event
+from src.visual.utils.primitives import Vec2
 
 
 class LeaderBoardScene(Node):
@@ -16,29 +18,31 @@ class LeaderBoardScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a LeaderBoardScene instance."""
+        """Initialize a LeaderBoardScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
         width, height = context.width, context.height
         panel = Panel(
             context,
-            Vector2(300, 350),
+            Vec2(300, 350),
             context.colors.darker,
             border_color=context.colors.darkest,
             on_outside_press=lambda x: self.free_from_scene(),
         )
-        panel.local_position = Vector2(
-            width / 2 - panel.size.x / 2, height / 7
-        )
+        panel.local_position = Vec2(width / 2 - panel.size.x / 2, height / 7)
         self.add_child(panel)
 
         title_text = Label(
             context,
-            Vector2(300, 200),
+            Vec2(300, 200),
             [("LeaderBoard", context.colors.lightest)],
             2,
         )
         title_text.local_position = (
-            Vector2(width / 2, height / 5) - title_text.size / 2
+            Vec2(width / 2, height / 5) - title_text.size / 2
         )
         self.add_child(title_text)
 
@@ -46,13 +50,13 @@ class LeaderBoardScene(Node):
         for i, user in enumerate(context.user_manager.get_leaderboard()[:10]):
             entry = Label(
                 context,
-                Vector2(panel.size.x, panel.size.y / 12),
+                Vec2(panel.size.x, panel.size.y / 12),
                 [
                     (f"{user.username}:    ", context.colors.light),
                     (str(user.highscore), context.colors.lighter),
                 ],
             )
-            entry.local_position = Vector2(0, (panel.size.y * (i + 2)) / 13)
+            entry.local_position = Vec2(0, (panel.size.y * (i + 2)) / 13)
             self.entries.append(entry)
             panel.add_child(entry)
 
@@ -68,3 +72,4 @@ class LeaderBoardScene(Node):
         """
         if event.type == MOUSEBUTTONDOWN:
             self.context.root_scene.remove_child(self)
+        return None

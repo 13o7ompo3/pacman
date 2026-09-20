@@ -1,6 +1,6 @@
 """A button UI element for the game."""
 
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import pygame
 from pygame import (
@@ -8,47 +8,23 @@ from pygame import (
     MOUSEBUTTONDOWN,
     MOUSEBUTTONUP,
     Color,
-    Rect,
     Surface,
-    Vector2,
 )
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2, Rect
 
 
 class Button(Node):
-    """A class that represents a button.
-
-    Attributes:
-        context (Context): The context of the button.
-        fg_color (Color): The foreground color of the button.
-        bg_color (Color): The background color of the button.
-        border_color (Color): The border color of the button.
-        padding (int): The padding around the content of the button.
-        content (Surface): The content of the button.
-        original_content (Surface): The original content of the button.
-        size (Vector2): The size of the button.
-        thickness (int): The thickness of the button's border.
-        border_radius (int): The radius of the button's border corners.
-        bg_rect (Rect): The rectangle representing the button's background.
-        fg_rect (Rect): The rectangle representing the button's foreground.
-        pressed_rect (Rect): The rectangle representing if the button pressed.
-        content_position (Vector2): The position of the content on the button.
-        pressed_content_position (Vector2): The position when pressed.
-        is_hovered (bool): A flag indicating if the button is hovered.
-        is_pressed (bool): A flag indicating if the button is pressed.
-        is_shortcut_down (bool): A flag indicating if a shortcut key pressed.
-        callback (Callable): The callback function to be called when pressed.
-
-    """
+    """A class that represents a button."""
 
     def __init__(
         self,
         context: Context,
         content: str | Surface | list[Surface | str],
-        size: Vector2,
+        size: Vec2,
         color: Color,
         callback: Callable,
         shortcuts: set[int] = set(),
@@ -58,7 +34,21 @@ class Button(Node):
         highlight_color: Color | None = None,
         padding: int = 3,
     ) -> None:
-        """Initialize a Button instance."""
+        """Initialize a Button instance.
+
+        Args:
+            context (Context): The context in which the button exists.
+            content (str | Surface | list[Surface | str]): The content.
+            size (Vec2): The size of the button.
+            color (Color): The color of the button.
+            callback (Callable): The callback when the button is pressed.
+            shortcuts (set[int]): A set of key codes that trigger the button.
+            thickness (int): The thickness of the button's border.
+            border_radius (int): The radius of the button's border corners.
+            shadow_color (Color | None): The color of the button's shadow.
+            highlight_color (Color | None): The color of the highlight.
+            padding (int): The padding around the button's content.
+        """
         self.context = context
         self.fg_color = color
         self.bg_color = (
@@ -76,7 +66,7 @@ class Button(Node):
         self.content = self._prepare_content(content)
         self.original_content = self.content.copy()
         self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
-        size = Vector2(
+        size = Vec2(
             max(size.x, self.content.get_size()[0]),
             max(size.y, self.content.get_size()[1]),
         )
@@ -85,15 +75,15 @@ class Button(Node):
         self.thickness = thickness
         self.border_radius = border_radius
 
-        self.bg_rect = Rect(Vector2(0), size)
+        self.bg_rect = Rect(Vec2(0), size)
         self.bg_rect.height += thickness
-        self.fg_rect = Rect(Vector2(0), size)
+        self.fg_rect = Rect(Vec2(0), size)
 
-        self.pressed_rect = Rect(Vector2(0), size)
+        self.pressed_rect = Rect(Vec2(0), size)
         self.pressed_rect.y += thickness
 
-        self.content_position = Vector2()
-        self.pressed_content_position = Vector2()
+        self.content_position = Vec2()
+        self.pressed_content_position = Vec2()
 
         self.is_hovered = False
         self.is_pressed = False
@@ -128,34 +118,39 @@ class Button(Node):
                 .convert_alpha()
             )
         elif isinstance(content, list):
-            size = Vector2()
+            size = Vec2()
             for i in range(len(content)):
-                if isinstance(content[i], str):
+                text = content[i]
+                if isinstance(text, str):
                     content[i] = (
                         self.context.assets.font("ui")
                         .render(
-                            content[i],
+                            text,
                             False,
                             Color("white"),
                         )
                         .convert_alpha()
                     )
-                elif isinstance(content[i], Surface):
-                    content[i] = content[i]
-                w, h = content[i].get_size()
-                size.x += w
-                if h > size.y:
-                    size.y = h
+                elif isinstance(text, Surface):
+                    content[i] = text
+                surf = content[i]
+                if isinstance(surf, Surface):
+                    w, h = surf.get_size()
+                    size.x += w
+                    if h > size.y:
+                        size.y = h
 
-            size += Vector2(
-                self.padding * (len(content) + 1), self.padding * 2
+            size += Vec2(self.padding * (len(content) + 1), self.padding * 2)
+            surface = Surface(
+                cast(tuple[int, int], size), flags=pygame.SRCALPHA
             )
-            surface = Surface(size, flags=pygame.SRCALPHA)
             x = self.padding
             for i in range(len(content)):
-                w, h = content[i].get_size()
-                surface.blit(content[i], (x, size.y / 2 - h / 2))
-                x += w + self.padding
+                surf = content[i]
+                if isinstance(surf, Surface):
+                    w, h = surf.get_size()
+                    surface.blit(surf, (x, size.y / 2 - h / 2))
+                    x += w + self.padding
             content = surface
         elif isinstance(content, Surface):
             content = content.convert_alpha()
@@ -177,9 +172,9 @@ class Button(Node):
             self.fg_rect.topleft = (int(x), int(y))
             self.pressed_rect.topleft = (int(x), int(y) + self.thickness)
             self.content_position = (
-                Vector2(self.fg_rect.center)
-                - Vector2(self.content.get_size()) / 2
-                + Vector2(1)
+                self.fg_rect.center
+                - Vec2(self.content.get_size()) / 2
+                + Vec2(1)
             )
             self.pressed_content_position = self.content_position.copy()
             self.pressed_content_position.y += self.thickness
@@ -231,7 +226,8 @@ class Button(Node):
                 border_width=1,
             )
             self.context.screen.blit(
-                self.content, self.pressed_content_position
+                self.content,
+                cast(tuple[float, float], self.pressed_content_position),
             )
         else:
             Draw.rect(
@@ -258,7 +254,9 @@ class Button(Node):
                 border_width=1,
                 border_radius=self.border_radius,
             )
-            self.context.screen.blit(self.content, self.content_position)
+            self.context.screen.blit(
+                self.content, cast(tuple[float, float], self.content_position)
+            )
 
     def _on_redraw(self) -> None:
         """Redraw the button."""

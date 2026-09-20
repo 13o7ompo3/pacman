@@ -1,11 +1,11 @@
 """The loading scene is responsible for loading all the assets."""
 
-from pygame import Vector2
-from src.visual import Node, Context
+from src.visual import Context, Node
 from src.visual.scenes.title import TitleScene
 from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
 from src.visual.ui.prompt import Prompt
+from src.visual.utils.primitives import Vec2
 
 
 class LoadingScene(Node):
@@ -20,38 +20,44 @@ class LoadingScene(Node):
     """
 
     def __init__(self, context: Context) -> None:
-        """Initialize a LoadingScene instance."""
+        """Initialize a LoadingScene instance.
+
+        Args:
+            context (Context): The context of the game.
+        """
         super().__init__(context)
 
         def on_finish(_: ProgressBar) -> None:
-            """Handle the completion of asset loading."""
+            """Handle the completion of asset loading.
+
+            Args:
+                _: ProgressBar: The progress bar that finished loading.
+            """
             self.free_from_scene()
             self.context.root_scene.finish_loading()
             title_scene = TitleScene(context)
             context.root_scene.add_child(title_scene)
 
         # only load the font for the loading screen
-        context.assets.register_font(
-            "ui", "assets/fonts/perfect_dos_vga_437.ttf", 16
-        )
+        context.assets.register_font("ui", "assets/fonts/font.png", (9, 16))
         context.assets.load()
         self._register_assets()
 
         label = Label(
             context,
-            Vector2(256, 32),
+            Vec2(256, 32),
             [("Loading..", context.colors.lightest)],
             2,
         )
         label.local_position = (
-            Vector2(context.width, context.height) / 2
+            Vec2(context.width, context.height) / 2
             - label.size / 2
-            - Vector2(0, 64)
+            - Vec2(0, 64)
         )
 
         self.progress_bar = ProgressBar(
             context,
-            Vector2(256, 32),
+            Vec2(256, 32),
             ProgressBarOrientation.HORIZONTAL,
             context.colors.light,
             context.assets.total_assets,
@@ -59,9 +65,9 @@ class LoadingScene(Node):
             on_finish=on_finish,
         )
         self.progress_bar.local_position = (
-            Vector2(context.width, context.height) / 2
+            Vec2(context.width, context.height) / 2
             - self.progress_bar.size / 2
-            + Vector2(0, 64)
+            + Vec2(0, 64)
         )
 
         self.loading_iter = self.context.assets.load_progress()
@@ -80,8 +86,12 @@ class LoadingScene(Node):
             ret = next(self.loading_iter)
             if isinstance(ret, Exception):
 
-                def on_accept(_) -> None:
-                    """Handle the acceptance of the error prompt."""
+                def on_accept(prompt: Prompt) -> None:
+                    """Handle the acceptance of the error prompt.
+
+                    Args:
+                        prompt: The prompt that was accepted.
+                    """
                     self.context.game_running = False
 
                 prompt = Prompt(self.context, "Error", str(ret), on_accept)
@@ -94,9 +104,9 @@ class LoadingScene(Node):
     def _register_assets(self) -> None:
         """Register all the assets to be loaded."""
 
-        # load fonts
-        self.context.assets.register_font(
-            "title", "assets/fonts/alagard.ttf", 16
+        # load title banner
+        self.context.assets.register_image(
+            "banner", "assets/banners/title.png"
         )
 
         # load animations
@@ -275,9 +285,6 @@ class LoadingScene(Node):
         )
         self.context.assets.register_image(
             "robots-are-cool-1x", "assets/palettes/robots-are-cool-1x.png"
-        )
-        self.context.assets.register_image(
-            "roserust-1x", "assets/palettes/roserust-1x.png"
         )
         self.context.assets.register_image(
             "sandy-06-1x", "assets/palettes/sandy-06-1x.png"

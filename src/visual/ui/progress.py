@@ -3,9 +3,11 @@
 from enum import Enum
 from typing import Callable
 
-from pygame import Color, Rect, Vector2
-from src.visual import Node, Context
+from pygame import Color
+
+from src.visual import Context, Node
 from src.visual.draw import Draw
+from src.visual.utils.primitives import Vec2, Rect
 
 
 class ProgressBarOrientation(Enum):
@@ -25,7 +27,7 @@ class ProgressBar(Node):
     """A class that represents a progress bar.
 
     Attributes:
-        size (Vector2): The size of the progress bar.
+        size (Vec2): The size of the progress bar.
         orientation (ProgressBarOrientation): The orientation of the progress.
         progress_color (Color): The color of the progress indicator.
         total (float): The total value for the progress bar.
@@ -40,7 +42,7 @@ class ProgressBar(Node):
     def __init__(
         self,
         context: Context,
-        size: Vector2,
+        size: Vec2,
         orientation: ProgressBarOrientation,
         progress_color: Color,
         total: float = 1.0,
@@ -50,7 +52,20 @@ class ProgressBar(Node):
         border_radius: int = 7,
         on_finish: Callable = lambda _: None,
     ) -> None:
-        """Initialize a ProgressBar instance."""
+        """Initialize a ProgressBar instance.
+
+        Args:
+            context (Context): The context in which the progress bar exists.
+            size (Vec2): The size of the progress bar.
+            orientation (ProgressBarOrientation): The orientation.
+            progress_color (Color): The color of the progress indicator.
+            total (float): The total value for the progress bar.
+            reversed (bool): Whether the progress bar is reversed.
+            border_color (Color | None): The color of the border.
+            border_width (int): The width of the border.
+            border_radius (int): The radius of the border corners.
+            on_finish (Callable): A callback function when reaching total.
+        """
         super().__init__(context)
 
         self.size = size
@@ -64,7 +79,7 @@ class ProgressBar(Node):
         self.border_width = border_width
         self.border_radius = border_radius
         self.on_finish = on_finish
-        self._progress = 0
+        self._progress = 0.0
         self._animated_progress = 0
 
     @property
@@ -78,7 +93,7 @@ class ProgressBar(Node):
         return self._progress
 
     @progress.setter
-    def progress(self, value: float):
+    def progress(self, value: float) -> None:
         """Set the current progress value.
 
         Args:
@@ -100,16 +115,16 @@ class ProgressBar(Node):
 
     def _on_draw(self) -> None:
         """Draw the progress bar on the screen."""
-        inflate = Vector2()
+        inflate = Vec2()
         if self.orientation is ProgressBarOrientation.VERTICAL:
-            progress = Vector2(
+            progress = Vec2(
                 self.size.x,
                 self.size.y * self._progress / self.total if self.total else 0,
             )
             if progress.y < (self.border_radius * 2 + 2):
                 inflate.x = (self.border_radius * 2 + 2) - progress.y
         else:
-            progress = Vector2(
+            progress = Vec2(
                 self.size.x * self._progress / self.total if self.total else 0,
                 self.size.y,
             )

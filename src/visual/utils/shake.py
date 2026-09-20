@@ -2,9 +2,9 @@
 
 from random import randint
 
-from pygame import Vector2
 
 from src.visual import Context, Node
+from src.visual.utils.primitives import Vec2
 
 
 class Shake(Node):
@@ -12,8 +12,8 @@ class Shake(Node):
 
     Attributes:
         total_time (float): Total duration of the shake effect.
-        magnitude (Vector2): Initial magnitude of the shake effect.
-        acceleration (Vector2): Acceleration of the shake effect over time.
+        magnitude (Vec2): Initial magnitude of the shake effect.
+        acceleration (Vec2): Acceleration of the shake effect over time.
 
     """
 
@@ -21,17 +21,24 @@ class Shake(Node):
         self,
         context: Context,
         total_time: float,
-        magnitude: Vector2,
-        acceleration: Vector2,
+        magnitude: Vec2,
+        acceleration: Vec2,
     ) -> None:
-        """Initialize the Shake effect."""
+        """Initialize the Shake effect.
+
+        Args:
+            context (Context): The game context.
+            total_time (float): Total duration of the shake effect.
+            magnitude (Vec2): Initial magnitude of the shake effect.
+            acceleration (Vec2): Acceleration of the shake effect over time.
+        """
         super().__init__(context)
         self.total_time = total_time
         self.magnitude = magnitude
         self.acceleration = acceleration
         self.__delta_magnitude = magnitude.copy()
         self.__time: float = total_time
-        self.__target_original_position: Vector2 = Vector2()
+        self.__target_original_position: Vec2 = Vec2()
 
     def apply(self) -> None:
         """Apply the shake effect to the parent node."""
@@ -49,7 +56,7 @@ class Shake(Node):
         """
         if isinstance(self.parent, Node):
             if self.__time < self.total_time:
-                rand_value = Vector2()
+                rand_value = Vec2()
                 if int(self.__delta_magnitude.x) > 0:
                     rand_value.x = randint(
                         -int(self.__delta_magnitude.x),
@@ -69,4 +76,4 @@ class Shake(Node):
 
             else:
                 self.parent.local_position = self.__target_original_position
-                self.__target_original_position = Vector2()
+                self.__target_original_position = Vec2()

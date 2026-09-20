@@ -1,12 +1,13 @@
 """A module for managing game assets."""
 
-from pathlib import Path
-from typing import Iterator
-from pygame import Surface, image
-import pygame
-from pygame.font import Font
 import logging
+from collections.abc import Iterator
+from pathlib import Path
 
+import pygame
+from pygame import Surface, image
+
+from src.visual.utils.font import Font
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,9 @@ class AssetManager:
         """Initialize an AssetManager instance."""
         self._registered_images: dict[str, Path | str] = {}
         self._loaded_images: dict[str, Surface] = {}
-        self._registered_fonts: dict[str, tuple[Path | str, int]] = {}
+        self._registered_fonts: dict[
+            str, tuple[Path | str, tuple[int, int]]
+        ] = {}
         self._loaded_fonts: dict[str, Font] = {}
         self._registered_audios: dict[str, Path | str] = {}
         # self._loaded_audios: dict[str, Surface] = {}
@@ -44,7 +47,9 @@ class AssetManager:
         """
         self._registered_images[key] = path
 
-    def register_font(self, key: str, path: Path | str, size: int) -> None:
+    def register_font(
+        self, key: str, path: Path | str, char_size: tuple[int, int]
+    ) -> None:
         """Register a font asset.
 
         Args:
@@ -53,7 +58,7 @@ class AssetManager:
             size (int): The size of the font.
 
         """
-        self._registered_fonts[key] = (path, size)
+        self._registered_fonts[key] = (path, char_size)
 
     def register_audio(self, key: str, path: Path | str) -> None:
         """Register an audio asset.
@@ -121,7 +126,8 @@ class AssetManager:
             # load fonts
             for key, (path, size) in self._registered_fonts.copy().items():
                 del self._registered_fonts[key]
-                self._loaded_fonts[key] = Font(path, size)
+                atlas = image.load(path).convert_alpha()
+                self._loaded_fonts[key] = Font(atlas, size)
                 yield key
             logger.info(
                 f"{self.total_assets} assets have been successfully loaded"
@@ -143,6 +149,8 @@ class AssetManager:
         Args:
             key (str): The key of the image to retrieve.
 
+        Returns:
+            Surface: The loaded image surface.
         """
         return self._loaded_images[key]
 
@@ -152,5 +160,7 @@ class AssetManager:
         Args:
             key (str): The key of the font to retrieve.
 
+        Returns:
+            Font: The loaded font object.
         """
         return self._loaded_fonts[key]

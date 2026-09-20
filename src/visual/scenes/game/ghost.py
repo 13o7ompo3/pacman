@@ -2,15 +2,17 @@
 
 from src.logical.core_types import GhostState
 from src.visual.utils.particle import ParticleSystem
-import pygame
 from src.logical.entities import Ghost
 from src.logical.maze import LogicalMaze
 from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
-from pygame import PixelArray, Surface, Color, Vector2
+from pygame import PixelArray, Color
+from src.visual.utils.primitives import Vec2
 
 
 class VisualGhost(Node):
+    from src.visual.scenes.game.player import Player
+
     """A class representing the visual representation of a ghost in the game.
 
     Attributes:
@@ -18,8 +20,8 @@ class VisualGhost(Node):
         logical_maze (LogicalMaze): The logical representation of the maze.
         logical_ghost (Ghost): The logical representation of the ghost.
         step_size (int): The size of each step the ghost takes in the maze.
-        target_position (Vector2): Target position of the ghost in the maze.
-        animated_position (Vector2): Current animated position of the ghost.
+        target_position (Vec2): Target position of the ghost in the maze.
+        animated_position (Vec2): Current animated position of the ghost.
         ghost_step_timer (float): Timer to track the duration of ghost step.
         speed (float): The speed at which the ghost moves.
         ghost_step_duration (float): The duration of each ghost step.
@@ -37,18 +39,29 @@ class VisualGhost(Node):
         ghost: Ghost,
         step_size: int,
         speed: float,
+        player: Player,
     ) -> None:
-        """Initialize the VisualGhost object."""
+        """Initialize the VisualGhost object.
+
+        Args:
+            context (Context): The context of the game.
+            id (int): The unique identifier for the ghost.
+            maze (LogicalMaze): The logical representation of the maze.
+            ghost (Ghost): The logical representation of the ghost.
+            step_size (int): The size of each step the ghost takes in the maze.
+            speed (float): The speed at which the ghost moves.
+        """
         super().__init__(context)
         self.id = id
         self.logical_maze = maze
         self.logical_ghost = ghost
         self.step_size = step_size
-        self.target_position = Vector2(ghost.x, ghost.y) * step_size
+        self.target_position = Vec2(ghost.x, ghost.y) * step_size
         self.animated_position = self.target_position.copy()
 
-        self.ghost_step_timer = 0
+        self.ghost_step_timer = 0.0
         self.speed = speed
+        self.player = player
         self.ghost_step_duration = step_size / self.speed
 
         self.sprite_neutral = Sprite(
@@ -72,17 +85,18 @@ class VisualGhost(Node):
             w, h = particle_img.get_size()
             for x in range(w):
                 for y in range(h):
-                    color = Color(array[x, y])
+                    color = Color(array[x, y])  # type: ignore[index]
                     color.a = 100
-                    array[x, y] = color
+                    array[x, y] = color  # type: ignore[index]
         self.particles = ParticleSystem(
             context,
             particle_img,
-            (Vector2(10, 10), Vector2(-10, -10)),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(10, 10), Vec2(-10, -10)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.4,
             20,
         )
+        self.is_collided = False
 
     def _on_update(self, delta: float) -> None:
         """Update the visual representation of the ghost.
@@ -105,16 +119,26 @@ class VisualGhost(Node):
             self.world_position + self.animated_position
         )
         self.ghost_step_timer += delta
+        if not self.is_collided:
+            self.is_collided = self.collided_with_player()
         if self.ghost_step_timer > self.ghost_step_duration:
-            self.logical_maze.tick_ghost(self.id)
+            self.logical_maze.tick_ghost(self.id, self.is_collided)
+            self.is_collided = False
             self.ghost_step_timer = 0
 
         self.target_position = (
-            Vector2(self.logical_ghost.x, self.logical_ghost.y)
-            * self.step_size
+            Vec2(self.logical_ghost.x, self.logical_ghost.y) * self.step_size
         )
         self.animated_position = self.animated_position.move_towards(
             self.target_position, self.speed * delta
+        )
+
+    def collided_with_player(self) -> bool:
+        return (
+            self.player.world_position.distance_to(
+                self.world_position + self.animated_position
+            )
+            < self.step_size / 2
         )
 
     def _on_draw(self) -> None:
@@ -130,7 +154,7 @@ class VisualGhost(Node):
         )
         current_sprite.render()
 
-    def respawn(self, x, y):
+    def respawn(self, x: int, y: int) -> None:
         """Respawn the ghost at the specified coordinates.
 
         Args:
@@ -138,9 +162,10 @@ class VisualGhost(Node):
             y (int): The y-coordinate to respawn the ghost.
 
         """
-        self.target_position = Vector2(x, y) * self.step_size
+        self.target_position = Vec2(x, y) * self.step_size
         self.animated_position = self.target_position.copy()
         self.dead = False
+        self.paused = False
 
     def _on_redraw(self) -> None:
         """Redraw the ghost's sprites."""
