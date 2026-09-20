@@ -428,6 +428,7 @@ class VisualMaze(Node):
                         self.context, event.final_score, TerminalState.LOST
                     )
                 )
+                self.hidden = True
             if isinstance(event, LevelCompleteEvent):
                 self.refresh()
                 self.level_up_callback()
@@ -439,6 +440,7 @@ class VisualMaze(Node):
                         self.context, event.final_score, TerminalState.WON
                     )
                 )
+                self.hidden = True
                 self.refresh()
 
     def _on_draw(self) -> None:
