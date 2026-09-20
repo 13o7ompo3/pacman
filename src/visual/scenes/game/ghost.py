@@ -96,6 +96,7 @@ class VisualGhost(Node):
             0.4,
             20,
         )
+        self.is_collided = False
 
     def _on_update(self, delta: float) -> None:
         """Update the visual representation of the ghost.
@@ -118,8 +119,11 @@ class VisualGhost(Node):
             self.world_position + self.animated_position
         )
         self.ghost_step_timer += delta
-        if self.ghost_step_timer > self.ghost_step_duration:
-            self.logical_maze.tick_ghost(self.id, self.collided_with_player())
+        if not self.is_collided:
+            self.is_collided = self.collided_with_player()
+        if self.ghost_step_timer > self.ghost_step_duration or self.is_collided:
+            self.logical_maze.tick_ghost(self.id, self.is_collided)
+            self.is_collided = False
             self.ghost_step_timer = 0
 
         self.target_position = (

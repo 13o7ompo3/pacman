@@ -163,8 +163,7 @@ class Player(Node):
             0.4,
             4,
         )
-        print(speed)
-        self.last_positions = [self.world_position] * int(1 + speed / 8)
+        self.is_collided: Ghost | None = None
 
     def _set_surface_alpha(self, surface: Surface, alpha: int) -> None:
         """Set the alpha value of a Pygame Surface.
@@ -233,12 +232,12 @@ class Player(Node):
             self.local_position = self.local_position.move_towards(
                 self.target_position, delta * self.speed
             )
-            self.last_positions.pop(0)
-            self.last_positions.append(self.world_position)
             self.particles.local_position = self.world_position
             self.super_pacgum_silhouette.local_position = self.world_position
 
-        if self.local_position == self.target_position:
+        if not self.is_collided:
+            self.is_collided = self.get_collided_ghost()
+        if self.local_position == self.target_position or self.is_collided:
             self._step_target_position()
         elif self.direction is not None:
             self.sprites[self.direction].update(delta)
@@ -246,8 +245,8 @@ class Player(Node):
     def _step_target_position(self) -> None:
         """Update the target position of the player based the direction."""
         if self.direction is not None:
-            ghost_collided = self.get_collided_ghost()
-            self.maze.tick_player(self.direction, ghost_collided)
+            self.maze.tick_player(self.direction, self.is_collided)
+            self.is_collided = None
             player_pos = self.maze.player.get_grid_position()
             if self.next_direction and self.maze.can_move_player(
                 self.next_direction
@@ -266,14 +265,13 @@ class Player(Node):
 
     def get_collided_ghost(self) -> Ghost | None:
         for ghost in self.ghosts:
-            for position in self.last_positions:
-                if (
-                    position.distance_to(
-                        ghost.world_position + ghost.animated_position
-                    )
-                    < self.step_size / 4
-                ):
-                    return ghost.logical_ghost
+            if (
+                self.world_position.distance_to(
+                    ghost.world_position + ghost.animated_position
+                )
+                < self.step_size / 4
+            ):
+                return ghost.logical_ghost
         return None
 
     def die(self) -> None:
@@ -314,10 +312,9 @@ class Player(Node):
             self.super_pacgum_silhouette.stop()
         self.particles.render()
         if self.direction is not None:
-            for pos in self.last_positions:
-                sprite = self.sprites[self.direction]
-                sprite.local_position = pos
-                sprite.render()
+            sprite = self.sprites[self.direction]
+            sprite.local_position = self.world_position
+            sprite.render()
         else:
             self.context.screen.blit(
                 self.idle_img,
