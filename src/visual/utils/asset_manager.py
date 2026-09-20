@@ -8,8 +8,14 @@ import pygame
 from pygame import Surface, image
 
 from src.visual.utils.font import Font
+import sys
+
 
 logger = logging.getLogger(__name__)
+
+
+class AssetError(Exception):
+    pass
 
 
 class AssetManager:
@@ -117,31 +123,26 @@ class AssetManager:
             or an exception if loading fails.
 
         """
-        try:
-            # load images
-            for key, path in self._registered_images.copy().items():
-                del self._registered_images[key]
-                self._loaded_images[key] = image.load(path).convert_alpha()
+        # load images
+        for key, path in self._registered_images.copy().items():
+            del self._registered_images[key]
+            try:
+                self._loaded_images[key] = AssetManager.load_image(path)
                 yield key
-            # load fonts
-            for key, (path, size) in self._registered_fonts.copy().items():
+            except AssetError as err:
+                yield err
+        # load fonts
+        for key, (path, size) in self._registered_fonts.copy().items():
+            try:
                 del self._registered_fonts[key]
-                atlas = image.load(path).convert_alpha()
+                atlas = AssetManager.load_image(path)
                 self._loaded_fonts[key] = Font(atlas, size)
                 yield key
-            logger.info(
-                f"{self.total_assets} assets have been successfully loaded"
-            )
-        except FileNotFoundError:
-            yield Exception("File not found")
-        except PermissionError:
-            yield Exception("Could not read from file")
-        except IsADirectoryError:
-            yield Exception("File path was a directory")
-        except pygame.error as error:
-            yield error
-        except Exception:
-            yield Exception("Could not load assets")
+            except AssetError as err:
+                yield err
+        logger.info(
+            f"{self.total_assets} assets have been successfully loaded"
+        )
 
     def image(self, key: str) -> Surface:
         """Get a loaded image surface by key.
@@ -164,3 +165,34 @@ class AssetManager:
             Font: The loaded font object.
         """
         return self._loaded_fonts[key]
+
+    @staticmethod
+    def load_image(path: str | Path) -> Surface:
+        try:
+            return image.load(AssetManager.resource_path(path)).convert_alpha()
+        except FileNotFoundError as err:
+            raise AssetError(f"File not found {path}") from err
+        except PermissionError as err:
+            raise AssetError(f"Could not read from file {path}") from err
+        except IsADirectoryError as err:
+            raise AssetError(f"File path was a directory {path}") from err
+        except pygame.error as err:
+            raise AssetError("Pygame error") from err
+        except Exception as err:
+            raise AssetError(f"Could not load asset {path}") from err
+
+    @staticmethod
+    def resource_path(path: str | Path) -> Path:
+        """Get the path to a bundled resource.
+
+        Args:
+            path: Relative path to the resource.
+
+        Returns:
+            Absolute path to the resource.
+        """
+        if getattr(sys, "frozen", False):
+            return Path(sys._MEIPASS) / path
+
+        # resolve the relative assets dir throught parent-ception
+        return Path(__file__).resolve().parent.parent.parent.parent / path
