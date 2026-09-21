@@ -1,19 +1,13 @@
 _This project has been created as part of the 42 curriculum by atahiri-, obahya._
 
-```mermaid
-graph TD;
-    A[Start] --> B(Process);
-    B --> C{Decision};
-    C -- Yes --> D[Success];
-    C -- No --> E[Fail];
-
-```
-# Pac-Man
+# Spooks
 
 ## Description:
 
-This project is a Python remake of the original Pac-man game using minimal features from pygame graphics library.
-The goal of the project is to create a playable version of the classic Pac-man game, complete with a maze, ghosts, and power-ups. The game is designed to be simple yet engaging, providing players with a nostalgic experience while also showcasing the capabilities of Python and pygame.
+Spooks is our Pac-Man clone in Python 3.13 and pygame. Every level is a procedurally
+generated maze, the ghosts chase or flee depending on what we just ate, and the whole
+game can switch between 26 color themes at runtime. Scores are saved per user and shown
+on a leaderboard.
 
 ## Instructions:
 
@@ -158,104 +152,69 @@ by `src/logical/maze.py` via `from mazegenerator import MazeGenerator`.
   direction, and pellets/ghosts skip cells equal to `15`. Each level's `seed`
   makes its layout deterministic and reproducible.
 
----
-
 ## Implementation
 
-- **Stack:** Python ≥3.13, Pygame (640×480, scaled), Pydantic, NumPy. Built with
-  `uv` + `Makefile` (`make run`/`debug`/`lint`/`deploy` → PyInstaller "Spooks").
-- **Boot/loop (`pac-man.py`):** init Pygame → `UserManager` + `AssetManager` +
-  `parse_config` → `Context` → `LoadingScene` → main loop (input → `update(delta)`
-  → clear → `render` → flip). Quit on `QUIT`/`Esc`/`Q`.
-- **Scene graph:** `GameComponent` (tree + update/input) → `Node` (+ position/
-  render). Maze drawn tile-by-tile via a 2×2 neighborhood corner lookup.
-- **Logic/view split:** `src/logical` is pure Python (no Pygame). `LogicalMaze`
-  advances state via `tick_player`/`tick_ghost`/`tick_timers` and **emits
-  immutable `GameEvent`s** (e.g. `AtePacgum`, `PlayerDied`, `LevelComplete`)
-  collected and returned by `flush_events()`. `VisualMaze` calls `tick_timers()`
-  at a fixed **60 Hz** and translates events into animation (death, freeze,
-  particles, shake, level refresh). Player/ghosts interpolate between cells using
-  level `speed`.
-- **Frame-rate independence:** render uses `delta`; logic ticks fixed at 60 Hz;
-  respawn/invuln/ghost-respawn/power-up timers count in ticks.
-- **Ghost AI:** greedy chase (minimize distance, no reversing) in `CHASE`,
-  flee in `FRIGHTENED`. Deterministic given the grid.
-
----
+- Two layers: `src/logical` holds the rules and never imports pygame, `src/visual` renders them.
+- `LogicalMaze` owns the grid (vendored `mazegenerator`, seeded per level), the player, four
+  ghosts, the pacgums and all timers. It ticks at a fixed 60 Hz, independent of the frame rate.
+- Ghost AI: take the non-reversing move closest to the player (farthest when frightened), with
+  a 20 percent chance of the second best so the ghosts spread out.
+- Rule outcomes are frozen dataclass events (`AtePacgumEvent`, `PlayerDiedEvent`, `WinEvent`,
+  ...) that the view drains once per frame with `flush_events()`.
+- Everything on screen is a `Node` in a tree: `update`, `handle_input` and `render` recurse over
+  the children, a node can consume an input event, scenes are swapped by replacing the root's
+  children.
+- Entities interpolate between cell centers with `delta * speed` and call `tick_player` /
+  `tick_ghost` on arrival; collisions are distance checks with our own `Vec2`.
+- We draw with our own `Draw` engine (rects, rounded rects, sectors, circles, alpha), cut
+  sprites from PNG atlases, use a 9x16 bitmap font and store a theme as a 6x1 PNG palette.
+  Switching theme recolors every loaded asset with numpy masks.
+- `config.json` (JSON with `#` comments) is validated by pydantic; a `FallbackToDefault` wrap
+  validator swaps any invalid field for its default, so a broken file still starts the game.
+- `UserManager` stores one JSON per user with a SHA-256 password hash and the highscore.
+- Cheats unlock with a hashed key sequence: `N` next level, `F` freeze ghosts, `G` power-up.
+- Tooling: uv, flake8, mypy, PyInstaller one-file binary.
 
 ## General Software Architecture
 
-Clear one-directional layers:
+```
+pac-man.py               main loop: input -> update -> render
+src/parser.py            Config, LevelConfig (pydantic)
+src/db_manager/user.py   User, UserManager
+src/logical/             Direction, GhostState, PlayerState | Entity -> Player, Ghost
+                         GameEvent -> 10 event types | LogicalMaze
+src/visual/              GameComponent -> Node | Context | Draw | ColorPalette
+  scenes/                RootScene, LoadingScene, TitleScene, PauseScene, GameOverScene,
+                         LeaderBoardScene, InstructionsScene,
+                         game/: GameScene, VisualMaze, Player, VisualGhost, InfoBar
+  ui/                    Button, Label, Panel, ProgressBar, Prompt, TextBox
+  utils/                 AssetManager, Font, Image, Vec2, Rect, Sprite, ParticleSystem,
+                         Parallax, Shake, Timer
+```
 
 ```
-pac-man.py → parser.py ─┐
-                        ▼
-                     Context (shared state)
-        ┌───────────────┼────────────────┐
-        ▼               ▼                ▼
-   Visual layer    Data layer       Logical layer      ──uses──▶ MazeGenerator
-   src/visual/*    db_manager        src/logical/*                 (A-Maze-ing)
-   (scenes, ui,    (UserManager,     (LogicalMaze,
-    draw, assets)   User)             entities, events)
+pygame events / clock --> RootScene --> GameScene --> VisualMaze --> LogicalMaze
+                                                         ^  ticks it at 60 Hz, flushes its
+                                                         |  events into particles, shake,
+                                                         |  freeze frames and scene changes
 ```
 
-- **`Context`** — singleton-ish shared state (surface, size, assets,
-  `user_manager`, `config`, palette, `root_scene`, `game_running`); passed to
-  every `Node`.
-- **Scenes** (all `Node`s): `RootScene` (background + themes) → `LoadingScene` →
-  `TitleScene` → `GameScene` (+ `Pause`, `Instructions`, `LeaderBoard`,
-  `GameOver`). `GameScene` is the bridge: it owns a `LogicalMaze` and a
-  `VisualMaze` plus HUD widgets.
-- **Logical layer:** `LogicalMaze`, `entities` (`Player`/`Ghost`), `core_types`
-  (enums), `game_event` (frozen dataclasses). **Never imports Pygame.**
-- **Maze package:** `mazegenerator.MazeGenerator` → `LogicalMaze.grid`.
-- **Data layer:** `UserManager`/`User`, reached from scenes via
-  `Context.user_manager`.
-- **Key rule:** `visual → logical → mazegenerator`; Pygame is confined to
-  `pac-man.py` and `src/visual`. The logical layer is fully decoupled from
-  rendering, so simulation/scoring/AI can be reasoned about independently.
+- Every scene, widget, entity and effect is a `Node`; `Context` (screen, assets, palette,
+  users, config) is handed to each one.
+- `GameScene` builds one `LogicalMaze` and a `VisualMaze`, which binds a `Player` and a
+  `VisualGhost` to each logical entity.
+- Dependencies point one way: `visual` -> `logical` -> `mazegenerator`; only `pac-man.py`
+  imports `visual`.
 
-**File structure**
+## Project Management
 
-```
-src/
-├── db_manager/
-│   └── user.py
-├── logical/
-│   ├── core_types.py
-│   ├── entities.py
-│   ├── game_event.py
-│   └── maze.py
-└── visual/
-    ├── scenes/
-    │   ├── game/
-    │   │   ├── __init__.py
-    │   │   ├── ghost.py
-    │   │   ├── maze.py
-    │   │   └── player.py
-    │   ├── game_over.py
-    │   ├── instructions.py
-    │   ├── leaderboard.py
-    │   ├── loading.py
-    │   ├── pause.py
-    │   ├── root.py
-    │   └── title.py
-    ├── ui/
-    │   ├── button.py
-    │   ├── label.py
-    │   ├── panel.py
-    │   ├── progress.py
-    │   ├── prompt.py
-    │   └── text_box.py
-    ├── utils/
-    │   ├── asset_manager.py
-    │   ├── image.py
-    │   ├── parallax.py
-    │   ├── particle.py
-    │   ├── shake.py
-    │   ├── sprite.py
-    │   └── timer.py
-    ├── __init__.py
-    ├── draw.py
-    └── palette.py
-```
+Two of us: atahiri- (Blxee) on the visual layer and tooling, obahya (13o7ompo3) on the game
+logic, config and persistence. We worked on `feat/<topic>` branches merged into `main`, with
+small verb-prefixed commits (Added, Fixed, Changed) and `make lint` as the merge gate. The
+295 commits (2026-06-24 to 2026-09-21) fall into eight phases, each closed by a milestone:
+first playable build, own draw engine, full theme support, game juice, lint clean, release.
+
+We track it in Obsidian with the dotpm plugin, in [project_management/](project_management/):
+the [project board](project_management/Projects/Spooks/Spooks.md) (phases, subtasks,
+milestones, backlog), the [people notes](project_management/People/) and the
+[commit timeline](project_management/timeline.md) it was built from.
