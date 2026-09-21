@@ -3,7 +3,7 @@
 300+ commits crunched into the changes that actually matter.
 Merges, reverts of typos, and small fixes are skipped.
 
-Authors: A = atahiri- (visual), O = obayha (logic).
+Authors: A = atahiri- (visual), O = obahya (logic).
 Range: 2026-06-24 to 2026-09-21. Stack: Python, pygame, pydantic, numpy, uv.
 
 ## Phase 0 - Standalone building blocks (Jun 24 - Jul 4)

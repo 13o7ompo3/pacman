@@ -10,7 +10,7 @@ priority: "low"
 start: "2026-08-01"
 due: ""
 progress: 0
-assignees: ["[[obayha]]"]
+assignees: ["[[obahya]]"]
 tags: []
 subtaskIds: []
 dependencies: []

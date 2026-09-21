@@ -10,7 +10,7 @@ priority: "critical"
 start: "2026-07-16"
 due: ""
 progress: 0
-assignees: ["[[atahiri-]]", "[[obayha]]"]
+assignees: ["[[atahiri-]]", "[[obahya]]"]
 tags: []
 subtaskIds: []
 dependencies: []

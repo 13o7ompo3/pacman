@@ -2,10 +2,10 @@
 
 ## The initial split
 
-We are two people: atahiri- and obayha. At the start we split the
+We are two people: atahiri- and obahya. At the start we split the
 project in two halves that could grow in parallel:
 
-- obayha owned the logic: maze generation, game rules, events,
+- obahya owned the logic: maze generation, game rules, events,
   config parsing, and the users database.
 - atahiri- owned the visual: scene tree, draw engine, UI widgets,
   scenes, assets, and themes.
