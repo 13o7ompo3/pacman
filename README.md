@@ -2,74 +2,89 @@ _This project has been created as part of the 42 curriculum by atahiri-, obahya.
 
 # Spooks
 
-## Description:
+## Description
 
 Spooks is our Pac-Man clone in Python 3.13 and pygame. Every level is a procedurally
 generated maze, the ghosts chase or flee depending on what we just ate, and the whole
 game can switch between 26 color themes at runtime. Scores are saved per user and shown
 on a leaderboard.
 
-## Instructions:
+The goal of the project is to build a complete Pac-Man on top of the assigned A-Maze-ing
+maze generator: a configurable set of levels, a highscore system, and a codebase that
+keeps the game rules separate from the rendering.
 
-### Installation:
+## Instructions
 
-To install the necessary dependecies, just run the appropriate make rule:
+Requirements: Python 3.13 or newer and [uv](https://docs.astral.sh/uv/).
 
-```bash
-make install
-```
-
-This is equivalent to running:
+### Installation
 
 ```bash
-uv sync
+make install        # equivalent to: uv sync
 ```
 
-### Excution:
-
-In order to run the game, simply do:
+### Execution
 
 ```bash
-make run
+make run            # equivalent to: uv run python3 pac-man.py
 ```
 
-Which is equivalent to:
+The game reads `config.json` from the current directory (see Configuration). Arrow keys
+move, Escape quits.
+
+### Other targets
 
 ```bash
-uv run python pac_man.py
+make lint           # flake8 + mypy
+make deploy         # PyInstaller one-file binary in dist/Spooks
+make clean
 ```
 
-• A “Resources” section listing classic references related to the topic (documentation, articles, tutorials, etc.),
-as well as a description of how AI was used —specifying for which tasks and which parts of the project.
-## Resources:
+## Resources
 
-### Documentation:
+### Documentation and references
 
-Since the project does not require much theory and since we were already familiar with the libraries used, we did not use any documentation for the implementation of the project. However, we did use some documentation to understand how to use the libraries and their features.
+We mostly relied on the documentation of the libraries we used; the classic references
+on the topic are listed with them.
 
-* [MiniLibX official 42 docs](https://harm-smits.github.io/42docs/libs/minilibx)
-* [PyGame docs](https://www.pygame.org/docs/)
+* [pygame documentation](https://www.pygame.org/docs/)
+* [pydantic documentation](https://docs.pydantic.dev/latest/), in particular
+  [validators](https://docs.pydantic.dev/latest/concepts/validators/)
+* [NumPy documentation](https://numpy.org/doc/) (palette swapping)
+* [uv](https://docs.astral.sh/uv/) and [PyInstaller](https://pyinstaller.org/en/stable/)
+* [The Pac-Man Dossier](https://www.gamedeveloper.com/design/the-pac-man-dossier):
+  the reference on the original game's ghost behaviour and movement
+* [Maze generation algorithms](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
+  and Jamis Buck's
+  [Recursive Backtracking](http://weblog.jamisbuck.org/2010/12/27/maze-generation-recursive-backtracking)
+* [Fix Your Timestep!](https://gafferongames.com/post/fix_your_timestep/) (fixed 60 Hz
+  logic tick) and [Game Programming Patterns](https://gameprogrammingpatterns.com/)
+  (game loop, update method, scene tree)
+* [Lospec palette list](https://lospec.com/palette-list): source of the color palettes
+* [dotpm for Obsidian](https://github.com/dotpm/obsidian-pm): the project management tool
 
-### AI Usage:
+### AI usage
 
-The AI was not used to write actual code, but rather it was used for boilerplate docs and as brainstrorming tool to design high level architecture and to generate ideas for the project. It was used to help with the following tasks:
+AI was not used to write the game code. We used it for boilerplate documentation and as
+a brainstorming tool for the high-level architecture. Concretely it helped with:
 
-* Improving the documentation of the project.
-* Making the readme more readable and structured.
-* rethinking the architecture of the project and generating ideas for the implementation.
+* Improving the docstrings of the project.
+* Making this README more readable and structured.
+* Rethinking the architecture and generating ideas for the implementation.
 
-## Configuration:
+## Configuration
 
-
-Config is JSON (`config.json`, passed as a CLI arg) parsed and validated by
-Pydantic models in `parser.py` (`Config`, `LevelConfig`). Unknown **root** keys
-are ignored; level entries are validated strictly. On any error it falls back to
-safe defaults.
+The config is `config.json` in the working directory (`#` comments are allowed), parsed
+and validated by the pydantic models in `src/parser.py` (`Config`, `LevelConfig`).
+Unknown keys are ignored. A missing or unparsable file starts the game with the
+defaults. Each field is wrapped in `FallbackToDefault`: a value of the wrong type falls
+back to the field default. An out-of-range value inside a level invalidates that level
+list, which then falls back to the built-in levels.
 
 ```json
 {
   "levels": [
-    { "width": 14, "height": 14, "seed": 42, "level_max_time": 12 },
+    { "width": 14, "height": 14, "seed": 42, "level_max_time": 60 },
     { "width": 15, "height": 20, "seed": 42 }
   ],
   "lives": 3,
@@ -84,73 +99,69 @@ safe defaults.
 
 | Field | Default | Notes |
 |---|---|---|
-| `levels` | 10 default level | played in order |
-| `lives` | `3` | `1–5` |
-| `points_per_pacgum` | `10` | |
-| `points_per_super_pacgum` | `50` | |
-| `points_per_ghost` | `200` | |
-| `super_pacgum_duration` | `500` | FRIGHTENED ticks |
+| `levels` | 10 built-in levels | played in order; a shorter list is padded with the built-in ones |
+| `lives` | `3` | `1-5` |
+| `points_per_pacgum` | `10` | `0-20` |
+| `points_per_super_pacgum` | `50` | `0-100` |
+| `points_per_ghost` | `200` | `0-400` |
+| `super_pacgum_duration` | `500` | FRIGHTENED duration in ticks (60 per second), `200-1000` |
 
 **Per-level (`LevelConfig`) defaults**
 
 | Field | Default | Notes |
 |---|---|---|
-| `width` / `height` | `28` / `31` | `≥ 10` |
-| `seed` | `1337` | RNG seed → reproducible maze |
-| `level_max_time` | `90` | seconds (`ticks = time × 60`) |
-| `speed` | `100` | `1–100`; ghosts use `speed × 0.4` |
+| `width` / `height` | `10` / `10` | `10-22` cells |
+| `seed` | `1337` | int or numeric string; `0` gives a different maze each run |
+| `level_max_time` | `90` | seconds (`ticks = time * 60`) |
+| `speed` | `75` | `1-200` pixels per second; ghosts move at `speed * 0.4` |
 | `pacgum` | `1337` | declared, not consumed |
-
-> **Caveat:** the shipped `config.json` uses `level_max_timer` (typo) instead of
-> `level_max_time`. Since `LevelConfig` rejects extra keys, this silently drops
-> the whole `levels` array and falls back to one default level.
-
----
 
 ## Highscore
 
 Implemented in `src/db_manager/user.py` via two classes:
 
-- **`User`** (Pydantic): `username` (1–10 alnum), `password` (**SHA-256 hashed**, never plaintext), `highscore` (`≥ 0`).
-- **`UserManager`**: stores one JSON file per user in `./database/`.
-  - `load_all_users()` / `save_user_data()` — load & persist users.
-  - `create_new_user()` / `authenticate_user()` — register or log in (sets active `loged_in_user`).
-  - `update_highscore(score)` — **only if logged in and only when the new score is higher** (monotonic best-run rule); persists on change.
-  - `get_leaderboard()` — users sorted by `highscore` desc.
+- **`User`** (pydantic): `username` (1-10 characters, letters, digits and spaces),
+  `password` (**SHA-256 hash**, never plaintext), `highscore` (`>= 0`).
+- **`UserManager`**: stores one JSON file per user in `./database/` (git-ignored).
+  - `load_all_users()` / `save_user_data()`: load and persist users, corrupt files are skipped.
+  - `create_new_user()` / `authenticate_user()`: register or log in (sets `loged_in_user`).
+  - `update_highscore(score)`: **only if logged in and only when the new score is higher**;
+    persists on change.
+  - `get_leaderboard()`: users sorted by `highscore` descending.
   - `logout_user()`.
 
-**Flow:** on game over, `GameOverScene` shows login forms — existing users are
-authenticated, new ones are created, then `update_highscore(final_score)` runs.
-If already logged in it offers an **Update** button. `LeaderBoardScene` shows
-the top 10 via `get_leaderboard()[:10]`.
+**Flow:** on game over, `GameOverScene` shows a login form: existing users are
+authenticated, new ones are created, then `update_highscore(final_score)` runs. If a
+user is already logged in it offers **Update** and **Logout** buttons instead.
+`LeaderBoardScene` shows the top 10 from `get_leaderboard()`.
 
-**Why this way:** file-per-user JSON keeps it dependency-light (no DB/server,
-easy to inspect/back up); passwords are hashed; the "max only" rule preserves a
-true best score; the model is validated (safe filenames, non-negative scores);
-and the UI only calls high-level `UserManager` methods, so the storage backend
-can be swapped without touching scenes.
-
----
+**Why this way:** one JSON file per user keeps it dependency-free (no database, no
+server, easy to inspect and back up); passwords are hashed; the "higher only" rule keeps
+a true best score; the model is validated (safe filenames, non-negative scores); and the
+scenes only call `UserManager` methods, so the storage could be swapped without touching
+the UI.
 
 ## Maze Generation
 
-Mazes come from the assigned **A-Maze-ing** package, vendored here as
-`mazegenerator` (`MazeGenerator` in `mazegenerator/mazegenerator.py`), imported
-by `src/logical/maze.py` via `from mazegenerator import MazeGenerator`.
+Mazes come from the assigned **A-Maze-ing** package, vendored as the `mazegenerator`
+wheel and imported by `src/logical/maze.py` with `from mazegenerator import MazeGenerator`.
 
-- **Wall encoding:** each cell is an int whose bits are walls — `1=N, 2=E, 4=S,
-  8=W`. `15` = fully solid (impassable), `0` = open.
-- **`generate(seed)`** seeds RNG, builds a bordered maze with a decorative "42"
-  obstacle, carves passages with a **recursive-backtracker (DFS)** (randomly
-  adding loops when not `perfect`), then BFS-computes the shortest path.
+- **Wall encoding:** each cell is an int whose bits are walls: `1=N, 2=E, 4=S, 8=W`.
+  `15` is a fully closed cell, `0` a fully open one.
+- **`generate(seed)`** seeds the RNG, builds a bordered grid, embeds a "42" made of closed
+  cells when the maze is at least 14x10, carves passages with an iterative
+  depth-first backtracker, and, since we keep the default `perfect=False`, braids the
+  result (dead ends are opened, extra loops added) so nobody can be trapped in a
+  corridor. A BFS then computes the shortest path.
 - **Used by `LogicalMaze.load_level()`:**
   ```python
   self.maze_generator = MazeGenerator((self.width, self.height), seed=int(level.seed))
   self.grid = self.maze_generator.maze
   ```
-  The grid is the single source of truth: `can_move()` checks wall bits per
-  direction, and pellets/ghosts skip cells equal to `15`. Each level's `seed`
-  makes its layout deterministic and reproducible.
+  The grid is the single source of truth: `can_move()` checks the wall bit of the
+  direction taken, pacgums and ghosts skip the closed `15` cells, the player spawns in
+  the center, the ghosts in the four corners, the super pacgums in the corner cells.
+  The seed makes every level reproducible.
 
 ## Implementation
 
@@ -218,3 +229,4 @@ We track it in Obsidian with the dotpm plugin, in [project_management/](project_
 the [project board](project_management/Projects/Spooks/Spooks.md) (phases, subtasks,
 milestones, backlog), the [people notes](project_management/People/) and the
 [commit timeline](project_management/timeline.md) it was built from.
+
