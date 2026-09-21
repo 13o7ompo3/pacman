@@ -3,10 +3,11 @@ for implementing particle systems in Pygame."""
 
 import random
 
-from pygame import Surface, Vector2
+from pygame import Surface
 
 from src.visual import Context, Node
 from src.visual.utils.sprite import Sprite
+from src.visual.utils.primitives import Vec2
 
 
 class Particle(Node):
@@ -16,9 +17,9 @@ class Particle(Node):
         self,
         context: Context,
         particle_object: Surface | Sprite,
-        position: Vector2,
-        velocity: Vector2,
-        acceleration: Vector2,
+        position: Vec2,
+        velocity: Vec2,
+        acceleration: Vec2,
         lifetime: float,
     ) -> None:
         """Initialize a Particle instance.
@@ -26,9 +27,9 @@ class Particle(Node):
         Args:
             context (Context): The context in which the particle exists.
             particle_object (Surface | Sprite): The image of one particle.
-            position (Vector2): The initial position of the particle.
-            velocity (Vector2): The initial velocity of the particle.
-            acceleration (Vector2): The acceleration of the particle.
+            position (Vec2): The initial position of the particle.
+            velocity (Vec2): The initial velocity of the particle.
+            acceleration (Vec2): The acceleration of the particle.
             lifetime (float): The lifetime of the particle, in seconds.
         """
         super().__init__(context)
@@ -75,7 +76,7 @@ class Particle(Node):
             self.particle_object.render()
         else:
             self.context.screen.blit(
-                self.particle_object, tuple(map(int, self.local_position))
+                self.particle_object, tuple(self.local_position.array)
             )
 
 
@@ -86,8 +87,8 @@ class ParticleSystem(Node):
         self,
         context: Context,
         particle_object: Surface | Sprite,
-        velocity_range: tuple[Vector2, Vector2],
-        acceleration_range: tuple[Vector2, Vector2],
+        velocity_range: tuple[Vec2, Vec2],
+        acceleration_range: tuple[Vec2, Vec2],
         lifetime: float,
         amount: int,
     ) -> None:
@@ -96,9 +97,9 @@ class ParticleSystem(Node):
         Args:
             context (Context): The context in which the particle system exists.
             surface (Surface): The surface representing the particles' image.
-            velocity_range (Tuple[Vector2, Vector2]): A tuple containing the
+            velocity_range (Tuple[Vec2, Vec2]): A tuple containing the
                 minimum and maximum velocity vectors for emitted particles.
-            acceleration_range (Tuple[Vector2, Vector2]): A tuple containing
+            acceleration_range (Tuple[Vec2, Vec2]): A tuple containing
                 the minimum and maximum acceleration vectors
                 for emitted particles.
             lifetime (float): The lifetime of each particle, in seconds.
@@ -125,7 +126,7 @@ class ParticleSystem(Node):
         self.time_since_last_emission += delta
         while self.time_since_last_emission >= 1.0 / self.emission_rate:
             self.time_since_last_emission -= 1.0 / self.emission_rate
-            velocity = Vector2(
+            velocity = Vec2(
                 random.uniform(
                     self.velocity_range[0].x, self.velocity_range[1].x
                 ),
@@ -133,7 +134,7 @@ class ParticleSystem(Node):
                     self.velocity_range[0].y, self.velocity_range[1].y
                 ),
             )
-            acceleration = Vector2(
+            acceleration = Vec2(
                 random.uniform(
                     self.acceleration_range[0].x, self.acceleration_range[1].x
                 ),

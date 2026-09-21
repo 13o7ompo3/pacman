@@ -1,14 +1,16 @@
 """A module containing the Player class for the game."""
 
 import pygame
-from pygame import KEYDOWN, Color, PixelArray, Surface, Vector2
+from pygame import KEYDOWN, Color, PixelArray, Surface
 from pygame.event import Event
 
+from src.logical.entities import Ghost
 from src.logical.maze import Direction, LogicalMaze
 from src.visual import Context, Node
 from src.visual.utils.particle import ParticleSystem
 from src.visual.utils.sprite import Sprite
 from src.visual.utils.timer import Timer
+from src.visual.utils.primitives import Vec2
 
 
 class Player(Node):
@@ -17,7 +19,7 @@ class Player(Node):
     Attributes:
         direction (Direction): The current direction of the player.
         next_direction (Direction): The next direction the player will move in.
-        target_position (Vector2): Target position of the player in the maze.
+        target_position (Vec2): Target position of the player in the maze.
         step_size (int): The size of each step the player takes in the maze.
         maze (LogicalMaze): The logical representation of the maze.
         speed (float): The speed at which the player moves.
@@ -34,7 +36,8 @@ class Player(Node):
         context: Context,
         maze: LogicalMaze,
         step_size: int,
-        speed: float = 80,
+        ghosts: list,
+        speed: float,
     ) -> None:
         """Initialize the Player object.
 
@@ -48,13 +51,14 @@ class Player(Node):
         self.direction: Direction | None = None
         self.next_direction: Direction | None = None
         self.target_position = (
-            Vector2(maze.player.x, maze.player.y) * step_size
-            + Vector2(step_size, step_size) / 2
+            Vec2(maze.player.x, maze.player.y) * step_size
+            + Vec2(step_size, step_size) / 2
         )
         self.local_position = self.target_position.copy()
         self.step_size = step_size
         self.maze = maze
         self.speed = speed
+        self.ghosts = ghosts
         self.dead = False
         self.sprites = {
             Direction.UP: Sprite(
@@ -92,16 +96,16 @@ class Player(Node):
         }
         self.idle_img = context.assets.image("player_idle")
         particle_img = context.assets.image("particle_2x2")
-        self._set_surface_alpha(particle_img, 100)
+        particle_img = self._set_surface_alpha(particle_img, 100)
         particle_scatter = 12
         self.particles = ParticleSystem(
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.4,
             20,
         )
@@ -111,10 +115,10 @@ class Player(Node):
             context,
             particle_img,
             (
-                Vector2(particle_scatter, particle_scatter),
-                Vector2(-particle_scatter, -particle_scatter),
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
             ),
-            (Vector2(0, 0), Vector2(0, 0)),
+            (Vec2(0, 0), Vec2(0, 0)),
             0.2,
             20,
         )
@@ -154,13 +158,14 @@ class Player(Node):
                 10,
                 False,
             ),
-            (Vector2(), Vector2()),
-            (Vector2(), Vector2()),
+            (Vec2(), Vec2()),
+            (Vec2(), Vec2()),
             0.4,
             4,
         )
+        self.is_collided: Ghost | None = None
 
-    def _set_surface_alpha(self, surface: Surface, alpha: int) -> None:
+    def _set_surface_alpha(self, surface: Surface, alpha: int) -> Surface:
         """Set the alpha value of a Pygame Surface.
 
         Args:
@@ -168,6 +173,7 @@ class Player(Node):
             alpha (int): The alpha value to set (0-255).
 
         """
+        surface = surface.copy()
         with PixelArray(surface) as array:
             w, h = surface.get_size()
             for x in range(w):
@@ -175,6 +181,7 @@ class Player(Node):
                     color = Color(array[x, y])  # type: ignore[index]
                     color.a = alpha
                     array[x, y] = color  # type: ignore[index]
+        return surface
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the player.
@@ -208,8 +215,8 @@ class Player(Node):
                     ),
                 ):
                     self.target_position = (
-                        Vector2(player_pos) + self.direction.value
-                    ) * self.step_size + Vector2(
+                        Vec2(player_pos) + self.direction.value
+                    ) * self.step_size + Vec2(
                         self.step_size, self.step_size
                     ) / 2
         return event
@@ -230,6 +237,8 @@ class Player(Node):
             self.particles.local_position = self.world_position
             self.super_pacgum_silhouette.local_position = self.world_position
 
+        if not self.is_collided:
+            self.is_collided = self.get_collided_ghost()
         if self.local_position == self.target_position:
             self._step_target_position()
         elif self.direction is not None:
@@ -238,7 +247,8 @@ class Player(Node):
     def _step_target_position(self) -> None:
         """Update the target position of the player based the direction."""
         if self.direction is not None:
-            self.maze.tick_player(self.direction)
+            self.maze.tick_player(self.direction, self.is_collided)
+            self.is_collided = None
             player_pos = self.maze.player.get_grid_position()
             if self.next_direction and self.maze.can_move_player(
                 self.next_direction
@@ -252,8 +262,19 @@ class Player(Node):
                 ),
             ):
                 self.target_position = (
-                    Vector2(player_pos) + self.direction.value
-                ) * self.step_size + Vector2(self.step_size) / 2
+                    Vec2(player_pos) + self.direction.value
+                ) * self.step_size + Vec2(self.step_size) / 2
+
+    def get_collided_ghost(self) -> Ghost | None:
+        for ghost in self.ghosts:
+            if (
+                self.world_position.distance_to(
+                    ghost.world_position + ghost.animated_position
+                )
+                < self.step_size / 4
+            ):
+                return ghost.logical_ghost
+        return None
 
     def die(self) -> None:
         """Handle the player's death."""
@@ -273,8 +294,8 @@ class Player(Node):
         self.dead = False
         self.hidden = False
         self.target_position = (
-            Vector2(x, y) * self.step_size
-            + Vector2(self.step_size, self.step_size) / 2
+            Vec2(x, y) * self.step_size
+            + Vec2(self.step_size, self.step_size) / 2
         )
         self.local_position = self.target_position.copy()
 
@@ -299,10 +320,26 @@ class Player(Node):
         else:
             self.context.screen.blit(
                 self.idle_img,
-                self.world_position - Vector2(self.idle_img.get_size()) / 2,
+                (
+                    self.world_position - Vec2(self.idle_img.get_size()) / 2
+                ).as_tuple(),
             )
 
     def _on_redraw(self) -> None:
         """Redraw the player and its particles."""
         for sprite in self.sprites.values():
             sprite.redraw()
+        particle_img = self.context.assets.image("particle_2x2")
+        particle_img = self._set_surface_alpha(particle_img, 100)
+        particle_scatter = 12
+        self.particles = ParticleSystem(
+            self.context,
+            particle_img,
+            (
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
+            ),
+            (Vec2(0, 0), Vec2(0, 0)),
+            0.4,
+            20,
+        )

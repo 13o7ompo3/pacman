@@ -1,30 +1,11 @@
 import logging
 
+from src.visual.utils.asset_manager import AssetError
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
-
-
-def set_icon() -> None:
-    """Set the game icon for the Pygame window."""
-    import pygame
-
-    try:
-        icon_surface = pygame.image.load("assets/icons/icon.png")
-        pygame.display.set_icon(icon_surface)
-    except FileNotFoundError:
-        logging.error("game icon was not found")
-        exit(1)
-    except PermissionError:
-        logging.error("Could not read icon image")
-        exit(1)
-    except IsADirectoryError:
-        logging.error("Icon path was a directory")
-        exit(1)
-    except (RuntimeError, Exception):
-        logging.error("Could not load game icon")
-        exit(1)
 
 
 def main() -> None:
@@ -41,7 +22,7 @@ def main() -> None:
     from src.visual import Context
     from src.visual.scenes.loading import LoadingScene
     from src.visual.utils.asset_manager import AssetManager
-    from parser import parse_config
+    from src.parser import parse_config
 
     pygame.init()
     pygame.font.init()
@@ -49,7 +30,7 @@ def main() -> None:
     WIDTH, HEIGHT = 640, 480
     surface = pygame.display.set_mode((WIDTH, HEIGHT), pygame.SCALED)
 
-    set_icon()
+    pygame.display.set_icon(AssetManager.load_image("assets/icons/icon.png"))
 
     user_manager = UserManager()
 
@@ -64,8 +45,7 @@ def main() -> None:
     while context.game_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (
-                event.type == pygame.KEYDOWN
-                and event.key in {pygame.K_ESCAPE, pygame.K_q}
+                event.type == pygame.KEYDOWN and event.key in {pygame.K_ESCAPE}
             ):
                 context.game_running = False
 
@@ -90,5 +70,7 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
+    except AssetError as err:
+        logging.error(str(err))
     except KeyboardInterrupt:
-        logging.warning("\nProgram stopped by the user..")
+        logging.warning("Program stopped by the user..")

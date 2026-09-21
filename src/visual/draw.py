@@ -1,8 +1,9 @@
 """A module that provides basic drawing functions."""
 
-from pygame import Surface, PixelArray, Vector2, Color
+from pygame import Surface, PixelArray, Color
 import math
 import pygame
+from src.visual.utils.primitives import Vec2
 
 
 class Draw:
@@ -18,8 +19,8 @@ class Draw:
     @staticmethod
     def rect(
         surface: Surface,
-        position: Vector2 | tuple[int, int],
-        size: Vector2 | tuple[int, int],
+        position: Vec2 | tuple[int, int],
+        size: Vec2 | tuple[int, int],
         fill_color: Color
         | tuple[int, int, int]
         | tuple[int, int, int, int]
@@ -35,8 +36,8 @@ class Draw:
 
         Args:
             surface (Surface): The surface to draw on.
-            position (Vector2 | tuple[int, int]): The position.
-            size (Vector2 | tuple[int, int]): The size of the rectangle.
+            position (Vec2 | tuple[int, int]): The position.
+            size (Vec2 | tuple[int, int]): The size of the rectangle.
             fill_color (Color | tuple[int, int, int] \
                 | tuple[int, int, int, int] | None): The fill color.
             border_color (Color | tuple[int, int, int] \
@@ -45,9 +46,9 @@ class Draw:
             border_radius (int): The radius of the border corners.
 
         """
-        if isinstance(position, Vector2):
+        if isinstance(position, Vec2):
             position = (int(position.x), int(position.y))
-        if isinstance(size, Vector2):
+        if isinstance(size, Vec2):
             size = (int(size.x), int(size.y))
         if isinstance(fill_color, Color):
             fill_color = (
@@ -176,9 +177,9 @@ class Draw:
     def sector(
         surface: Surface,
         color: Color | tuple[int, int, int, int],
-        position: Vector2 | tuple[int, int],
+        position: Vec2 | tuple[int, int],
         border_width: int,
-        radius: int,
+        r: int,
         start_angle: float,
         end_angle: float,
         filled: bool,
@@ -188,7 +189,7 @@ class Draw:
         Args:
             surface (Surface): The surface to draw on.
             color (Color | tuple[int, int, int, int]): The color of the sector.
-            position (Vector2 | tuple[int, int]): The position of the sector.
+            position (Vec2 | tuple[int, int]): The position of the sector.
             border_width (int): The width of the border.
             radius (int): The radius of the sector.
             start_angle (float): The start angle of the sector in radians.
@@ -196,8 +197,8 @@ class Draw:
             filled (bool): Whether the sector is filled or not.
 
         """
-        if isinstance(position, Vector2):
-            position = (int(position.x) - radius, int(position.y) - radius)
+        if isinstance(position, Vec2):
+            position = (int(position.x) - r, int(position.y) - r)
         if isinstance(color, Color):
             color = (color.r, color.g, color.b, color.a)
         if len(color) == 3:
@@ -207,7 +208,7 @@ class Draw:
             "sector",
             color,
             position,
-            radius,
+            r,
             border_width,
             start_angle,
             end_angle,
@@ -215,29 +216,21 @@ class Draw:
         )
 
         if cache_key not in Draw.cache:
-            size = (radius * 2 + 1, radius * 2 + 1)
+            size = (r * 2 + 1, r * 2 + 1)
             sector = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(sector)
+            arr = PixelArray(sector)
 
-            for x in range(-radius, radius + 1):
-                for y in range(-radius, radius + 1):
+            for x in range(-r, r + 1):
+                for y in range(-r, r + 1):
                     length = math.sqrt((x) ** 2 + (y) ** 2)
                     angle = math.atan2(y, -x)
                     in_sector = start_angle <= angle + math.pi <= end_angle
-                    if filled and (length <= radius) and in_sector:
-                        array[
-                            x + radius,
-                            y + radius
-                        ] = color  # type: ignore[index]
-                    elif (
-                        radius - border_width < length <= radius
-                    ) and in_sector:
-                        array[
-                            x + radius,
-                            y + radius
-                        ] = color  # type: ignore[index]
+                    if filled and (length <= r) and in_sector:
+                        arr[x + r, y + r] = color  # type: ignore[index]
+                    elif (r - border_width < length <= r) and in_sector:
+                        arr[x + r, y + r] = color  # type: ignore[index]
 
-            array.close()
+            arr.close()
             Draw.cache[cache_key] = sector
         else:
             sector = Draw.cache[cache_key]
@@ -247,8 +240,8 @@ class Draw:
     @staticmethod
     def circle(
         surface: Surface,
-        position: Vector2 | tuple[int, int],
-        radius: int,
+        position: Vec2 | tuple[int, int],
+        r: int,
         fill_color: Color
         | tuple[int, int, int, int]
         | tuple[int, int, int]
@@ -263,7 +256,7 @@ class Draw:
 
         Args:
             surface (Surface): The surface to draw on.
-            position (Vector2 | tuple[int, int]): The position of the circle.
+            position (Vec2 | tuple[int, int]): The position of the circle.
             radius (int): The radius of the circle.
             fill_color (Color | tuple[int, int, int, int] \
             | tuple[int, int, int] | None): The fill color of the circle.
@@ -272,8 +265,8 @@ class Draw:
             border_width (int): The width of the border.
 
         """
-        if isinstance(position, Vector2):
-            position = (int(position.x) - radius, int(position.y) - radius)
+        if isinstance(position, Vec2):
+            position = (int(position.x) - r, int(position.y) - r)
         if isinstance(fill_color, Color):
             fill_color = (
                 fill_color.r,
@@ -291,36 +284,30 @@ class Draw:
 
         cache_key = (
             "circle",
-            radius,
+            r,
             fill_color,
             border_color,
             border_width,
         )
 
         if cache_key not in Draw.cache:
-            size = (radius * 2 + 1, radius * 2 + 1)
+            size = (r * 2 + 1, r * 2 + 1)
             circle = Surface(size, flags=pygame.SRCALPHA)
-            array = PixelArray(circle)
+            arr = PixelArray(circle)
 
-            for x in range(-radius, radius + 1):
-                for y in range(-radius, radius + 1):
+            for x in range(-r, r + 1):
+                for y in range(-r, r + 1):
                     length = math.sqrt((x) ** 2 + (y) ** 2)
-                    if fill_color and (length < radius):
-                        array[
-                            x + radius,
-                            y + radius
-                        ] = fill_color  # type: ignore[index]
+                    if fill_color and (length < r):
+                        arr[x + r, y + r] = fill_color  # type: ignore[index]
                     if (
                         border_color
                         and border_width > 0
-                        and radius - border_width <= length < radius
+                        and r - border_width <= length < r
                     ):
-                        array[
-                            x + radius,
-                            y + radius
-                        ] = border_color  # type: ignore[index]
+                        arr[x + r, y + r] = border_color  # type: ignore[index]
 
-            array.close()
+            arr.close()
             Draw.cache[cache_key] = circle
         else:
             circle = Draw.cache[cache_key]

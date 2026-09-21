@@ -2,13 +2,14 @@
 
 from typing import final
 
-from pygame import Surface, Vector2
+from pygame import Surface
 from pygame.event import Event
 
-from parser import Config
+from src.parser import Config
 from src.db_manager.user import UserManager
 from src.visual.palette import DEFAULT_PALETTE
 from src.visual.utils.asset_manager import AssetManager
+from src.visual.utils.primitives import Vec2
 
 
 class GameComponent:
@@ -129,7 +130,7 @@ class Node(GameComponent):
     """A base class for all game nodes.
 
     Attributes:
-        local_position (Vector2): The position relative to its parent.
+        local_position (Vec2): The position relative to its parent.
         context (Context): The context of the game.
 
     """
@@ -141,15 +142,15 @@ class Node(GameComponent):
             context (Context): The context of the game.
         """
         super().__init__()
-        self.local_position: Vector2 = Vector2()
+        self.local_position: Vec2 = Vec2()
         self.context = context
 
     @property
-    def world_position(self) -> Vector2:
+    def world_position(self) -> Vec2:
         """Get the absolute world position from relative parent positions.
 
         Returns:
-            Vector2: The absolute world position of the node.
+            Vec2: The absolute world position of the node.
         """
         if isinstance(self.parent, Node):
             return self.parent.world_position + self.local_position

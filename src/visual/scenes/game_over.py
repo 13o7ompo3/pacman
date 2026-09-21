@@ -3,7 +3,6 @@
 from enum import Enum
 from typing import Callable
 
-from pygame import Vector2
 
 from src.visual import Context, Node
 from src.visual.ui.button import Button
@@ -11,6 +10,7 @@ from src.visual.ui.label import Label
 from src.visual.ui.panel import Panel
 from src.visual.ui.prompt import Prompt
 from src.visual.ui.text_box import TextBox
+from src.visual.utils.primitives import Vec2
 
 
 class TerminalState(Enum):
@@ -55,18 +55,18 @@ class InputForm(Node):
 
         label = Label(
             context,
-            Vector2(300, 200),
+            Vec2(300, 200),
             [
                 (label_text, context.colors.lightest),
             ],
         )
         label.local_position = (
-            Vector2(context.width / 2, context.height * 4 / 8) - label.size / 2
+            Vec2(context.width / 2, context.height * 4 / 8) - label.size / 2
         )
 
         self.text_box = TextBox(context, 24, on_submit, is_password)
         self.text_box.local_position = (
-            Vector2(context.width / 2, context.height * 5 / 8)
+            Vec2(context.width / 2, context.height * 5 / 8)
             - self.text_box.size / 2
         )
 
@@ -82,13 +82,13 @@ class InputForm(Node):
         title_button = Button(
             context,
             [context.assets.image("return_icon"), "Quit To Tittle"],
-            Vector2(150, 30),
+            Vec2(150, 30),
             context.colors.dark,
             go_to_title,
             shadow_color=context.colors.darker,
         )
         title_button.local_position = (
-            Vector2(context.width / 2, context.height * 6 / 8)
+            Vec2(context.width / 2, context.height * 6 / 8)
             - title_button.size / 2
         )
 
@@ -217,14 +217,14 @@ class LogoutForm(Node):
         super().__init__(context)
         score = Label(
             context,
-            Vector2(300, 200),
+            Vec2(300, 200),
             [
                 ("Logged in as: ", context.colors.lightest),
                 (username, context.colors.light),
             ],
         )
         score.local_position = (
-            Vector2(context.width / 2, context.height * 4 / 8) - score.size / 2
+            Vec2(context.width / 2, context.height * 4 / 8) - score.size / 2
         )
 
         def on_update(button: Button) -> None:
@@ -256,25 +256,25 @@ class LogoutForm(Node):
         update_button = Button(
             context,
             [context.assets.image("update_icon"), "Update"],
-            Vector2(80, 30),
+            Vec2(80, 30),
             context.colors.light,
             on_update,
             shadow_color=context.colors.dark,
         )
         update_button.local_position = (
-            Vector2(context.width / 2 - 50, context.height * 5 / 8)
+            Vec2(context.width / 2 - 50, context.height * 5 / 8)
             - update_button.size / 2
         )
         logout_button = Button(
             context,
             [context.assets.image("exit_icon"), "Logout"],
-            Vector2(80, 30),
+            Vec2(80, 30),
             context.colors.dark,
             on_logout,
             shadow_color=context.colors.darker,
         )
         logout_button.local_position = (
-            Vector2(context.width / 2 + 50, context.height * 5 / 8)
+            Vec2(context.width / 2 + 50, context.height * 5 / 8)
             - logout_button.size / 2
         )
         self.add_child(score)
@@ -304,40 +304,40 @@ class GameOverScene(Node):
         super().__init__(context)
         panel = Panel(
             context,
-            Vector2(300, 350),
+            Vec2(300, 350),
             context.colors.darker,
             border_color=context.colors.darkest,
             on_outside_press=lambda _: None,
         )
-        panel.local_position = Vector2(
+        panel.local_position = Vec2(
             context.width / 2 - panel.size.x / 2, context.height / 7
         )
 
         label_text = (
             [("Game Over", context.colors.dark)]
             if state is TerminalState.LOST
-            else [("Wa Tbark Allah 3lik Ou Saf", context.colors.light)]
+            else [("Tbark Allah 3lik", context.colors.light)]
         )
         title = Label(
             context,
-            Vector2(400, 200),
+            Vec2(400, 200),
             label_text,
             2,
         )
         title.local_position = (
-            Vector2(context.width / 2, context.height / 4) - title.size / 2
+            Vec2(context.width / 2, context.height / 4) - title.size / 2
         )
 
         score = Label(
             context,
-            Vector2(300, 200),
+            Vec2(300, 200),
             [
                 ("Final Score: ", context.colors.light),
                 (str(final_score), context.colors.lighter),
             ],
         )
         score.local_position = (
-            Vector2(context.width / 2, context.height * 3 / 8) - score.size / 2
+            Vec2(context.width / 2, context.height * 3 / 8) - score.size / 2
         )
 
         self.add_child(panel)

@@ -6,13 +6,13 @@ import pygame
 from pygame import (
     K_RETURN,
     Surface,
-    Vector2,
 )
 from pygame.event import Event
 
 from src.visual import Context, Node
 from src.visual.draw import Draw
 from src.visual.ui.button import Button
+from src.visual.utils.primitives import Vec2
 
 
 class Prompt(Node):
@@ -21,7 +21,7 @@ class Prompt(Node):
     Attributes:
         title (Surface): The title of the prompt.
         message (Surface): The message of the prompt.
-        size (Vector2): The size of the prompt.
+        size (Vec2): The size of the prompt.
         content (Surface): The content of the prompt.
 
     """
@@ -49,17 +49,16 @@ class Prompt(Node):
             message, False, context.colors.lightest
         )
 
-        padding = Vector2(10, 10)
-        button_size = Vector2(50, 30)
+        padding = Vec2(10, 10)
+        button_size = Vec2(50, 30)
 
-        self.size = Vector2(
+        self.size = Vec2(
             max(self.title.get_size()[0], self.message.get_size()[0]),
             self.title.get_size()[1] + self.message.get_size()[1],
-        ) + Vector2(padding.x * 2, padding.y * 5 + button_size.y)
+        ) + Vec2(padding.x * 2, padding.y * 5 + button_size.y)
 
         self.local_position = (
-            Vector2(self.context.width, self.context.height) / 2
-            - self.size / 2
+            Vec2(self.context.width, self.context.height) / 2 - self.size / 2
         )
         self.content = Surface(self.size, flags=pygame.SRCALPHA)
 
@@ -115,7 +114,7 @@ class Prompt(Node):
         ]
 
         for i, button in enumerate(buttons):
-            button.local_position = self.world_position + Vector2(
+            button.local_position = self.world_position + Vec2(
                 self.size.x * i / len(buttons)
                 + self.size.x * 0.5 / len(buttons)
                 - button_size.x / 2,

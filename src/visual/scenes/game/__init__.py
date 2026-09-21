@@ -3,7 +3,7 @@
 import math
 
 import pygame
-from pygame import Color, Surface, Vector2
+from pygame import Color, Surface
 from pygame.event import Event
 
 from src.logical.core_types import GhostState, PlayerState
@@ -15,6 +15,7 @@ from src.visual.scenes.pause import PauseScene
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
 from src.visual.ui.progress import ProgressBar, ProgressBarOrientation
+from src.visual.utils.primitives import Vec2
 
 
 class GumTimer(Node):
@@ -41,7 +42,7 @@ class GumTimer(Node):
         self.radius = radius
         self.label = Label(
             context,
-            Vector2(100, 20),
+            Vec2(100, 20),
             [("SUPER PACGUM", context.colors.lightest)],
         )
         self.add_child(self.label)
@@ -53,7 +54,7 @@ class GumTimer(Node):
             self.context.colors.dark,
             self.world_position
             + self.label.size / 2
-            + Vector2(0, self.radius * 1.5),
+            + Vec2(0, self.radius * 1.5),
             0,
             self.radius - 1,
             0,
@@ -67,7 +68,7 @@ class GumTimer(Node):
             self.context.screen,
             self.world_position
             + self.label.size / 2
-            + Vector2(0, self.radius * 1.5),
+            + Vec2(0, self.radius * 1.5),
             self.radius,
             border_color=self.context.colors.lightest,
             border_width=2,
@@ -111,7 +112,7 @@ class TitleLabel(Node):
         self.accent_color = accent_color
         self.label = Label(
             self.context,
-            Vector2(),
+            Vec2(),
             [
                 (self.static_text, context.colors.lightest),
                 (self.dynamic_text, self.accent_color),
@@ -128,7 +129,7 @@ class TitleLabel(Node):
         if self.dynamic_text != val:
             self.label = Label(
                 self.context,
-                Vector2(),
+                Vec2(),
                 [
                     (self.static_text, self.context.colors.lightest),
                     (self.dynamic_text, self.accent_color),
@@ -141,8 +142,8 @@ class TitleLabel(Node):
         Draw.rect(
             self.context.screen,
             self.world_position
-            + Vector2(0, self.label.size.y / 2 - self.line_thickness / 2),
-            Vector2(
+            + Vec2(0, self.label.size.y / 2 - self.line_thickness / 2),
+            Vec2(
                 self.width / 2 - self.label.size.x * 1.2 / 2,
                 self.line_thickness,
             ),
@@ -151,17 +152,17 @@ class TitleLabel(Node):
         Draw.rect(
             self.context.screen,
             self.world_position
-            + Vector2(
+            + Vec2(
                 self.width / 2 + self.label.size.x * 1.2 / 2,
                 self.label.size.y / 2 - self.line_thickness / 2,
             ),
-            Vector2(
+            Vec2(
                 self.width / 2 - self.label.size.x * 1.2 / 2,
                 self.line_thickness,
             ),
             fill_color=self.context.colors.light,
         )
-        self.label.local_position = self.world_position + Vector2(
+        self.label.local_position = self.world_position + Vec2(
             self.width / 2 - self.label.size.x / 2, 0
         )
         self.label.render()
@@ -226,7 +227,7 @@ class InfoBar(Node):
         self.last_world_pos = self.world_position
         self.progress = ProgressBar(
             self.context,
-            Vector2(
+            Vec2(
                 width
                 - self.dynamic_label.get_size()[0] * 1.1
                 - self.icon.get_size()[0] * 1.2,
@@ -260,17 +261,17 @@ class InfoBar(Node):
 
     def _update_positions(self) -> None:
         """Update the positions of the elements."""
-        self.icon_pos = self.world_position + Vector2(
+        self.icon_pos = self.world_position + Vec2(
             0, self.static_label.get_size()[1] * 1.2
         )
-        self.static_text_pos = self.world_position + Vector2(
+        self.static_text_pos = self.world_position + Vec2(
             self.width / 2 - self.static_label.get_size()[0] / 2, 0
         )
-        self.dynamic_text_pos = self.world_position + Vector2(
+        self.dynamic_text_pos = self.world_position + Vec2(
             self.width - self.dynamic_label.get_size()[0],
             self.static_label.get_size()[1] * 1.2,
         )
-        self.progress.local_position = Vector2(
+        self.progress.local_position = Vec2(
             self.icon.get_size()[0] * 1.6,
             self.static_label.get_size()[1] * 1.2,
         )
@@ -289,15 +290,15 @@ class InfoBar(Node):
         """Draw the information bar elements."""
         self.context.screen.blit(
             self.static_label,
-            self.static_text_pos,
+            self.static_text_pos.as_tuple(),
         )
         self.context.screen.blit(
             self.icon,
-            self.icon_pos,
+            self.icon_pos.as_tuple(),
         )
         self.context.screen.blit(
             self.dynamic_label,
-            self.dynamic_text_pos,
+            self.dynamic_text_pos.as_tuple(),
         )
 
     def _on_redraw(self) -> None:
@@ -340,13 +341,23 @@ class LivesLeft(Node):
         """Draw the lives left text and life icons."""
         self.context.screen.blit(
             self.lives_text,
-            self.world_position,
+            self.world_position.as_tuple(),
         )
-        for i in range(self.logical_maze.player.lives):
-            self.context.screen.blit(
-                self.context.assets.image("life_icon"),
-                self.world_position + (32 * i + 25, 30),
-            )
+        lives = self.logical_maze.player.lives
+        if lives <= 3:
+            x_offset = 25
+        else:
+            x_offset = 25 - 14 * (min(lives, 5) - 3)
+
+        for y in range(lives // 5 + 1):
+            for x in range(min(lives, 5)):
+                self.context.screen.blit(
+                    self.context.assets.image("life_icon"),
+                    (
+                        self.world_position + (32 * x + x_offset, 30 + 20 * y)
+                    ).as_tuple(),
+                )
+                lives -= 1
 
     def _on_redraw(self) -> None:
         """Redraw the lives left text."""
@@ -394,28 +405,28 @@ class GameScene(Node):
         """Initialize the widgets for the game scene."""
         self.clear_children()
         self.maze.local_position = (
-            Vector2(self.context.width, self.context.height) / 2
+            Vec2(self.context.width, self.context.height) / 2
             - self.maze.size / 2
         )
 
         pause_button = Button(
             self.context,
             self.context.assets.image("pause_icon"),
-            Vector2(30, 30),
+            Vec2(30, 30),
             self.context.colors.lightest,
             lambda _: self.context.root_scene.add_child(
                 PauseScene(self.context, self.maze)
             ),
             shadow_color=self.context.colors.light,
         )
-        pause_button.local_position = Vector2(10, 10)
+        pause_button.local_position = Vec2(10, 10)
         gum_timer = GumTimer(self.context, self.logical_maze, 24)
-        gum_timer.local_position = Vector2(
+        gum_timer.local_position = Vec2(
             self.maze.local_position.x / 2 - gum_timer.label.size.x / 2, 150
         )
 
         lives_left = LivesLeft(self.context, self.logical_maze)
-        lives_left.local_position = Vector2(
+        lives_left.local_position = Vec2(
             self.maze.local_position.x / 2
             - lives_left.lives_text.get_size()[0] / 2
             + 10,
@@ -430,7 +441,7 @@ class GameScene(Node):
             self.context.colors.dark,
         )
         self.score_title_label.local_position = (
-            self.maze.world_position - Vector2(0, 50)
+            self.maze.world_position - Vec2(0, 50)
         )
 
         self.level_title_label = TitleLabel(
@@ -441,7 +452,7 @@ class GameScene(Node):
             self.context.colors.darker,
         )
         self.level_title_label.local_position = (
-            self.maze.world_position + Vector2(0, self.maze.size.y + 40)
+            self.maze.world_position + Vec2(0, self.maze.size.y + 40)
         )
 
         self.time_bar = InfoBar(
@@ -454,7 +465,7 @@ class GameScene(Node):
             False,
             self.context.colors.light,
         )
-        self.time_bar.local_position = self.maze.local_position + Vector2(
+        self.time_bar.local_position = self.maze.local_position + Vec2(
             self.maze.size.x + 10, self.maze.size.y / 2 - 76
         )
 
@@ -468,7 +479,7 @@ class GameScene(Node):
             True,
             self.context.colors.darker,
         )
-        self.gums_bar.local_position = self.maze.local_position + Vector2(
+        self.gums_bar.local_position = self.maze.local_position + Vec2(
             self.maze.size.x + 10, self.maze.size.y / 2 + 50
         )
         self.key_queue: list[int] = []
@@ -542,7 +553,7 @@ class GameScene(Node):
         """Draw a semi-transparent overlay on the game scene."""
         Draw.rect(
             self.context.screen,
-            Vector2(),
+            Vec2(),
             (self.context.width, self.context.height),
             fill_color=Color((0, 0, 0, 100)),
         )
