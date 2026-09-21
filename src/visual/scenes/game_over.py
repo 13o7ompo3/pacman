@@ -316,7 +316,7 @@ class GameOverScene(Node):
         label_text = (
             [("Game Over", context.colors.dark)]
             if state is TerminalState.LOST
-            else [("Wa Tbark Allah 3lik Ou Saf", context.colors.light)]
+            else [("Tbark Allah 3lik", context.colors.light)]
         )
         title = Label(
             context,

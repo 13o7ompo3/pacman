@@ -31,7 +31,6 @@ class Button(Node):
         thickness: int = 5,
         border_radius: int = 4,
         shadow_color: Color | None = None,
-        highlight_color: Color | None = None,
         padding: int = 3,
     ) -> None:
         """Initialize a Button instance.
@@ -56,11 +55,7 @@ class Button(Node):
             if shadow_color
             else color.lerp(Color("darkblue"), 0.4)
         )
-        self.border_color = (
-            highlight_color
-            if highlight_color
-            else color.lerp(Color("lightyellow"), 0.4)
-        )
+        self.border_color = self.fg_color.lerp(Color("lightyellow"), 0.4)
 
         self.padding = padding
         self.content = self._prepare_content(content)
@@ -248,7 +243,7 @@ class Button(Node):
                 self.context.screen,
                 self.bg_rect.topleft,
                 self.bg_rect.size,
-                border_color=Color("white")
+                border_color=self.context.colors.lightest
                 if self.is_hovered
                 else self.border_color,
                 border_width=1,
@@ -262,3 +257,4 @@ class Button(Node):
         """Redraw the button."""
         self.content = self.original_content.copy()
         self.content.fill(self.bg_color, special_flags=BLEND_RGBA_MULT)
+        self.border_color = self.fg_color.lerp(Color("lightyellow"), 0.4)

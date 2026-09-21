@@ -96,7 +96,7 @@ class Player(Node):
         }
         self.idle_img = context.assets.image("player_idle")
         particle_img = context.assets.image("particle_2x2")
-        self._set_surface_alpha(particle_img, 100)
+        particle_img = self._set_surface_alpha(particle_img, 100)
         particle_scatter = 12
         self.particles = ParticleSystem(
             context,
@@ -165,7 +165,7 @@ class Player(Node):
         )
         self.is_collided: Ghost | None = None
 
-    def _set_surface_alpha(self, surface: Surface, alpha: int) -> None:
+    def _set_surface_alpha(self, surface: Surface, alpha: int) -> Surface:
         """Set the alpha value of a Pygame Surface.
 
         Args:
@@ -173,6 +173,7 @@ class Player(Node):
             alpha (int): The alpha value to set (0-255).
 
         """
+        surface = surface.copy()
         with PixelArray(surface) as array:
             w, h = surface.get_size()
             for x in range(w):
@@ -180,6 +181,7 @@ class Player(Node):
                     color = Color(array[x, y])  # type: ignore[index]
                     color.a = alpha
                     array[x, y] = color  # type: ignore[index]
+        return surface
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the player.
@@ -327,3 +329,17 @@ class Player(Node):
         """Redraw the player and its particles."""
         for sprite in self.sprites.values():
             sprite.redraw()
+        particle_img = self.context.assets.image("particle_2x2")
+        particle_img = self._set_surface_alpha(particle_img, 100)
+        particle_scatter = 12
+        self.particles = ParticleSystem(
+            self.context,
+            particle_img,
+            (
+                Vec2(particle_scatter, particle_scatter),
+                Vec2(-particle_scatter, -particle_scatter),
+            ),
+            (Vec2(0, 0), Vec2(0, 0)),
+            0.4,
+            20,
+        )
