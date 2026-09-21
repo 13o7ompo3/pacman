@@ -1,67 +1,39 @@
 from typing import Iterator, Tuple, Union, Any
 
 import numpy as np
-import numpy.typing as npt
 
 
 class Vec2:
     def __init__(
         self, *args: Union[float, int, Tuple[float, float], "Vec2"]
     ) -> None:
+        self.x: float = 0.0
+        self.y: float = 0.0
+
         match len(args):
             case 0:
-                x, y = 0.0, 0.0
+                self.x, self.y = 0.0, 0.0
             case 1:
                 if isinstance(args[0], (float, int)):
-                    x, y = (args[0],) * 2
+                    self.x, self.y = (args[0],) * 2
                 else:
-                    x, y = args[0]
+                    self.x, self.y = args[0]
             case _:
-                x, y = args
-
-        self.array: npt.NDArray[np.floating[Any]] = np.array(
-            [float(x), float(y)]
-        )
-
-    @classmethod
-    def from_array(cls, array: npt.NDArray[np.floating[Any]]) -> "Vec2":
-        new = cls()
-        new.array = array
-        return new
-
-    @property
-    def x(self) -> float:
-        return float(self.array[0])
-
-    @property
-    def y(self) -> float:
-        return float(self.array[1])
-
-    @x.setter
-    def x(self, value: float) -> None:
-        self.array[0] = value
-
-    @y.setter
-    def y(self, value: float) -> None:
-        self.array[1] = value
+                self.x, self.y = args
 
     def __add__(self, other: Union["Vec2", Tuple[float, float]]) -> "Vec2":
-        if isinstance(other, tuple):
-            x, y = other
-            return Vec2(self.x + x, self.y + y)
-        return Vec2.from_array(self.array + other.array)
+        x, y = other
+        return Vec2(self.x + x, self.y + y)
 
     def __sub__(self, other: Union["Vec2", Tuple[float, float]]) -> "Vec2":
-        if isinstance(other, tuple):
-            x, y = other
-            return Vec2(self.x - x, self.y - y)
-        return Vec2.from_array(self.array - other.array)
+        x, y = other
+        return Vec2(self.x - x, self.y - y)
 
     def __mul__(self, scalar: float) -> "Vec2":
-        return Vec2.from_array(self.array * scalar)
+        return Vec2(self.x * scalar, self.y * scalar)
 
     def __truediv__(self, scalar: float) -> "Vec2":
-        return Vec2.from_array(self.array / scalar)
+        return Vec2(self.x / scalar, self.y / scalar)
 
     def __str__(self) -> str:
         return f"Vec2({self.x}, {self.y})"
@@ -69,13 +41,19 @@ class Vec2:
     __repr__ = __str__
 
     def __getitem__(self, i: int) -> float:
-        return float(self.array[i])
+        return (self.x, self.y)[i]
 
     def __setitem__(self, i: int, value: float) -> None:
-        self.array[i] = value
+        if i == 0:
+            self.x = value
+        elif i == 1:
+            self.y = value
 
     def __delitem__(self, i: int) -> None:
-        self.array[i] = 0
+        if i == 0:
+            self.x = 0
+        elif i == 1:
+            self.y = 0
 
     def __len__(self) -> int:
         return 2
@@ -96,10 +74,10 @@ class Vec2:
         return Vec2(self.x, self.y)
 
     def distance_to(self, other: "Vec2") -> float:
-        return np.linalg.norm(self.array - other.array)
+        return np.linalg.norm(np.array(self) - np.array(other))
 
     def move_towards(self, other: "Vec2", distance: float) -> "Vec2":
-        mag = float(np.linalg.norm(self.array - other.array))
+        mag = float(np.linalg.norm(np.array(self) - np.array(other)))
         distance = min(distance, mag)
         ratio = distance / mag if mag else 0.0
         result = Vec2(

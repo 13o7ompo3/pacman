@@ -76,7 +76,7 @@ class Particle(Node):
             self.particle_object.render()
         else:
             self.context.screen.blit(
-                self.particle_object, tuple(self.local_position.array)
+                self.particle_object, tuple(self.local_position)
             )
 
 
