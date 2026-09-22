@@ -1,4 +1,5 @@
 {
+	"lives": 999,
 	"levels": [
 		{
 			"width": 5,

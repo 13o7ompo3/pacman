@@ -108,4 +108,12 @@ def parse_config(config_file: str) -> Config:
                      " Proceeding with safe defaults.")
         return Config()
 
-    return Config(**config_data)
+    try:
+        return Config(**config_data)
+    except ValidationError as e:
+        logger.error(
+            f"Validation error in '{config_file}': {e}."
+            " Proceeding with safe defaults."
+        )
+        return Config()
+
