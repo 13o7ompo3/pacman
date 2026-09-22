@@ -216,7 +216,7 @@ class Button(Node):
                 self.pressed_rect.topleft,
                 self.pressed_rect.size,
                 fill_color=self.fg_color,
-                border_color=Color("white"),
+                border_color=self.context.colors.lightest,
                 border_radius=self.border_radius,
                 border_width=1,
             )
@@ -245,7 +245,7 @@ class Button(Node):
                 self.bg_rect.size,
                 border_color=self.context.colors.lightest
                 if self.is_hovered
-                else self.border_color,
+                else self.context.colors.darkest,
                 border_width=1,
                 border_radius=self.border_radius,
             )

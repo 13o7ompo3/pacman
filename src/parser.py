@@ -92,6 +92,10 @@ def parse_config(config_file: str) -> Config:
     try:
         with open(config_file, 'r') as f:
             raw_content = f.read()
+    except UnicodeDecodeError as e:
+        logger.error(f"Decode error '{config_file}': {e}."
+                     " Proceeding with safe defaults.")
+        return Config()
     except OSError as e:
         logger.error(f"File error '{config_file}': {e}."
                      " Proceeding with safe defaults.")
