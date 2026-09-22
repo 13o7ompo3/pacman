@@ -13,6 +13,8 @@ The goal of the project is to build a complete Pac-Man on top of the assigned A-
 maze generator: a configurable set of levels, a highscore system, and a codebase that
 keeps the game rules separate from the rendering.
 
+Itch.io listing: [**Spooks**](https://blxee.itch.io/spooks)
+
 ## Instructions
 
 Requirements: Python 3.13 or newer and [uv](https://docs.astral.sh/uv/).
