@@ -18,8 +18,11 @@ class Vec2:
                     self.x, self.y = (args[0],) * 2
                 else:
                     self.x, self.y = args[0]
-            case _:
-                self.x, self.y = args
+            case 2:
+                if isinstance(args[0], (int, float)) and isinstance(
+                    args[1], (int, float)
+                ):
+                    self.x, self.y = args[0], args[1]
 
     def __add__(self, other: Union["Vec2", Tuple[float, float]]) -> "Vec2":
         x, y = other

@@ -1,7 +1,7 @@
 import logging
 import random
 
-from mazegenerator import MazeGenerator
+import mazegenerator
 from src.parser import LevelConfig
 from src.logical.core_types import (
     Direction,
@@ -98,6 +98,9 @@ class LogicalMaze:
             None
 
         """
+        if not hasattr(mazegenerator, "MazeGenerator"):
+            logger.error("Amazing package has not MazeGenerator class.")
+            exit(1)
         if level_idx < 0 or level_idx >= len(self.levels):
             logger.error(f"Level index {level_idx} out of bounds.")
             return
@@ -110,7 +113,7 @@ class LogicalMaze:
         self.max_ticks = self.current_level.level_max_time * 60
 
         seed = self.base_seed
-        self.maze_generator = MazeGenerator(
+        self.maze_generator = mazegenerator.MazeGenerator(
             (self.width, self.height), seed=seed
         )
         self.grid = self.maze_generator.maze
