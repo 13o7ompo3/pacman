@@ -44,7 +44,7 @@ class TitleScene(Node):
             button_size,
             context.colors.light,
             start_game,
-            shortcuts={pygame.K_SPACE},
+            shortcuts={pygame.K_SPACE, pygame.K_RETURN},
             shadow_color=context.colors.dark,
         )
 
@@ -63,6 +63,7 @@ class TitleScene(Node):
             context.colors.light,
             open_leader_board,
             shadow_color=context.colors.dark,
+            shortcuts={pygame.K_l},
         )
 
         def open_instructions(button: Button) -> None:
@@ -84,6 +85,7 @@ class TitleScene(Node):
             context.colors.light,
             open_instructions,
             shadow_color=context.colors.dark,
+            shortcuts={pygame.K_i},
         )
 
         def quit_game(button: Button) -> None:
@@ -101,6 +103,7 @@ class TitleScene(Node):
             context.colors.dark,
             quit_game,
             shadow_color=context.colors.darker,
+            shortcuts={pygame.K_ESCAPE, pygame.K_q},
         )
 
         theme_button = Button(

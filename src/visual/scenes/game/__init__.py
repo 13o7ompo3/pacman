@@ -418,6 +418,7 @@ class GameScene(Node):
                 PauseScene(self.context, self.maze)
             ),
             shadow_color=self.context.colors.light,
+            shortcuts={pygame.K_ESCAPE},
         )
         pause_button.local_position = Vec2(10, 10)
         gum_timer = GumTimer(self.context, self.logical_maze, 24)

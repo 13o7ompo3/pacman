@@ -1,5 +1,6 @@
 """The pause scene module."""
 
+import pygame
 from src.visual import Context, GameComponent, Node
 from src.visual.ui.button import Button
 from src.visual.ui.label import Label
@@ -65,6 +66,7 @@ class PauseScene(Node):
             context.colors.light,
             resume_game,
             shadow_color=context.colors.dark,
+            shortcuts={pygame.K_ESCAPE},
         )
 
         def go_to_title(button: Button) -> None:

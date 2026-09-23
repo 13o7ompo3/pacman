@@ -44,9 +44,7 @@ def main() -> None:
     clock = Clock()
     while context.game_running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or (
-                event.type == pygame.KEYDOWN and event.key in {pygame.K_ESCAPE}
-            ):
+            if event.type == pygame.QUIT:
                 context.game_running = False
 
             # send input events to the node tree
