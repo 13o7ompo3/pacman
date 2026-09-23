@@ -11,6 +11,11 @@ logging.basicConfig(
 def main() -> None:
     """Main function to run the game."""
     import os
+    from sys import argv
+
+    if len(argv) != 2:
+        logging.error(f"Usage: python3 {argv[0]} <config_file>")
+        exit(1)
 
     # hide pygame hello message
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
@@ -35,7 +40,7 @@ def main() -> None:
     user_manager = UserManager()
 
     assets = AssetManager()
-    config = parse_config("config.json")
+    config = parse_config(argv[1])
 
     context = Context(surface, WIDTH, HEIGHT, assets, user_manager, config)
     loading_scene = LoadingScene(context)
