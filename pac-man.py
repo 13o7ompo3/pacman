@@ -72,3 +72,5 @@ if __name__ == "__main__":
         logging.error(str(err))
     except KeyboardInterrupt:
         logging.warning("Program stopped by the user..")
+    except Exception as err:
+        logging.error(f"Error: {err}")

@@ -11,6 +11,7 @@ from pydantic_core import PydanticUseDefault
 import json
 import logging
 from typing import List, Annotated, Any, TypeVar
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -145,18 +146,20 @@ class Config(BaseModel):
 
 
 def _strip_comments(content: str) -> str:
-    result = "\n".join(
+    return "\n".join(
         line
         for line in content.splitlines()
         if not line.strip().startswith("#")
     )
-    print(result)
-    return result
 
 
 def parse_config(config_file: str) -> Config:
+    config_path = Path(config_file)
+    if not config_path.is_file():
+        logger.error("Config is not a file. resorting to defaults.")
+        return Config()
     try:
-        with open(config_file, "r") as f:
+        with open(config_path, "r") as f:
             raw_content = f.read()
     except UnicodeDecodeError as e:
         logger.error(
