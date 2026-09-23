@@ -327,16 +327,16 @@ class VisualMaze(Node):
             if x >= width and y < 0:
                 return 0
             if x < 0:
-                return self.logical_maze.grid[y][0] & 8
+                return int(self.logical_maze.grid[y][0] & 8)
             if y < 0:
-                return self.logical_maze.grid[0][x] & 1
+                return int(self.logical_maze.grid[0][x] & 1)
             if x >= width and y >= height:
                 return 0
             if x >= width:
-                return self.logical_maze.grid[y][width - 1] & 2
+                return int(self.logical_maze.grid[y][width - 1] & 2)
             if y >= height:
-                return self.logical_maze.grid[height - 1][x] & 4
-            return self.logical_maze.grid[y][x]
+                return int(self.logical_maze.grid[height - 1][x] & 4)
+            return int(self.logical_maze.grid[y][x])
 
         for x in range(-1, self.logical_maze.width):
             for y in range(-1, self.logical_maze.height):
@@ -358,7 +358,7 @@ class VisualMaze(Node):
 
                 self.add_child(corner)
 
-        self.ghosts = []
+        self.ghosts: list[VisualGhost] = []
 
         self.player = Player(
             self.context,

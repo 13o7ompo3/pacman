@@ -58,11 +58,13 @@ class Label(Node):
         else:
             self.font = context.assets.font("ui")
 
+        self.text: Surface
+
         self._on_redraw()
 
     def _on_draw(self) -> None:
         """Draw the label on the screen."""
-        self.context.screen.blit(self.text, self.world_position)
+        self.context.screen.blit(self.text, self.world_position.as_tuple())
 
     def get_as_surface(self) -> Surface:
         """Get the label as a Pygame Surface.
@@ -83,10 +85,10 @@ class Label(Node):
             min_size.y = max(min_size.y, surface.get_size()[1])
             min_size.x += surface.get_size()[0]
 
-        text_surf = Surface(min_size, pygame.SRCALPHA)
+        text_surf = Surface(min_size.as_tuple(), pygame.SRCALPHA)
         offset = Vec2()
         for surface in text_surfaces:
-            text_surf.blit(surface, offset)
+            text_surf.blit(surface, offset.as_tuple())
             offset.x += surface.get_size()[0]
 
         text_surf = transform.scale_by(text_surf, self.scale)
@@ -96,7 +98,7 @@ class Label(Node):
             max(self.box_size.x, text_size.x),
             max(self.box_size.y, text_size.y),
         )
-        self.text = Surface(label_size, pygame.SRCALPHA)
+        self.text = Surface(label_size.as_tuple(), pygame.SRCALPHA)
 
         self.size = label_size
         Draw.rect(
@@ -108,4 +110,7 @@ class Label(Node):
             1,
             self.border_radius,
         )
-        self.text.blit(text_surf, label_size / 2 - text_size / 2)
+        self.text.blit(
+            text_surf,
+            (label_size / 2 - text_size / 2).as_tuple(),
+        )

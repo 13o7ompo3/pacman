@@ -192,7 +192,7 @@ class AssetManager:
             Absolute path to the resource.
         """
         if getattr(sys, "frozen", False):
-            return Path(sys._MEIPASS) / path
+            return Path(getattr(sys, "_MEIPASS")) / path
 
         # resolve the relative assets dir throught parent-ception
         return Path(__file__).resolve().parent.parent.parent.parent / path

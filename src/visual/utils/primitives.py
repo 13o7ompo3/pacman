@@ -1,4 +1,4 @@
-from typing import Iterator, Tuple, Union, Any
+from typing import Iterator, Tuple, Union
 
 import numpy as np
 
@@ -74,7 +74,7 @@ class Vec2:
         return Vec2(self.x, self.y)
 
     def distance_to(self, other: "Vec2") -> float:
-        return np.linalg.norm(np.array(self) - np.array(other))
+        return float(np.linalg.norm(np.array(self) - np.array(other)))
 
     def move_towards(self, other: "Vec2", distance: float) -> "Vec2":
         mag = float(np.linalg.norm(np.array(self) - np.array(other)))

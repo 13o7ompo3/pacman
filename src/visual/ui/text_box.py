@@ -118,5 +118,6 @@ class TextBox(Node):
         )
         if self.text is not None:
             self.context.screen.blit(
-                self.text, self.world_position + self.text_pos
+                self.text,
+                (self.world_position + self.text_pos).as_tuple(),
             )

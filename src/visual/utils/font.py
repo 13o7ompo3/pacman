@@ -8,7 +8,8 @@ class Font:
     def __init__(
         self, font_atlas: Surface, char_size: tuple[int, int]
     ) -> None:
-        chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+        chars = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        chars += "[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
         char_images = Image.split_surface(font_atlas, 6, 18)
         self.__char_mapping = {
             char: image for char, image in zip(chars, char_images)

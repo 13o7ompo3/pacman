@@ -65,7 +65,7 @@ class Panel(Node):
             else context.colors.lightest
         )
 
-        self.surface = Surface(self.size, flags=pygame.SRCALPHA)
+        self.surface = Surface(self.size.as_tuple(), flags=pygame.SRCALPHA)
         if border_color is None:
             border_color = color.lerp("darkblue", 0.3)
 
@@ -107,7 +107,7 @@ class Panel(Node):
 
     def _on_draw(self) -> None:
         """Draw the panel on the screen."""
-        self.context.screen.blit(self.surface, self.world_position)
+        self.context.screen.blit(self.surface, self.world_position.as_tuple())
 
     def _on_input(self, event: Event) -> Event | None:
         """Handle input events for the panel.

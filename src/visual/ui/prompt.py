@@ -60,7 +60,7 @@ class Prompt(Node):
         self.local_position = (
             Vec2(self.context.width, self.context.height) / 2 - self.size / 2
         )
-        self.content = Surface(self.size, flags=pygame.SRCALPHA)
+        self.content = Surface(self.size.as_tuple(), flags=pygame.SRCALPHA)
 
         Draw.rect(
             self.content,
@@ -126,7 +126,7 @@ class Prompt(Node):
 
     def _on_draw(self) -> None:
         """Draw the prompt on the screen."""
-        self.context.screen.blit(self.content, self.world_position)
+        self.context.screen.blit(self.content, self.world_position.as_tuple())
 
     def _on_input(self, event: Event) -> Event | None:
         """Stop input events from propagating to other nodes.

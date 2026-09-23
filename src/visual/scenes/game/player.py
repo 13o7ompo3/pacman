@@ -3,6 +3,7 @@
 import pygame
 from pygame import KEYDOWN, Color, PixelArray, Surface
 from pygame.event import Event
+from typing import TYPE_CHECKING
 
 from src.logical.entities import Ghost
 from src.logical.maze import Direction, LogicalMaze
@@ -11,6 +12,9 @@ from src.visual.utils.particle import ParticleSystem
 from src.visual.utils.sprite import Sprite
 from src.visual.utils.timer import Timer
 from src.visual.utils.primitives import Vec2
+
+if TYPE_CHECKING:
+    from src.visual.scenes.game.ghost import VisualGhost
 
 
 class Player(Node):
@@ -36,7 +40,7 @@ class Player(Node):
         context: Context,
         maze: LogicalMaze,
         step_size: int,
-        ghosts: list,
+        ghosts: list["VisualGhost"],
         speed: float,
     ) -> None:
         """Initialize the Player object.
@@ -322,9 +326,9 @@ class Player(Node):
         else:
             self.context.screen.blit(
                 self.idle_img,
-                (
+                tuple(
                     self.world_position - Vec2(self.idle_img.get_size()) / 2
-                ).as_tuple(),
+                ),
             )
 
     def _on_redraw(self) -> None:

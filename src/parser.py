@@ -141,7 +141,7 @@ class Config(BaseModel):
                 pacgum=1337,
             ),
         ]
-        self.levels = self.levels + default_levels[len(self.levels) :]
+        self.levels = self.levels + default_levels[len(self.levels):]
         return self
 
 

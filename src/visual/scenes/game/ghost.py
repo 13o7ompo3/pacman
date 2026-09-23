@@ -8,11 +8,13 @@ from src.visual import Node, Context
 from src.visual.utils.sprite import Sprite
 from pygame import PixelArray, Color
 from src.visual.utils.primitives import Vec2
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.visual.scenes.game.player import Player
 
 
 class VisualGhost(Node):
-    from src.visual.scenes.game.player import Player
-
     """A class representing the visual representation of a ghost in the game.
 
     Attributes:
@@ -39,7 +41,7 @@ class VisualGhost(Node):
         ghost: Ghost,
         step_size: int,
         speed: float,
-        player: Player,
+        player: "Player",
     ) -> None:
         """Initialize the VisualGhost object.
 
@@ -54,7 +56,7 @@ class VisualGhost(Node):
         super().__init__(context)
         self.id = id
         self.logical_maze = maze
-        self.logical_ghost = ghost
+        self.logical_ghost: Ghost = ghost
         self.step_size = step_size
         self.target_position = Vec2(ghost.x, ghost.y) * step_size
         self.animated_position = self.target_position.copy()
