@@ -1,5 +1,6 @@
 from typing import Any
 
+import pygame
 from pygame.event import Event
 
 from src.visual import Context, Node
@@ -213,6 +214,7 @@ class InstructionsScene(Node):
             context.colors.light,
             go_next,
             shadow_color=context.colors.dark,
+            shortcuts={pygame.K_RIGHT},
         )
         next_button.local_position = (
             Vec2(context.width - 10, context.height - 10) - next_button.size
@@ -236,6 +238,7 @@ class InstructionsScene(Node):
             context.colors.light,
             go_prev,
             shadow_color=context.colors.dark,
+            shortcuts={pygame.K_LEFT},
         )
         previous_button.local_position = Vec2(
             10, context.height - previous_button.size.y - 10
@@ -256,6 +259,7 @@ class InstructionsScene(Node):
             context.colors.dark,
             go_back,
             shadow_color=context.colors.darker,
+            shortcuts={pygame.K_ESCAPE, pygame.K_BACKSPACE},
         )
         return_button.local_position = Vec2(10, 10)
 
