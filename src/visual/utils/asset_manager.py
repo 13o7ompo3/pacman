@@ -139,9 +139,6 @@ class AssetManager:
                 yield key
             except AssetError as err:
                 yield err
-        logger.info(
-            f"{self.total_assets} assets have been successfully loaded"
-        )
 
     def image(self, key: str) -> Surface:
         """Get a loaded image surface by key.
