@@ -45,7 +45,6 @@ class Button(Node):
             thickness (int): The thickness of the button's border.
             border_radius (int): The radius of the button's border corners.
             shadow_color (Color | None): The color of the button's shadow.
-            highlight_color (Color | None): The color of the highlight.
             padding (int): The padding around the button's content.
         """
         self.context = context
@@ -132,8 +131,7 @@ class Button(Node):
                 if isinstance(surf, Surface):
                     w, h = surf.get_size()
                     size.x += w
-                    if h > size.y:
-                        size.y = h
+                    size.y = max(size.y, h)
 
             size += Vec2(self.padding * (len(content) + 1), self.padding * 2)
             surface = Surface(
@@ -152,7 +150,7 @@ class Button(Node):
 
         return content
 
-    def __setattr__(self, name: str, value: Any, /) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         """Set an attribute and update the button rectangle position if needed.
 
         Args:

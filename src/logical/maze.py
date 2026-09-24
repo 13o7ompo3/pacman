@@ -523,10 +523,7 @@ class LogicalMaze:
 
         Args:
             player_dir (Direction): The direction the player is going to move.
-
-        Returns:
-            None
-
+            collided_with_ghost (Ghost | None): The collided ghost if any.
         """
         events: set[GameEvent] = set()
 
@@ -576,10 +573,7 @@ class LogicalMaze:
 
         Args:
             ghost_id (int): The identity of the ghost to move (0–3).
-
-        Returns:
-            None
-
+            collided_with_player (bool): if the ghost collided with player.
         """
         events: set[GameEvent] = set()
 

@@ -1,14 +1,16 @@
 """A module for the visual representation of ghosts in the game."""
 
+from typing import TYPE_CHECKING
+
+from pygame import Color, PixelArray
+
 from src.logical.core_types import GhostState
-from src.visual.utils.particle import ParticleSystem
 from src.logical.entities import Ghost
 from src.logical.maze import LogicalMaze
-from src.visual import Node, Context
-from src.visual.utils.sprite import Sprite
-from pygame import PixelArray, Color
+from src.visual import Context, Node
+from src.visual.utils.particle import ParticleSystem
 from src.visual.utils.primitives import Vec2
-from typing import TYPE_CHECKING
+from src.visual.utils.sprite import Sprite
 
 if TYPE_CHECKING:
     from src.visual.scenes.game.player import Player
@@ -52,6 +54,7 @@ class VisualGhost(Node):
             ghost (Ghost): The logical representation of the ghost.
             step_size (int): The size of each step the ghost takes in the maze.
             speed (float): The speed at which the ghost moves.
+            player (Player): The player object to check for collisions with.
         """
         super().__init__(context)
         self.id = id
@@ -136,6 +139,11 @@ class VisualGhost(Node):
         )
 
     def collided_with_player(self) -> bool:
+        """Check if the ghost has collided with the player.
+
+        Returns:
+            bool: True if the ghost has collided with the player.
+        """
         return (
             self.player.world_position.distance_to(
                 self.world_position + self.animated_position

@@ -49,6 +49,7 @@ class Player(Node):
             context (Context): The context in which the player exists.
             maze (LogicalMaze): The logical representation of the maze.
             step_size (int): The size of each step.
+            ghosts (list[VisualGhost]): A list of visual ghost objects.
             speed (float): The speed at which the player moves.
         """
         super().__init__(context)
@@ -176,6 +177,8 @@ class Player(Node):
             surface (Surface): The Pygame Surface to modify.
             alpha (int): The alpha value to set (0-255).
 
+        Returns:
+            Surface: A new Pygame Surface with the specified alpha value.
         """
         surface = surface.copy()
         with PixelArray(surface) as array:
@@ -272,6 +275,11 @@ class Player(Node):
                 ) * self.step_size + Vec2(self.step_size) / 2
 
     def get_collided_ghost(self) -> Ghost | None:
+        """Check if the player has collided with any ghosts.
+
+        Returns:
+            Ghost | None: The ghost that the player has collided with if any.
+        """
         for ghost in self.ghosts:
             if (
                 self.world_position.distance_to(

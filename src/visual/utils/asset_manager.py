@@ -1,6 +1,7 @@
 """A module for managing game assets."""
 
 import logging
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -8,14 +9,12 @@ import pygame
 from pygame import Surface, image
 
 from src.visual.utils.font import Font
-import sys
-
 
 logger = logging.getLogger(__name__)
 
 
 class AssetError(Exception):
-    pass
+    """Custom exception for asset loading errors."""
 
 
 class AssetManager:
@@ -61,7 +60,7 @@ class AssetManager:
         Args:
             key (str): The key to register the font under.
             path (Path | str): The path to the font file.
-            size (int): The size of the font.
+            char_size (int): The size of the font.
 
         """
         self._registered_fonts[key] = (path, char_size)
@@ -168,6 +167,14 @@ class AssetManager:
 
     @staticmethod
     def load_image(path: str | Path) -> Surface:
+        """Load an image from the given path.
+
+        Args:
+            path (str | Path): The path to the image file.
+
+        Returns:
+            Surface: The loaded image surface.
+        """
         try:
             return image.load(AssetManager.resource_path(path)).convert_alpha()
         except FileNotFoundError as err:

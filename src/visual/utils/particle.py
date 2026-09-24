@@ -6,8 +6,8 @@ import random
 from pygame import Surface
 
 from src.visual import Context, Node
-from src.visual.utils.sprite import Sprite
 from src.visual.utils.primitives import Vec2
+from src.visual.utils.sprite import Sprite
 
 
 class Particle(Node):
@@ -96,7 +96,7 @@ class ParticleSystem(Node):
 
         Args:
             context (Context): The context in which the particle system exists.
-            surface (Surface): The surface representing the particles' image.
+            particle_object (Surface | Sprite): The image of one particle.
             velocity_range (Tuple[Vec2, Vec2]): A tuple containing the
                 minimum and maximum velocity vectors for emitted particles.
             acceleration_range (Tuple[Vec2, Vec2]): A tuple containing

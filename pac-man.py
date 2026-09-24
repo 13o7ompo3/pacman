@@ -2,7 +2,6 @@ import logging
 
 from src.visual.utils.asset_manager import AssetError
 
-
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
@@ -21,13 +20,13 @@ def main() -> None:
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
     import pygame
     from pygame.time import Clock
-    from src.visual.draw import Draw
 
     from src.db_manager.user import UserManager
+    from src.parser import parse_config
     from src.visual import Context
+    from src.visual.draw import Draw
     from src.visual.scenes.loading import LoadingScene
     from src.visual.utils.asset_manager import AssetManager
-    from src.parser import parse_config
 
     pygame.init()
     pygame.font.init()

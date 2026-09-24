@@ -139,6 +139,7 @@ class TitleScene(Node):
         self.add_child(theme_button)
 
     def _on_draw(self) -> None:
+        """Draw the title scene."""
         self.context.screen.blit(
             self.title_text,
             (

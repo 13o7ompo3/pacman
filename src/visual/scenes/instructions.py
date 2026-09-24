@@ -76,7 +76,7 @@ class InstructionPage(Node):
         self.add_child(self.text)
         self.add_child(self.breaking_text)
 
-    def __setattr__(self, name: str, value: Any, /) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         """Reset frames when the page is shown.
 
         Args:

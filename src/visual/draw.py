@@ -191,7 +191,7 @@ class Draw:
             color (Color | tuple[int, int, int, int]): The color of the sector.
             position (Vec2 | tuple[int, int]): The position of the sector.
             border_width (int): The width of the border.
-            radius (int): The radius of the sector.
+            r (int): The radius of the sector.
             start_angle (float): The start angle of the sector in radians.
             end_angle (float): The end angle of the sector in radians.
             filled (bool): Whether the sector is filled or not.
@@ -257,7 +257,7 @@ class Draw:
         Args:
             surface (Surface): The surface to draw on.
             position (Vec2 | tuple[int, int]): The position of the circle.
-            radius (int): The radius of the circle.
+            r (int): The radius of the circle.
             fill_color (Color | tuple[int, int, int, int] \
             | tuple[int, int, int] | None): The fill color of the circle.
             border_color (Color | tuple[int, int, int, int] \
