@@ -1,7 +1,7 @@
 [project]
 name = "pacman"
 version = "0.1.0"
-description = "Add your description here"
+description = "Pacman clone 1337 project"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
