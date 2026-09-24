@@ -53,7 +53,6 @@ class UserManager:
         """
         self.loged_in_user: User | None = None
         self.db_dir = Path(db_dir)
-        self.db_dir.mkdir(parents=True, exist_ok=True)
         self.users: dict[str, User] = {}
         self.load_all_users()
 
@@ -62,6 +61,9 @@ class UserManager:
         Loads all user data from the database directory into memory.
         """
         for user_file in self.db_dir.glob("*.json"):
+            if not user_file.is_file():
+                logger.warning(f"{user_file} is not a valid file. Skipping.")
+                continue
             try:
                 with open(user_file, "r") as f:
                     user_data = json.load(f)
@@ -74,6 +76,10 @@ class UserManager:
                         continue
                     self.users[user.username] = user
                 logger.info(f"Loaded user '{user.username}' data.")
+            except OSError as e:
+                logger.warning(
+                    f"File error while loading user from {user_file}: {e}"
+                )
             except json.JSONDecodeError as e:
                 logger.warning(
                     f"Invalid user JSON in database {user_file}: {e}"
@@ -82,7 +88,7 @@ class UserManager:
                 for error in e.errors():
                     logger.warning(
                         "Invalid user data in database "
-                        f"{user_file}: {error['msg']}"
+                        f"{user_file}: {error.get('msg', 'Unknown error')}"
                     )
             except ValueError as e:
                 logger.warning(
@@ -103,13 +109,22 @@ class UserManager:
             user (User): The user object to save.
         """
         path = self.db_dir / f"{user.username}.json"
-        self.db_dir.mkdir(parents=True, exist_ok=True)
-        if path.exists():
-            path.unlink()
-        with open(path, "w") as f:
-            json.dump(user.model_dump(), f, indent=4)
-
-        logger.info(f"User data for '{user.username}' saved successfully.")
+        try:
+            self.db_dir.mkdir(parents=True, exist_ok=True)
+            with open(path, "w") as f:
+                json.dump(user.model_dump(), f, indent=4)
+        except OSError as e:
+            logger.error(
+                f"File error while saving user '{user.username}': {e}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Unexpected error while saving user '{user.username}': {e}"
+            )
+        else:
+            logger.info(f"User data for '{user.username}' saved successfully.")
+            return
+        raise ValueError(f"Failed to save user data for '{user.username}'.")
 
     def is_existing_user(self, username: str) -> bool:
         """
@@ -138,7 +153,7 @@ class UserManager:
         try:
             user = User(username=username, password=hashed_password)
         except ValidationError as e:
-            error_msg = e.errors()[0]["msg"]
+            error_msg = e.errors()[0].get("msg", "Unknown validation error")
             raise ValueError(
                 f"Invalid user data for '{username}': {error_msg}"
             )

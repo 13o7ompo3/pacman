@@ -201,15 +201,15 @@ def parse_config(config_file: str) -> Config:
     try:
         with open(config_path, "r") as f:
             raw_content = f.read()
-    except UnicodeDecodeError as e:
-        logger.error(
-            f"Decode error '{config_file}': {e}."
-            " Proceeding with safe defaults."
-        )
-        return Config()
     except OSError as e:
         logger.error(
             f"File error '{config_file}': {e}. Proceeding with safe defaults."
+        )
+        return Config()
+    except Exception as e:
+        logger.error(
+            f"Unexpected error '{config_file}': {e}."
+            " Proceeding with safe defaults."
         )
         return Config()
 
@@ -225,12 +225,24 @@ def parse_config(config_file: str) -> Config:
             " Proceeding with safe defaults."
         )
         return Config()
+    except Exception as e:
+        logger.error(
+            f"Unexpected error '{config_file}': {e}."
+            " Proceeding with safe defaults."
+        )
+        return Config()
 
     try:
         return Config(**config_data)
     except ValidationError as e:
         logger.error(
             f"Validation error in '{config_file}': {e}."
+            " Proceeding with safe defaults."
+        )
+        return Config()
+    except Exception as e:
+        logger.error(
+            f"Unexpected error '{config_file}': {e}."
             " Proceeding with safe defaults."
         )
         return Config()
