@@ -532,6 +532,11 @@ class GameScene(Node):
             if self.cheats_enabled:
                 if event.key == pygame.K_n:
                     self.logical_maze.skip_to_next_level()
+                if (
+                    event.key == pygame.K_h
+                    and self.logical_maze.player.lives < 40
+                ):
+                    self.logical_maze.player.lives += 1
                 if event.key == pygame.K_f:
                     self.logical_maze.cheat_freeze_ghosts = (
                         not self.logical_maze.cheat_freeze_ghosts

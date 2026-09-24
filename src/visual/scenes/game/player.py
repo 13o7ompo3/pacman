@@ -246,8 +246,9 @@ class Player(Node):
 
         if not self.is_collided:
             self.is_collided = self.get_collided_ghost()
-            if self.is_collided and not self.direction:
-                self.maze.tick_player(Direction.UP, self.is_collided)
+            if self.is_collided:
+                self.maze.tick_player(Direction.NONE, self.is_collided)
+            self.is_collided = None
         if self.local_position == self.target_position:
             self._step_target_position()
         elif self.direction is not None:

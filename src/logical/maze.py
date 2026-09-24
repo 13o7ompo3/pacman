@@ -76,7 +76,7 @@ class LogicalMaze:
         self.points_ghost: int = points_ghost
         self.max_ticks: int
         self.elapsed_ticks: int = 0
-        self.super_pacgum_duration: int = super_pacgum_duration
+        self.super_pacgum_duration: int = super_pacgum_duration * 60
         self.respawn_delay: int = respawn_delay
         self.invulnerability_duration: int = invulnerability_duration
         self.ghost_respawn_delay: int = ghost_respawn_delay

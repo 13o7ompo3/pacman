@@ -24,7 +24,6 @@ class LevelConfig(BaseModel):
     seed: int = Field(default=1337)
     level_max_time: int = Field(default=90, ge=10, le=120)
     speed: float = Field(default=75, ge=1, le=200)
-    pacgum: int = Field(default=1337, ge=0)
 
 
 def default_handler(value: Any, arg: str) -> Any:
@@ -65,9 +64,9 @@ class Config(BaseModel):
         default_factory=default_handler(200, "points_per_ghost"), ge=0, le=400
     )
     super_pacgum_duration: int = Field(
-        default_factory=default_handler(500, "super_pacgum_duration"),
-        ge=200,
-        le=1000,
+        default_factory=default_handler(10, "super_pacgum_duration"),
+        ge=1,
+        le=30,
     )
 
     @model_validator(mode="after")
@@ -84,7 +83,6 @@ class Config(BaseModel):
                 seed=1337,
                 level_max_time=90,
                 speed=75,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=11,
@@ -92,7 +90,6 @@ class Config(BaseModel):
                 seed=42,
                 level_max_time=95,
                 speed=75,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=13,
@@ -100,7 +97,6 @@ class Config(BaseModel):
                 seed=1337,
                 level_max_time=100,
                 speed=80,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=13,
@@ -108,7 +104,6 @@ class Config(BaseModel):
                 seed=42,
                 level_max_time=105,
                 speed=80,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=15,
@@ -116,7 +111,6 @@ class Config(BaseModel):
                 seed=1337,
                 level_max_time=110,
                 speed=85,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=17,
@@ -124,7 +118,6 @@ class Config(BaseModel):
                 seed=42,
                 level_max_time=115,
                 speed=90,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=17,
@@ -132,7 +125,6 @@ class Config(BaseModel):
                 seed=1337,
                 level_max_time=120,
                 speed=95,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=17,
@@ -140,7 +132,6 @@ class Config(BaseModel):
                 seed=42,
                 level_max_time=120,
                 speed=100,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=19,
@@ -148,7 +139,6 @@ class Config(BaseModel):
                 seed=1337,
                 level_max_time=120,
                 speed=105,
-                pacgum=1337,
             ),
             LevelConfig(
                 width=20,
@@ -156,7 +146,6 @@ class Config(BaseModel):
                 seed=42,
                 level_max_time=120,
                 speed=110,
-                pacgum=1337,
             ),
         ]
         level_len = len(self.levels)

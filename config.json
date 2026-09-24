@@ -1,17 +1,17 @@
 {
+	"hello": 34,
 	"lives": 3,
+	"points_per_pacgum": 10,
+	"points_per_super_pacgum": 20,
+	"points_per_ghost": 50,
+	"super_pacgum_duration": 10,
 	"levels": [
 		{
-			"width": 20,
-			"height": 20,
-			"seed": "sdf",
-			"level_max_time": 12
-		},
-		{
-			"width": 15,
-			"height": 20,
-			"seed": 42
+	    "width": 10,
+	    "height": 10,
+	    "seed": 42,
+	    "level_max_time": 60,
+	    "speed": 80
 		}
-
 	]
 }
