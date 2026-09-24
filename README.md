@@ -85,15 +85,12 @@ list, which then falls back to the built-in levels.
 
 ```json
 {
-  "levels": [
-    { "width": 14, "height": 14, "seed": 42, "level_max_time": 60 },
-    { "width": 15, "height": 20, "seed": 42 }
-  ],
+  "levels": [...],
   "lives": 3,
   "points_per_pacgum": 10,
   "points_per_super_pacgum": 50,
   "points_per_ghost": 200,
-  "super_pacgum_duration": 500
+  "super_pacgum_duration": 10
 }
 ```
 
@@ -106,7 +103,7 @@ list, which then falls back to the built-in levels.
 | `points_per_pacgum` | `10` | `0-20` |
 | `points_per_super_pacgum` | `50` | `0-100` |
 | `points_per_ghost` | `200` | `0-400` |
-| `super_pacgum_duration` | `500` | FRIGHTENED duration in ticks (60 per second), `200-1000` |
+| `super_pacgum_duration` | `10` | time per super pacgum in seconds `1-30` |
 
 **Per-level (`LevelConfig`) defaults**
 
@@ -116,7 +113,6 @@ list, which then falls back to the built-in levels.
 | `seed` | `1337` | int or numeric string; `0` gives a different maze each run |
 | `level_max_time` | `90` | seconds (`ticks = time * 60`) |
 | `speed` | `75` | `1-200` pixels per second; ghosts move at `speed * 0.4` |
-| `pacgum` | `1337` | declared, not consumed |
 
 ## Highscore
 
