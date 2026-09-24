@@ -205,7 +205,11 @@ class LogoutForm(Node):
     """
 
     def __init__(
-        self, context: Context, username: str, on_logout: Callable
+        self,
+        context: Context,
+        username: str,
+        on_logout: Callable,
+        final_score: int,
     ) -> None:
         """Initialize the LogoutForm object.
 
@@ -244,14 +248,25 @@ class LogoutForm(Node):
                 context.root_scene.clear_children()
                 context.root_scene.add_child(TitleScene(context))
 
-            self.add_child(
-                Prompt(
-                    context,
-                    "Success",
-                    f"Updated score for {username}",
-                    on_accept,
+            try:
+                context.user_manager.update_highscore(final_score)
+                self.add_child(
+                    Prompt(
+                        context,
+                        "Success",
+                        f"Updated score for {username}",
+                        on_accept,
+                    )
                 )
-            )
+            except Exception as err:
+                self.add_child(
+                    Prompt(
+                        context,
+                        "Failed",
+                        str(err),
+                        on_accept,
+                    )
+                )
 
         update_button = Button(
             context,
@@ -363,5 +378,6 @@ class GameOverScene(Node):
                 context,
                 str(context.user_manager.loged_in_user.username),
                 show_login,
+                final_score,
             )
             self.add_child(logout_form)
