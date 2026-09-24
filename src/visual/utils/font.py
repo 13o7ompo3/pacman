@@ -24,13 +24,16 @@ class Font:
         }
         self.__char_size = char_size
 
-    def render(self, text: str, _: bool, color: Color) -> Surface:
+    def render(
+        self, text: str, _: bool, color: Color, scale: int = 1
+    ) -> Surface:
         """Render the given text using the bitmap font.
 
         Args:
             text (str): The text to render.
             _: bool: Unused parameter, kept for compatibility.
             color (Color): The color to apply to the rendered text.
+            scale (int): text scale
 
         Returns:
             Surface: A surface containing the rendered text.
@@ -46,6 +49,8 @@ class Font:
                 result.blit(char_img, (x, y))
                 x += self.__char_size[0]
         Image.fill(result, color)
+        if scale > 1:
+            return Image.scale(result, scale)
         return result
 
     def size(self, text: str) -> tuple[int, int]:

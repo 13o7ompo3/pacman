@@ -1,7 +1,7 @@
 """A module that defines a Label class."""
 
 import pygame
-from pygame import Color, Surface, transform
+from pygame import Color, Surface
 
 
 from src.visual import Context, Node
@@ -80,7 +80,9 @@ class Label(Node):
         text_surfaces = []
         min_size = Vec2()
         for text, color in self.texts:
-            surface = self.font.render(text, False, color).convert_alpha()
+            surface = self.font.render(
+                text, False, color, self.scale
+            ).convert_alpha()
             text_surfaces.append(surface)
             min_size.y = max(min_size.y, surface.get_size()[1])
             min_size.x += surface.get_size()[0]
@@ -91,7 +93,6 @@ class Label(Node):
             text_surf.blit(surface, offset.as_tuple())
             offset.x += surface.get_size()[0]
 
-        text_surf = transform.scale_by(text_surf, self.scale)
         text_size = Vec2(text_surf.get_size())
 
         label_size = Vec2(

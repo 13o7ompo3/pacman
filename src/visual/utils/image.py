@@ -4,7 +4,7 @@ This module provides utility functions for image manipulation using Pygame.
 
 import numpy as np
 import pygame
-from pygame import Color, Surface
+from pygame import Color, PixelArray, Surface
 
 from src.visual.palette import ColorPalette
 
@@ -48,8 +48,7 @@ class Image:
             pygame.PixelArray(surface) as parent,
             pygame.PixelArray(child_surface) as child,
         ):
-            child[
-                :] = parent[x: x + width, y: y + height]  # type: ignore[index]
+            child[:] = parent[x:x + width, y:y + height]  # type: ignore[index]
         return child_surface
 
     @staticmethod
@@ -125,6 +124,30 @@ class Image:
             color = Image.rgb(color)
         pixel_array = pygame.surfarray.pixels3d(surface)
         pixel_array[:, :] = color
+
+    @staticmethod
+    def scale(surface: Surface, scale: int) -> Surface:
+        """
+        Scale a surface to nearest neighbor.
+
+        Args:
+            surface (Surface): The surface to fill.
+            scale (int): the scale factor
+
+        Returns:
+            Surface: the scaled surface.
+        """
+        width, height = surface.get_size()
+        scaled = Surface(
+            (width * scale, height * scale), flags=pygame.SRCALPHA
+        )
+        with PixelArray(surface) as array, PixelArray(scaled) as new:
+            for x in range(width * scale):
+                for y in range(height * scale):
+                    new[x, y] = array[x // scale,  # type: ignore[index]
+                                      y // scale]
+
+        return scaled
 
     @staticmethod
     def switch_palette(
