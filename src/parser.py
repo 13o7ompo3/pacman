@@ -1,43 +1,17 @@
 import json
 import logging
 from pathlib import Path
-from typing import Annotated, Any, List, TypeVar
+from typing import Any
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
     ValidationError,
-    ValidatorFunctionWrapHandler,
-    WrapValidator,
     model_validator,
 )
-from pydantic_core import PydanticUseDefault
 
 logger = logging.getLogger(__name__)
-
-T = TypeVar("T")
-
-
-def _use_default_on_error(
-    value: Any, handler: ValidatorFunctionWrapHandler
-) -> Any:
-    """Validator that uses the default value if validation fails.
-
-    Args:
-        value (Any): The value to validate.
-        handler (ValidatorFunctionWrapHandler): The validation handler.
-
-    Returns:
-        Any: The validated value or the default if validation fails.
-    """
-    try:
-        return handler(value)
-    except ValidationError:
-        raise PydanticUseDefault()
-
-
-type FallbackToDefault[T] = Annotated[T, WrapValidator(_use_default_on_error)]
 
 
 class LevelConfig(BaseModel):
@@ -45,12 +19,31 @@ class LevelConfig(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    width: FallbackToDefault[int] = Field(default=10, ge=10, le=22)
-    height: FallbackToDefault[int] = Field(default=10, ge=10, le=22)
-    seed: FallbackToDefault[int] = Field(default=1337)
-    level_max_time: FallbackToDefault[int] = Field(default=90, ge=10, le=120)
-    speed: FallbackToDefault[float] = Field(default=75, ge=1, le=200)
-    pacgum: FallbackToDefault[int] = Field(default=1337, ge=0)
+    width: int = Field(default=10, ge=10, le=22)
+    height: int = Field(default=10, ge=10, le=22)
+    seed: int = Field(default=1337)
+    level_max_time: int = Field(default=90, ge=10, le=120)
+    speed: float = Field(default=75, ge=1, le=200)
+    pacgum: int = Field(default=1337, ge=0)
+
+
+def default_handler(value: Any, arg: str) -> Any:
+    """Handle defualt clamping with clear messages.
+
+    Args:
+        value (Any): the default value.
+        arg (str): the argument name to be set to default.
+
+    Returns:
+        Any: the default factory.
+    """
+
+    def inner() -> Any:
+        """Inner function to be returned."""
+        logger.warning(f"{arg} was missing and clamped to default ({value})")
+        return value
+
+    return inner
 
 
 class Config(BaseModel):
@@ -58,17 +51,23 @@ class Config(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    levels: FallbackToDefault[List[LevelConfig]] = Field(
-        default=[LevelConfig()]
+    levels: list[LevelConfig] = Field(default_factory=list)
+    lives: int = Field(default_factory=default_handler(3, "lives"), ge=1, le=5)
+    points_per_pacgum: int = Field(
+        default_factory=default_handler(10, "points_per_pacgum"), ge=0, le=20
     )
-    lives: FallbackToDefault[int] = Field(default=3, ge=1, le=5)
-    points_per_pacgum: FallbackToDefault[int] = Field(default=10, ge=0, le=20)
-    points_per_super_pacgum: FallbackToDefault[int] = Field(
-        default=50, ge=0, le=100
+    points_per_super_pacgum: int = Field(
+        default_factory=default_handler(50, "points_per_super_pacgum"),
+        ge=0,
+        le=100,
     )
-    points_per_ghost: FallbackToDefault[int] = Field(default=200, ge=0, le=400)
-    super_pacgum_duration: FallbackToDefault[int] = Field(
-        default=500, ge=200, le=1000
+    points_per_ghost: int = Field(
+        default_factory=default_handler(200, "points_per_ghost"), ge=0, le=400
+    )
+    super_pacgum_duration: int = Field(
+        default_factory=default_handler(500, "super_pacgum_duration"),
+        ge=200,
+        le=1000,
     )
 
     @model_validator(mode="after")
@@ -160,6 +159,12 @@ class Config(BaseModel):
                 pacgum=1337,
             ),
         ]
+        level_len = len(self.levels)
+        if level_len < 10:
+            logger.warning(
+                f"{level_len} levels were provided by config the rest"
+                f" {10 - level_len} were clamped to safe defaults"
+            )
         self.levels = self.levels + default_levels[len(self.levels):]
         return self
 
