@@ -22,6 +22,15 @@ T = TypeVar("T")
 def _use_default_on_error(
     value: Any, handler: ValidatorFunctionWrapHandler
 ) -> Any:
+    """Validator that uses the default value if validation fails.
+
+    Args:
+        value (Any): The value to validate.
+        handler (ValidatorFunctionWrapHandler): The validation handler.
+
+    Returns:
+        Any: The validated value or the default if validation fails.
+    """
     try:
         return handler(value)
     except ValidationError:
@@ -32,6 +41,8 @@ type FallbackToDefault[T] = Annotated[T, WrapValidator(_use_default_on_error)]
 
 
 class LevelConfig(BaseModel):
+    """Configuration for a single level in the game."""
+
     model_config = ConfigDict(extra="ignore")
 
     width: FallbackToDefault[int] = Field(default=10, ge=10, le=22)
@@ -43,6 +54,8 @@ class LevelConfig(BaseModel):
 
 
 class Config(BaseModel):
+    """Configuration for the game."""
+
     model_config = ConfigDict(extra="ignore")
 
     levels: FallbackToDefault[List[LevelConfig]] = Field(
@@ -60,6 +73,11 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def validator(self) -> "Config":
+        """Validator to ensure that the levels list is populated defaults.
+
+        Returns:
+            Config: The validated configuration.
+        """
         default_levels = [
             LevelConfig(
                 width=10,
@@ -147,6 +165,14 @@ class Config(BaseModel):
 
 
 def _strip_comments(content: str) -> str:
+    """Strip comments from the given content.
+
+    Args:
+        content (str): The content to strip comments from.
+
+    Returns:
+        str: The content with comments removed.
+    """
     return "\n".join(
         line
         for line in content.splitlines()
@@ -155,6 +181,14 @@ def _strip_comments(content: str) -> str:
 
 
 def parse_config(config_file: str) -> Config:
+    """Parse the configuration file and return a Config object.
+
+    Args:
+        config_file (str): The path to the configuration file.
+
+    Returns:
+        Config: The parsed configuration object.
+    """
     config_path = Path(config_file)
     if not config_path.is_file():
         logger.error("Config is not a file. resorting to defaults.")
