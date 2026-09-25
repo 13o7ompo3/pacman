@@ -1,6 +1,7 @@
 """A module for managing game assets."""
 
 import logging
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -172,7 +173,7 @@ class AssetManager:
             Surface: The loaded image surface.
         """
         try:
-            return image.load(path).convert_alpha()
+            return image.load(AssetManager.resource_path(path)).convert_alpha()
         except FileNotFoundError as err:
             raise AssetError(f"File not found {path}") from err
         except PermissionError as err:
@@ -183,3 +184,19 @@ class AssetManager:
             raise AssetError("Pygame error") from err
         except Exception as err:
             raise AssetError(f"Could not load asset {path}") from err
+
+    @staticmethod
+    def resource_path(path: str | Path) -> Path:
+        """Get the path to a bundled resource.
+
+        Args:
+            path: Relative path to the resource.
+
+        Returns:
+            Absolute path to the resource.
+        """
+        if getattr(sys, "frozen", False):
+            return Path(getattr(sys, "_MEIPASS")) / path
+
+        # resolve the relative assets dir throught parent-ception
+        return Path(__file__).resolve().parent.parent.parent.parent / path
