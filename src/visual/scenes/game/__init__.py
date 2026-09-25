@@ -127,6 +127,7 @@ class TitleLabel(Node):
 
         """
         if self.dynamic_text != val:
+            self.dynamic_text = val
             self.label = Label(
                 self.context,
                 Vec2(),
@@ -135,7 +136,6 @@ class TitleLabel(Node):
                     (self.dynamic_text, self.accent_color),
                 ],
             )
-            self.dynamic_text = val
 
     def _on_draw(self) -> None:
         """Draw the title label with lines and text."""
